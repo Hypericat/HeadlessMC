@@ -1,5 +1,7 @@
 package networking;
 
+import networking.packets.Packet;
+
 public interface PacketListener {
-    void apply(Packet<ClientPacketListener> packet);
+
 }

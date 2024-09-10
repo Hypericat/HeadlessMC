@@ -3,7 +3,7 @@ public class Main {
 
     public static void main(String[] args) {
         HeadlessInstance headless = new HeadlessInstance();
-        headless.connect("127.0.0.1");
+        if (!headless.connect("127.0.0.1")) return;
         headless.run();
 
     }

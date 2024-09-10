@@ -1,11 +1,10 @@
-package networking.packets.c2s;
+package networking.packets.C2S;
 
 import io.netty.buffer.ByteBuf;
-import networking.Packet;
 import networking.ClientPacketListener;
 import utils.PacketUtil;
 
-public class HandShakeC2SPacket implements Packet<ClientPacketListener> {
+public class HandShakeC2SPacket extends C2SPacket {
     public static final int typeID = 0x00;
     private int protocolNumber;
     private String serverAddress;

@@ -1,26 +1,30 @@
 import networking.NetworkHandler;
-import networking.packets.c2s.HandShakeC2SPacket;
-import networking.packets.c2s.StatusRequestC2SPacket;
+import networking.packets.C2S.HandShakeC2SPacket;
+import networking.packets.C2S.StatusRequestC2SPacket;
 
 public class HeadlessInstance {
 
     private final NetworkHandler network;
+    private String currentAddress = "";
+    private int currentPort = -1;
 
     public HeadlessInstance() {
         network = new NetworkHandler();
     }
 
-    public void connect(String address) {
-        connect(address, 25565);
+    public boolean connect(String address) {
+        return connect(address, 25565);
     }
 
-    public void connect(String address, int port) {
-        network.connect(address, port);
+    public boolean connect(String address, int port) {
+        this.currentAddress = address;
+        this.currentPort = port;
+        return network.connect(address, port);
     }
 
     public void run() {
         System.out.println("Running!");
-        network.sendPacket(new HandShakeC2SPacket("127.0.0.1", 25565, 1));
+        network.sendPacket(new HandShakeC2SPacket(this.getCurrentAddress(), getCurrentPort(), 1));
         network.sendPacket(new StatusRequestC2SPacket());
 
         try {
@@ -30,5 +34,15 @@ public class HeadlessInstance {
         }
     }
 
+    public NetworkHandler getNetworkHandler() {
+        return network;
+    }
 
+    public String getCurrentAddress() {
+        return currentAddress.isEmpty() ? "127.0.0.1" : currentAddress;
+    }
+
+    public int getCurrentPort() {
+        return currentPort == -1 ? 25565 : currentPort;
+    }
 }

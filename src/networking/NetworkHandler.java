@@ -7,7 +7,9 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import networking.packets.C2S.C2SPacket;
 
+import java.net.ConnectException;
 import java.util.Arrays;
 
 public class NetworkHandler {
@@ -19,12 +21,12 @@ public class NetworkHandler {
 
     }
 
-    public void sendPacket(Packet<?> packet) {
+    public void sendPacket(C2SPacket packet) {
         if (channel == null || !channel.isActive()) return;
         sendPacket(packet, channel);
     }
 
-    public void sendPacket(Packet<?> packet, Channel channel) {
+    public void sendPacket(C2SPacket packet, Channel channel) {
 
         ByteBuf buf = Unpooled.buffer();
         ByteBuf sizeBuf = Unpooled.buffer();
@@ -34,8 +36,16 @@ public class NetworkHandler {
         channel.writeAndFlush(sizeBuf);
         channel.writeAndFlush(buf);
     }
-
-    public void connect(String address, int port) {
+    public boolean connect(String address, int port) {
+        try {
+            connectInternal(address, port);
+            return true;
+        } catch (ConnectException e) {
+            System.err.println("Failed to connect to server. Most likely server offline!");
+            return false;
+        }
+    }
+    private void connectInternal(String address, int port) throws ConnectException {
         group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
         bootstrap.group(group).channel(NioSocketChannel.class).option(ChannelOption.SO_KEEPALIVE, true).handler(new ChannelInitializer<SocketChannel>() {
