@@ -15,7 +15,7 @@ public class StatusRequestC2SPacket implements Packet<ClientPacketListener> {
     }
 
     @Override
-    public byte getTypeId() {
+    public int getTypeId() {
         return 0x00;
     }
 

@@ -18,12 +18,16 @@ public class HeadlessInstance {
         network.connect(address, port);
     }
 
-    public void run() throws InterruptedException {
+    public void run() {
         System.out.println("Running!");
-        network.sendPacket(new HandShakeC2SPacket("192.168.2.226", 25565, 1));
+        network.sendPacket(new HandShakeC2SPacket("127.0.0.1", 25565, 1));
         network.sendPacket(new StatusRequestC2SPacket());
 
-        Thread.sleep(5000);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

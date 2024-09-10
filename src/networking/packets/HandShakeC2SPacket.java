@@ -43,13 +43,13 @@ public class HandShakeC2SPacket implements Packet<ClientPacketListener> {
     }
 
     @Override
-    public byte getTypeId() {
+    public int getTypeId() {
         return 0x00;
     }
 
     @Override
     public void encode(ByteBuf buf) {
-        buf.writeByte(getTypeId());
+        PacketUtil.writeVarInt(buf, getTypeId());
         PacketUtil.writeVarInt(buf, this.protocolNumber);
         PacketUtil.writeString(buf, this.serverAddress);
         buf.writeShort(this.serverPort);

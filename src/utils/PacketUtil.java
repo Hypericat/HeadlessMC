@@ -2,18 +2,17 @@ package utils;
 
 import io.netty.buffer.ByteBuf;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 
 public class PacketUtil {
+
     public static void writeString(ByteBuf buf, String string) {
-        byte [] bytes = string.getBytes(Charset.defaultCharset());
+        byte[] bytes = string.getBytes(Charset.defaultCharset());
         writeVarInt(buf, bytes.length);
         buf.writeBytes(bytes);
     }
+
     public static void writeVarInt(ByteBuf buf, int Int) {
         while (true) {
             if ((Int & 0xFFFFFF80) == 0) {
@@ -35,5 +34,11 @@ public class PacketUtil {
             if ((k & 0x80) != 128) break;
         }
         return i;
+    }
+    public static String readString(ByteBuf buf) {
+        int readIndex = buf.readerIndex();;
+        byte[] byteArray = new byte[buf.readableBytes()];
+        buf.getBytes(readIndex, byteArray);
+        return new String(byteArray, Charset.defaultCharset());
     }
 }

@@ -5,6 +5,6 @@ import io.netty.channel.ChannelHandlerContext;
 
 public interface Packet<T extends PacketListener> {
     void apply(T listener);
-    byte getTypeId();
+    int getTypeId();
     void encode(ByteBuf buf);
 }

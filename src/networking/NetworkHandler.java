@@ -20,7 +20,7 @@ public class NetworkHandler {
     }
 
     public void sendPacket(Packet<?> packet) {
-        //if (channel == null || !channel.isActive()) return;
+        if (channel == null || !channel.isActive()) return;
         sendPacket(packet, channel);
     }
 
