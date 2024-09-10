@@ -1,6 +1,6 @@
 import networking.NetworkHandler;
-import networking.packets.HandShakeC2SPacket;
-import networking.packets.StatusRequestC2SPacket;
+import networking.packets.c2s.HandShakeC2SPacket;
+import networking.packets.c2s.StatusRequestC2SPacket;
 
 public class HeadlessInstance {
 

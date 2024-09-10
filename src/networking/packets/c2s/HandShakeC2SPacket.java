@@ -1,17 +1,12 @@
-package networking.packets;
+package networking.packets.c2s;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import networking.NetworkHandler;
 import networking.Packet;
 import networking.ClientPacketListener;
 import utils.PacketUtil;
 
-import java.util.Arrays;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 public class HandShakeC2SPacket implements Packet<ClientPacketListener> {
+    public static final int typeID = 0x00;
     private int protocolNumber;
     private String serverAddress;
     private short serverPort;
@@ -44,7 +39,7 @@ public class HandShakeC2SPacket implements Packet<ClientPacketListener> {
 
     @Override
     public int getTypeId() {
-        return 0x00;
+        return typeID;
     }
 
     @Override

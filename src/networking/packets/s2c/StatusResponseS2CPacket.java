@@ -1,26 +1,27 @@
-package networking.packets;
+package networking.packets.s2c;
 
 import io.netty.buffer.ByteBuf;
 import networking.Packet;
 import networking.ClientPacketListener;
 
-public class StatusRequestC2SPacket implements Packet<ClientPacketListener> {
-    public StatusRequestC2SPacket() {
+public class StatusResponseS2CPacket implements Packet<ClientPacketListener> {
+    public static final int typeID = 122;
+    public StatusResponseS2CPacket() {
 
     }
 
     @Override
     public void apply(ClientPacketListener listener) {
-
+        listener.onStatus(this);
     }
 
     @Override
     public int getTypeId() {
-        return 0x00;
+        return typeID;
     }
 
     @Override
     public void encode(ByteBuf buf) {
-        buf.writeByte(getTypeId());
+
     }
 }

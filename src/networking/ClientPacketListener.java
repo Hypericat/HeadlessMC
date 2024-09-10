@@ -1,7 +1,7 @@
 package networking;
 
-import networking.packets.StatusRequestS2CPacket;
+import networking.packets.s2c.StatusResponseS2CPacket;
 
 public interface ClientPacketListener extends PacketListener {
-    void onStatus(StatusRequestS2CPacket packet);
+    void onStatus(StatusResponseS2CPacket packet);
 }
