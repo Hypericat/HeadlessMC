@@ -2,17 +2,20 @@ package networking.packets;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import networking.NetworkHandler;
 import networking.Packet;
 import networking.ClientPacketListener;
 import utils.PacketUtil;
+
+import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class HandShakeC2SPacket implements Packet<ClientPacketListener> {
     private int protocolNumber;
     private String serverAddress;
-    private int serverPort;
-    private int nextState;
+    private short serverPort;
+    private byte nextState;
 
     //state 1 = status
     //state 2 = login
@@ -21,8 +24,8 @@ public class HandShakeC2SPacket implements Packet<ClientPacketListener> {
     public HandShakeC2SPacket(int protocolNumber, String serverAddress, int serverPort, int nextState) {
         this.protocolNumber = protocolNumber;
         this.serverAddress = serverAddress;
-        this.serverPort = serverPort;
-        this.nextState = nextState;
+        this.serverPort = (short) serverPort;
+        this.nextState = (byte) nextState;
     }
     public HandShakeC2SPacket(String serverAddress, int serverPort, int nextState) {
         this(765, serverAddress, serverPort, nextState);
@@ -47,10 +50,10 @@ public class HandShakeC2SPacket implements Packet<ClientPacketListener> {
     @Override
     public void encode(ByteBuf buf) {
         buf.writeByte(getTypeId());
-        buf.writeInt(this.protocolNumber);
-        PacketUtil.writeString(this.serverAddress, buf);
-        buf.writeInt(this.serverPort);
-        buf.writeInt(this.nextState);
+        PacketUtil.writeVarInt(buf, this.protocolNumber);
+        PacketUtil.writeString(buf, this.serverAddress);
+        buf.writeShort(this.serverPort);
+        buf.writeByte(this.nextState);
     }
 
     public int getProtocolNumber() {
@@ -61,11 +64,11 @@ public class HandShakeC2SPacket implements Packet<ClientPacketListener> {
         return serverAddress;
     }
 
-    public int getServerPort() {
-        return protocolNumber;
+    public short getServerPort() {
+        return serverPort;
     }
 
-    public int getNextState() {
+    public byte getNextState() {
         return nextState;
     }
 
@@ -77,11 +80,11 @@ public class HandShakeC2SPacket implements Packet<ClientPacketListener> {
         this.serverAddress = address;
     }
 
-    public void setServerPort(int port) {
+    public void setServerPort(short port) {
         this.serverPort = port;
     }
 
-    public void setNextState(int nextState) {
+    public void setNextState(byte nextState) {
         this.nextState = nextState;
     }
 

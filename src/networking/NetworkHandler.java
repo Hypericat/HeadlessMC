@@ -8,6 +8,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.util.Arrays;
+
 public class NetworkHandler {
     private EventLoopGroup group;
     private Bootstrap bootstrap;
@@ -18,18 +20,16 @@ public class NetworkHandler {
     }
 
     public void sendPacket(Packet<?> packet) {
-        if (channel == null || !channel.isActive()) return;
+        //if (channel == null || !channel.isActive()) return;
         sendPacket(packet, channel);
     }
 
     public void sendPacket(Packet<?> packet, Channel channel) {
-        System.out.println("Sending packet!");
+
         ByteBuf buf = Unpooled.buffer();
         ByteBuf sizeBuf = Unpooled.buffer();
-
         packet.encode(buf);
         sizeBuf.writeInt(buf.readableBytes());
-
 
         channel.writeAndFlush(sizeBuf);
         channel.writeAndFlush(buf);
@@ -54,5 +54,15 @@ public class NetworkHandler {
             throw new RuntimeException(e);
         }
         System.out.println("Successfully connected to server!");
+    }
+    public static void debugBuf(ByteBuf buf) {
+        int readIndex = buf.readerIndex();;
+        byte[] byteArray = new byte[buf.readableBytes()];
+        buf.getBytes(readIndex, byteArray);
+        buf.readerIndex(readIndex);
+        debugBuf(byteArray);
+    }
+    public static void debugBuf(byte[] bytes) {
+        System.out.println(Arrays.toString(bytes));
     }
 }
