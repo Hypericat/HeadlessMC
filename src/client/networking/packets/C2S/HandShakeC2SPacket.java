@@ -1,8 +1,8 @@
-package networking.packets.C2S;
+package client.networking.packets.C2S;
 
 import io.netty.buffer.ByteBuf;
-import networking.ClientPacketListener;
-import utils.PacketUtil;
+import client.networking.ClientPacketListener;
+import client.utils.PacketUtil;
 
 public class HandShakeC2SPacket extends C2SPacket {
     public static final int typeID = 0x00;
@@ -22,7 +22,7 @@ public class HandShakeC2SPacket extends C2SPacket {
         this.nextState = (byte) nextState;
     }
     public HandShakeC2SPacket(String serverAddress, int serverPort, int nextState) {
-        this(765, serverAddress, serverPort, nextState);
+        this(767, serverAddress, serverPort, nextState);
     }
     public HandShakeC2SPacket(String serverAddress, int serverPort) {
         this(serverAddress, serverPort, 2);

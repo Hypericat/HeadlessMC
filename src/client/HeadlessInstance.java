@@ -1,15 +1,21 @@
-import networking.NetworkHandler;
-import networking.packets.C2S.HandShakeC2SPacket;
-import networking.packets.C2S.StatusRequestC2SPacket;
+package client;
+
+import client.networking.NetworkHandler;
+import client.networking.NetworkState;
+import client.networking.packets.C2S.HandShakeC2SPacket;
+import client.networking.packets.C2S.LoginStartC2SPacket;
+
+import java.util.Random;
 
 public class HeadlessInstance {
 
     private final NetworkHandler network;
     private String currentAddress = "";
     private int currentPort = -1;
+    private static Random random = new Random();
 
     public HeadlessInstance() {
-        network = new NetworkHandler();
+        network = new NetworkHandler(this);
     }
 
     public boolean connect(String address) {
@@ -21,17 +27,19 @@ public class HeadlessInstance {
         this.currentPort = port;
         return network.connect(address, port);
     }
+    public void login(String userName) {
+        network.sendPacket(new HandShakeC2SPacket(this.getCurrentAddress(), getCurrentPort(), 2));
+        network.sendPacket(new LoginStartC2SPacket(userName
+                //+ random.nextInt()
+        ));
+    }
 
     public void run() {
         System.out.println("Running!");
-        network.sendPacket(new HandShakeC2SPacket(this.getCurrentAddress(), getCurrentPort(), 1));
-        network.sendPacket(new StatusRequestC2SPacket());
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        network.setNetworkState(NetworkState.HANDSHAKE);
+        login("User");
+
     }
 
     public NetworkHandler getNetworkHandler() {

@@ -1,7 +1,7 @@
-package networking.packets.C2S;
+package client.networking.packets.C2S;
 
 import io.netty.buffer.ByteBuf;
-import networking.ClientPacketListener;
+import client.networking.ClientPacketListener;
 
 public class StatusRequestC2SPacket extends C2SPacket {
     public final static int typeID = 0x00;

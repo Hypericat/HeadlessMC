@@ -1,9 +1,8 @@
-package networking.packets.S2C;
+package client.networking.packets.S2C;
 
 import io.netty.buffer.ByteBuf;
-import networking.ClientPacketListener;
-import networking.packets.Packet;
-import utils.PacketUtil;
+import client.networking.ClientPacketListener;
+import client.networking.packets.Packet;
 
 public abstract class S2CPacket implements Packet<ClientPacketListener> {
     private int size;
@@ -14,4 +13,5 @@ public abstract class S2CPacket implements Packet<ClientPacketListener> {
     }
 
     public abstract void decode(ByteBuf buf);
+
 }

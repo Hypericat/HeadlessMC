@@ -1,11 +1,13 @@
-package networking.packets.S2C;
+package client.networking.packets.S2C;
 
 import io.netty.buffer.ByteBuf;
-import networking.ClientPacketListener;
-import utils.PacketUtil;
+import client.networking.ClientPacketListener;
+import client.networking.NetworkState;
+import client.utils.PacketUtil;
 
 public class StatusResponseS2CPacket extends S2CPacket {
-    public static final int typeID = 102;
+    public static final int typeID = 0x00;
+    public final static NetworkState networkState = NetworkState.HANDSHAKE;
     private String string;
 
     public StatusResponseS2CPacket(ByteBuf buf, int size) throws IllegalArgumentException {
@@ -29,5 +31,9 @@ public class StatusResponseS2CPacket extends S2CPacket {
 
     public String getString() {
         return string;
+    }
+
+    public static long getTypeIdOffset() {
+        return (long) StatusResponseS2CPacket.typeID + (StatusResponseS2CPacket.networkState == NetworkState.HANDSHAKE ? Integer.MAX_VALUE : 0);
     }
 }

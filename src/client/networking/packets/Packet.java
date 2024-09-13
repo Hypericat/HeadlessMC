@@ -1,6 +1,6 @@
-package networking.packets;
+package client.networking.packets;
 
-import networking.PacketListener;
+import client.networking.PacketListener;
 
 public interface Packet<T extends PacketListener> {
     void apply(T listener);

@@ -1,4 +1,4 @@
-package utils;
+package client.utils;
 
 import io.netty.buffer.ByteBuf;
 
@@ -36,8 +36,12 @@ public class PacketUtil {
         return i;
     }
     public static String readString(ByteBuf buf) {
-        int readIndex = buf.readerIndex();;
-        byte[] byteArray = new byte[buf.readableBytes()];
+        return readString(buf, -1);
+    }
+    public static String readString(ByteBuf buf, int byteCount) {
+        int readIndex = buf.readerIndex();
+        byteCount = Math.min(buf.readableBytes(), byteCount == -1 ? Integer.MAX_VALUE : byteCount);
+        byte[] byteArray = new byte[byteCount];
         buf.getBytes(readIndex, byteArray);
         return new String(byteArray, Charset.defaultCharset());
     }
