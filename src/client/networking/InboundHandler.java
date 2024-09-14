@@ -1,16 +1,17 @@
 package client.networking;
 
 import client.HeadlessInstance;
-import client.networking.packets.S2C.LoginSuccessfulS2CPacket;
+import client.networking.packets.C2S.StatusRequestC2SPacket;
+import client.networking.packets.S2C.*;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import client.networking.packets.S2C.CompressionRequestS2CPacket;
-import client.networking.packets.S2C.S2CPacket;
-import client.networking.packets.S2C.StatusResponseS2CPacket;
 import client.utils.PacketUtil;
+import io.netty.util.ReferenceCountUtil;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.Buffer;
 import java.util.HashMap;
 
 public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
@@ -26,17 +27,31 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf buf) {
-        int packetSize = PacketUtil.readVarInt(buf);
-        int packetType = buf.readByte();
-        int idk = PacketUtil.readVarInt(buf);
-        System.out.println("Received packet with type " + packetType);
-        System.out.println("Received packet with size " + buf.readableBytes());
-        try {
-            Class<?> clazz = packetMap.get(packetType + (long) (handler.getNetworkState() == NetworkState.HANDSHAKE ? Integer.MAX_VALUE : 0));
-            if (clazz == null) throw new ClassNotFoundException();
-            S2CPacket packet = (S2CPacket) clazz.getDeclaredConstructors()[0].newInstance(buf, packetSize);
-            packet.apply(packetHandler);
+        System.out.println("RECIEVED REAL PACKET WITH SIZE " + buf.readableBytes());
+        while (buf.readableBytes() != 0) {
+            int readerIndex = buf.readerIndex();
+            int packetSize = PacketUtil.readVarInt(buf);
+            buf.readerIndex(readerIndex);
 
+            ByteBuf sliced = buf.slice(readerIndex, readerIndex + packetSize);
+            readBuf(ctx, sliced, packetSize);
+            buf.readerIndex(readerIndex + packetSize + 1);
+        }
+        System.out.println("END OF PACKET");
+    }
+    public void readBuf(ChannelHandlerContext ctx, ByteBuf buf, int maxLength) {
+        int readable = buf.readableBytes();
+        PacketUtil.readVarInt(buf);
+        int packetType = buf.readByte();
+        PacketUtil.readVarInt(buf);
+        System.out.println("Received packet with type " + packetType + " with " + handler.getNetworkState().toString());
+        System.out.println("Total of " + readable);
+        System.out.println("Packet of " + maxLength);
+        try {
+            Class<?> clazz = packetMap.get(handler.getNetworkState().calcOffset(packetType));
+            if (clazz == null) throw new ClassNotFoundException();
+            S2CPacket packet = (S2CPacket) clazz.getDeclaredConstructors()[0].newInstance(buf, maxLength);
+            packet.apply(packetHandler);
         } catch (IllegalArgumentException e) {
             System.err.println("Failed to apply packet id : " + packetType);
             e.printStackTrace();
@@ -46,13 +61,15 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         } catch (ClassNotFoundException e) {
             System.err.println("Invalid/Unknown packet ID Packet Received, class is null");
         }
-
     }
+
     private void initPacketMap() {
         packetMap = new HashMap<>();
-        packetMap.put(StatusResponseS2CPacket.getTypeIdOffset(), StatusResponseS2CPacket.class);
-        packetMap.put(CompressionRequestS2CPacket.getTypeIdOffset(), CompressionRequestS2CPacket.class);
-        packetMap.put(LoginSuccessfulS2CPacket.getTypeIdOffset(), LoginSuccessfulS2CPacket.class);
+        packetMap.put(StatusResponseS2CPacket.networkState.calcOffset(StatusResponseS2CPacket.typeID), StatusResponseS2CPacket.class);
+        packetMap.put(CompressionRequestS2CPacket.networkState.calcOffset(CompressionRequestS2CPacket.typeID), CompressionRequestS2CPacket.class);
+        packetMap.put(LoginSuccessfulS2CPacket.networkState.calcOffset(LoginSuccessfulS2CPacket.typeID), LoginSuccessfulS2CPacket.class);
+        packetMap.put(ClientBoundKnownPacksS2CPacket.networkState.calcOffset(ClientBoundKnownPacksS2CPacket.typeID), ClientBoundKnownPacksS2CPacket.class);
+        packetMap.put(ClientBoundPluginMessageS2CPacket.networkState.calcOffset(ClientBoundPluginMessageS2CPacket.typeID), ClientBoundPluginMessageS2CPacket.class);
         //packetMap.put(EncryptionRequestS2CPacket.getTypeIdOffset(), EncryptionRequestS2CPacket.class);
     }
 }

@@ -43,10 +43,6 @@ public class EncryptionRequestS2CPacket extends S2CPacket {
         shouldAuthenticate = buf.readBoolean();
     }
 
-    public static long getTypeIdOffset() {
-        return (long) EncryptionRequestS2CPacket.typeID + (EncryptionRequestS2CPacket.networkState == NetworkState.HANDSHAKE ? Integer.MAX_VALUE : 0);
-    }
-
     public String getServerID() {
         return serverID;
     }

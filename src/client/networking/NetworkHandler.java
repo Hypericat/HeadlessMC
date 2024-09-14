@@ -49,6 +49,10 @@ public class NetworkHandler {
         channel.writeAndFlush(sizeBuf);
         channel.writeAndFlush(buf);
     }
+
+    public void flush() {
+        channel.flush();
+    }
     private void sendCompressedPacket(C2SPacket packet, Channel channel) {
 
         ByteBuf buf = Unpooled.buffer();
@@ -98,6 +102,7 @@ public class NetworkHandler {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
         System.out.println("Successfully connected to server!");
     }
 

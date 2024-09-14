@@ -2,8 +2,7 @@ package client;
 
 import client.networking.NetworkHandler;
 import client.networking.NetworkState;
-import client.networking.packets.C2S.HandShakeC2SPacket;
-import client.networking.packets.C2S.LoginStartC2SPacket;
+import client.networking.packets.C2S.*;
 
 import java.util.Random;
 
@@ -30,8 +29,13 @@ public class HeadlessInstance {
     public void login(String userName) {
         network.sendPacket(new HandShakeC2SPacket(this.getCurrentAddress(), getCurrentPort(), 2));
         network.sendPacket(new LoginStartC2SPacket(userName
-                //+ random.nextInt()
+                + random.nextInt()
         ));
+    }
+
+    public void config() {
+        //network.sendPacket(new ServerboundPluginMessageC2SPacket());
+        //network.sendPacket(new ClientInformationC2SPacket());
     }
 
     public void run() {

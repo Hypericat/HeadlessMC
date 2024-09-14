@@ -32,8 +32,4 @@ public class StatusResponseS2CPacket extends S2CPacket {
     public String getString() {
         return string;
     }
-
-    public static long getTypeIdOffset() {
-        return (long) StatusResponseS2CPacket.typeID + (StatusResponseS2CPacket.networkState == NetworkState.HANDSHAKE ? Integer.MAX_VALUE : 0);
-    }
 }

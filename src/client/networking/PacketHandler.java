@@ -1,11 +1,10 @@
 package client.networking;
 
 import client.networking.packets.C2S.LoginAcknowledgedC2SPacket;
-import client.networking.packets.S2C.CompressionRequestS2CPacket;
-import client.networking.packets.S2C.EncryptionRequestS2CPacket;
-import client.networking.packets.S2C.LoginSuccessfulS2CPacket;
-import client.networking.packets.S2C.StatusResponseS2CPacket;
+import client.networking.packets.C2S.ServerBoundKnownPacksC2SPacket;
+import client.networking.packets.S2C.*;
 import client.HeadlessInstance;
+import client.utils.PacketUtil;
 
 import java.util.Arrays;
 
@@ -43,7 +42,20 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onLoginSuccess(LoginSuccessfulS2CPacket packet) {
-        instance.getNetworkHandler().setCompressionEnabled(true);
+        instance.getNetworkHandler().setCompressionEnabled(false);
         instance.getNetworkHandler().sendPacket(new LoginAcknowledgedC2SPacket());
+
+        instance.getNetworkHandler().setNetworkState(NetworkState.CONFIGURATION);
+        instance.config();
+    }
+
+    @Override
+    public void onClientPluginMessage(ClientBoundPluginMessageS2CPacket packet) {
+        System.out.println("Received server brand : " + packet.getText());
+    }
+
+    @Override
+    public void onKnowPacks(ClientBoundKnownPacksS2CPacket packet) {
+        instance.getNetworkHandler().sendPacket(new ServerBoundKnownPacksC2SPacket(packet));
     }
 }

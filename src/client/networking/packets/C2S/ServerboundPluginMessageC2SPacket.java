@@ -1,11 +1,12 @@
 package client.networking.packets.C2S;
 
-import io.netty.buffer.ByteBuf;
 import client.networking.ClientPacketListener;
+import client.utils.PacketUtil;
+import io.netty.buffer.ByteBuf;
 
-public class LoginAcknowledgedC2SPacket extends C2SPacket {
-    public final static int typeID = 0x03;
-    public LoginAcknowledgedC2SPacket() {
+public class ServerboundPluginMessageC2SPacket extends C2SPacket {
+    public final static int typeID = 0x02;
+    public ServerboundPluginMessageC2SPacket() {
 
     }
 
@@ -22,5 +23,6 @@ public class LoginAcknowledgedC2SPacket extends C2SPacket {
     @Override
     public void encode(ByteBuf buf) {
         buf.writeByte(getTypeId());
+        PacketUtil.writeString(buf, "minecraft:vanilla");
     }
 }

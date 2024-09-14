@@ -6,7 +6,7 @@ import client.networking.NetworkState;
 import client.utils.PacketUtil;
 
 public class CompressionRequestS2CPacket extends S2CPacket {
-    public static final int typeID = -1;
+    public static final int typeID = 0x02;
     public final static NetworkState networkState = NetworkState.HANDSHAKE;
     private int compressionType;
 
@@ -31,9 +31,5 @@ public class CompressionRequestS2CPacket extends S2CPacket {
 
     public int getCompressionType() {
         return compressionType;
-    }
-
-    public static long getTypeIdOffset() {
-        return (long) CompressionRequestS2CPacket.typeID + (CompressionRequestS2CPacket.networkState == NetworkState.HANDSHAKE ? Integer.MAX_VALUE : 0);
     }
 }
