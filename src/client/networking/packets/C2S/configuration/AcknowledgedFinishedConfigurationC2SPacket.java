@@ -1,11 +1,12 @@
-package client.networking.packets.C2S;
+package client.networking.packets.C2S.configuration;
 
-import io.netty.buffer.ByteBuf;
 import client.networking.ClientPacketListener;
+import client.networking.packets.C2S.C2SPacket;
+import io.netty.buffer.ByteBuf;
 
-public class LoginAcknowledgedC2SPacket extends C2SPacket {
+public class AcknowledgedFinishedConfigurationC2SPacket extends C2SPacket {
     public final static int typeID = 0x03;
-    public LoginAcknowledgedC2SPacket() {
+    public AcknowledgedFinishedConfigurationC2SPacket() {
 
     }
 

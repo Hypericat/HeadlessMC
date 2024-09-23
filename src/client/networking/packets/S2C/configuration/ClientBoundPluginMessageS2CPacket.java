@@ -1,7 +1,8 @@
-package client.networking.packets.S2C;
+package client.networking.packets.S2C.configuration;
 
 import client.networking.ClientPacketListener;
 import client.networking.NetworkState;
+import client.networking.packets.S2C.S2CPacket;
 import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
 

@@ -1,6 +1,7 @@
 package client.networking;
 
 import client.HeadlessInstance;
+import client.networking.packets.C2S.play.KeepAliveC2SPacket;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -43,6 +44,7 @@ public class NetworkHandler {
 
         ByteBuf buf = Unpooled.buffer();
         ByteBuf sizeBuf = Unpooled.buffer();
+
         packet.encode(buf);
         sizeBuf.writeInt(buf.readableBytes());
 

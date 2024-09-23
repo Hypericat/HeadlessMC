@@ -1,5 +1,6 @@
-package client.networking.packets.C2S;
+package client.networking.packets.C2S.configuration;
 
+import client.networking.packets.C2S.C2SPacket;
 import io.netty.buffer.ByteBuf;
 import client.networking.ClientPacketListener;
 import client.utils.PacketUtil;

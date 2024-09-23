@@ -4,17 +4,30 @@ public class Main {
     //make absolutely nothing static except for final variables in order to allow for multi clients
 
     public static void main(String[] args) {
-        for (int i = 0; i < 1; i++) {
-            HeadlessInstance headless = new HeadlessInstance();
-            if (!headless.connect("127.0.0.1")) return;
-            headless.run();
-        }
+        makeInstance("Winstona", "127.0.0.1", 1);
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        int counter = 0;
+        while (true) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            counter ++;
+            System.out.println("Counter : "  + counter);
         }
+    }
+
+    public static void makeInstance(String name, String ip, int count) {
+        for (int i = 0; i < count; i++) {
+            makeInstance(name + i, ip);
+        }
+    }
+
+    public static void makeInstance(String name, String ip) {
+        HeadlessInstance headless = new HeadlessInstance(name, ip);
+        Thread thread = new Thread(headless);
+        thread.start();
     }
 
     //Todo

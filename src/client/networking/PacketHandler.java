@@ -1,10 +1,13 @@
 package client.networking;
 
-import client.networking.packets.C2S.LoginAcknowledgedC2SPacket;
-import client.networking.packets.C2S.ServerBoundKnownPacksC2SPacket;
-import client.networking.packets.S2C.*;
+import client.networking.packets.C2S.configuration.AcknowledgedFinishedConfigurationC2SPacket;
+import client.networking.packets.C2S.configuration.ClientInformationC2SPacket;
+import client.networking.packets.C2S.configuration.LoginAcknowledgedC2SPacket;
+import client.networking.packets.C2S.configuration.ServerBoundKnownPacksC2SPacket;
 import client.HeadlessInstance;
-import client.utils.PacketUtil;
+import client.networking.packets.C2S.play.KeepAliveC2SPacket;
+import client.networking.packets.S2C.configuration.*;
+import client.networking.packets.S2C.play.KeepAliveS2CPacket;
 
 import java.util.Arrays;
 
@@ -20,6 +23,11 @@ public class PacketHandler implements ClientPacketListener {
         String response = packet.getString();
         System.out.println("Received status response from server");
         System.out.println(response);
+    }
+
+    @Override
+    public void onCookieRequest(CookieRequestS2CPacket packet) {
+        System.out.println("test");
     }
 
     @Override
@@ -44,9 +52,16 @@ public class PacketHandler implements ClientPacketListener {
     public void onLoginSuccess(LoginSuccessfulS2CPacket packet) {
         instance.getNetworkHandler().setCompressionEnabled(false);
         instance.getNetworkHandler().sendPacket(new LoginAcknowledgedC2SPacket());
+        instance.getNetworkHandler().sendPacket(new ClientInformationC2SPacket());
 
         instance.getNetworkHandler().setNetworkState(NetworkState.CONFIGURATION);
         instance.config();
+    }
+
+    @Override
+    public void onFinishConfiguration(FinishConfigurationS2CPacket packet) {
+        instance.getNetworkHandler().setNetworkState(NetworkState.PLAY);
+        instance.getNetworkHandler().sendPacket(new AcknowledgedFinishedConfigurationC2SPacket());
     }
 
     @Override
@@ -57,5 +72,10 @@ public class PacketHandler implements ClientPacketListener {
     @Override
     public void onKnowPacks(ClientBoundKnownPacksS2CPacket packet) {
         instance.getNetworkHandler().sendPacket(new ServerBoundKnownPacksC2SPacket(packet));
+    }
+
+    @Override
+    public void onKeepAlive(KeepAliveS2CPacket packet) {
+        //instance.getNetworkHandler().sendPacket(new KeepAliveC2SPacket(packet.getId()));
     }
 }
