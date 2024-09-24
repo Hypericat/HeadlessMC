@@ -72,6 +72,11 @@ public class PacketHandler implements ClientPacketListener {
     @Override
     public void onKnowPacks(ClientBoundKnownPacksS2CPacket packet) {
         instance.getNetworkHandler().sendPacket(new ServerBoundKnownPacksC2SPacket(packet));
+
+
+        //instance.getNetworkHandler().setNetworkState(NetworkState.PLAY);
+        //instance.getNetworkHandler().sendPacket(new AcknowledgedFinishedConfigurationC2SPacket());
+
     }
 
     @Override

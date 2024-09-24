@@ -27,24 +27,28 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf buf) {
         System.out.println("RECEIVED REAL PACKET WITH SIZE " + buf.readableBytes());
-        while (buf.readableBytes() != 0) {
-            int readerIndex = buf.readerIndex();
-            int packetSize = PacketUtil.readVarInt(buf);
-            buf.readerIndex(readerIndex);
+        while (buf.readableBytes() > 0) {
+            int packetSize;
+            try {
+                packetSize = PacketUtil.readVarInt(buf);
+            } catch (Exception e) {
+                break;
+            }
 
-            ByteBuf sliced = buf.slice(readerIndex, packetSize + 1);
+            int readerIndex = buf.readerIndex();
+
+            ByteBuf sliced = buf.slice(readerIndex, packetSize);
+            //if (packetSize == 0) break;
             readBuf(ctx, sliced, packetSize);
-            buf.readerIndex(readerIndex + packetSize + 1);
+            buf.readerIndex(readerIndex + packetSize);
         }
         System.out.println("END OF PACKET");
     }
     public void readBuf(ChannelHandlerContext ctx, ByteBuf buf, int maxLength) {
         System.out.println("Buf Size " + buf.capacity());
-        int readable = -1;
-        int packetType = -1;
+        int packetType;
         try {
-            readable = buf.readableBytes();
-            PacketUtil.readVarInt(buf); //this is just the maxLength which we have already read
+            //readable = buf.readableBytes();
             packetType = buf.readByte();
         } catch(IndexOutOfBoundsException e) {
             return;
@@ -69,7 +73,6 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         } catch (ClassNotFoundException e) {
             System.err.println("Invalid/Unknown packet ID Packet Received, class is null");
         }
-        buf.readerIndex(buf.capacity() - 1);
     }
 
     private void initPacketMap() {

@@ -101,6 +101,8 @@ public class NetworkHandler {
         try {
             ChannelFuture future = bootstrap.connect(address, port).sync();
             channel = future.channel();
+            bootstrap.option(ChannelOption.TCP_NODELAY, true);
+
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
