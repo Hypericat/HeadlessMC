@@ -27,8 +27,7 @@ public class ServerBoundKnownPacksC2SPacket extends C2SPacket {
     public void encode(ByteBuf buf) {
 
         buf.writeByte(getTypeId());
-        byte[] array = {1   , 9, 109, 105, 110, 101, 99, 114, 97, 102, 116, 4, 99, 111, 114, 101, 6, 49, 46, 50, 49, 46, 49};
-        NetworkHandler.debugBuf(packet.getBuf());
+        byte[] array = {1, 9, 109, 105, 110, 101, 99, 114, 97, 102, 116, 4, 99, 111, 114, 101, 6, 49, 46, 50, 49, 46, 49};
         buf.writeBytes(array);
 
 

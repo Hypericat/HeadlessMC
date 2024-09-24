@@ -74,8 +74,8 @@ public class PacketHandler implements ClientPacketListener {
         instance.getNetworkHandler().sendPacket(new ServerBoundKnownPacksC2SPacket(packet));
 
 
-        //instance.getNetworkHandler().setNetworkState(NetworkState.PLAY);
-        //instance.getNetworkHandler().sendPacket(new AcknowledgedFinishedConfigurationC2SPacket());
+        instance.getNetworkHandler().setNetworkState(NetworkState.PLAY);
+        instance.getNetworkHandler().sendPacket(new AcknowledgedFinishedConfigurationC2SPacket());
 
     }
 

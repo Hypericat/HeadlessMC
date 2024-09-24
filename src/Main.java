@@ -4,7 +4,7 @@ public class Main {
     //make absolutely nothing static except for final variables in order to allow for multi clients
 
     public static void main(String[] args) {
-        makeInstance("Winstona", "127.0.0.1", 1);
+        makeInstance("Winston", "127.0.0.1", 1);
 
         int counter = 0;
         while (true) {

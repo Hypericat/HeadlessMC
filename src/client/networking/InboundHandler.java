@@ -27,6 +27,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf buf) {
         System.out.println("RECEIVED REAL PACKET WITH SIZE " + buf.readableBytes());
+        NetworkHandler.debugBuf(buf);
         while (buf.readableBytes() > 0) {
             int packetSize;
             try {
@@ -73,6 +74,11 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         } catch (ClassNotFoundException e) {
             System.err.println("Invalid/Unknown packet ID Packet Received, class is null");
         }
+    }
+    @Override
+    public void channelInactive(ChannelHandlerContext context) {
+        //dc
+        handler.getChannel().close().awaitUninterruptibly();
     }
 
     private void initPacketMap() {
