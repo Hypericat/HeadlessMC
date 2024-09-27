@@ -27,7 +27,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf buf) {
         System.out.println("RECEIVED REAL PACKET WITH SIZE " + buf.readableBytes());
-        NetworkHandler.debugBuf(buf);
+        //NetworkHandler.debugBuf(buf);
         while (buf.readableBytes() > 0) {
             int packetSize;
             try {
@@ -46,11 +46,11 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         System.out.println("END OF PACKET");
     }
     public void readBuf(ChannelHandlerContext ctx, ByteBuf buf, int maxLength) {
-        System.out.println("Buf Size " + buf.capacity());
+        //System.out.println("Buf Size " + buf.capacity());
         int packetType;
         try {
             //readable = buf.readableBytes();
-            packetType = buf.readByte();
+            packetType = PacketUtil.readVarInt(buf);
         } catch(IndexOutOfBoundsException e) {
             return;
         }

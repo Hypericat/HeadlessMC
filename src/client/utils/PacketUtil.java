@@ -11,6 +11,8 @@ import java.nio.charset.Charset;
 
 
 public class PacketUtil {
+    private static final int SEGMENT_BITS = 0x7F;
+    private static final int CONTINUE_BIT = 0x80;
 
     public static void writeString(ByteBuf buf, String string) {
         byte[] bytes = string.getBytes(Charset.defaultCharset());
@@ -42,52 +44,68 @@ public class PacketUtil {
         }
     }
 
-    public static void writeVarInt(ByteBuf buf, int Int) {
+    public static void writeVarInt(ByteBuf buf, int value) {
         while (true) {
-            if ((Int & 0xFFFFFF80) == 0) {
-                buf.writeByte(Int);
+            if ((value & ~SEGMENT_BITS) == 0) {
+                buf.writeByte(value);
                 return;
             }
 
-            buf.writeByte(Int & 0x7F | 0x80);
-            Int >>>= 7;
+            buf.writeByte((value & SEGMENT_BITS) | CONTINUE_BIT);
+
+            // Note: >>> means that the sign bit is shifted with the rest of the number rather than being left alone
+            value >>>= 7;
         }
     }
     public static int readVarInt(ByteBuf buf) {
-        int i = 0;
-        int j = 0;
+        int value = 0;
+        int position = 0;
+        byte currentByte;
+
         while (true) {
-            int k = buf.readByte();
-            i |= (k & 0x7F) << j++ * 7;
-            if (j > 5) throw new RuntimeException("VarInt too big");
-            if ((k & 0x80) != 128) break;
+            currentByte = buf.readByte();
+            value |= (currentByte & SEGMENT_BITS) << position;
+
+            if ((currentByte & CONTINUE_BIT) == 0) break;
+
+            position += 7;
+
+            if (position >= 32) throw new RuntimeException("VarInt is too big");
         }
-        return i;
+
+        return value;
     }
     public static long readVarLong(ByteBuf buf) {
-        long l = 0L;
-        int i = 0;
+        long value = 0;
+        int position = 0;
+        byte currentByte;
 
-        byte b;
-        do {
-            b = buf.readByte();
-            l |= (long)(b & 127) << i++ * 7;
-            if (i > 10) {
-                throw new RuntimeException("VarLong too big");
-            }
-        } while ((b & 128) == 128);
+        while (true) {
+            currentByte = buf.readByte();
+            value |= (long) (currentByte & SEGMENT_BITS) << position;
 
-        return l;
-    }
+            if ((currentByte & CONTINUE_BIT) == 0) break;
 
-    public static ByteBuf writeVarLong(ByteBuf buf, long l) {
-        while ((l & -128L) != 0L) {
-            buf.writeByte((int)(l & 127L) | 128);
-            l >>>= 7;
+            position += 7;
+
+            if (position >= 64) throw new RuntimeException("VarLong is too big");
         }
 
-        buf.writeByte((int)l);
-        return buf;
+        return value;
+    }
+
+    public static void writeVarLong(ByteBuf buf, long value) {
+        while (true) {
+            if ((value & ~((long) SEGMENT_BITS)) == 0) {
+                buf.writeByte((int) value);
+                return;
+            }
+
+            buf.writeByte((int) ((value & SEGMENT_BITS) | CONTINUE_BIT));
+
+            // Note: >>> means that the sign bit is shifted with the rest of the number rather than being left alone
+            value >>>= 7;
+        }
     }
 
     public static String readString(ByteBuf buf) {

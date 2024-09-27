@@ -78,9 +78,12 @@ public class PacketHandler implements ClientPacketListener {
         instance.getNetworkHandler().sendPacket(new AcknowledgedFinishedConfigurationC2SPacket());
 
     }
+    int keepCount = 0;
 
     @Override
     public void onKeepAlive(KeepAliveS2CPacket packet) {
-        //instance.getNetworkHandler().sendPacket(new KeepAliveC2SPacket(packet.getId()));
+        instance.getNetworkHandler().sendPacket(new KeepAliveC2SPacket(packet.getId()));
+        keepCount ++;
+        System.out.println("KEEP COUNT : " + keepCount);
     }
 }
