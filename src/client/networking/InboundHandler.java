@@ -1,11 +1,12 @@
 package client.networking;
 
 import client.HeadlessInstance;
-import client.networking.packets.C2S.play.KeepAliveC2SPacket;
 import client.networking.packets.S2C.*;
 import client.networking.packets.S2C.configuration.*;
-import client.networking.packets.S2C.play.KeepAliveS2CPacket;
+import client.networking.packets.S2C.play.*;
+import client.utils.Vec3i;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import client.utils.PacketUtil;
@@ -23,56 +24,71 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         this.handler = handler;
         initPacketMap();
     }
+    byte[] lastBytes;
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf buf) {
-        System.out.println("RECEIVED REAL PACKET WITH SIZE " + buf.readableBytes());
+        if (lastBytes != null) {
+            ByteBuf newBuf = Unpooled.buffer();
+            newBuf.writeBytes(lastBytes);
+            newBuf.writeBytes(buf);
+            newBuf.readerIndex(0);
+            buf = newBuf;
+            lastBytes = null;
+        }
+        //System.out.println("RECEIVED REAL PACKET WITH SIZE " + buf.readableBytes());
+
+
         //NetworkHandler.debugBuf(buf);
         while (buf.readableBytes() > 0) {
+            int readerIndex = buf.readerIndex();
             int packetSize;
             try {
                 packetSize = PacketUtil.readVarInt(buf);
             } catch (Exception e) {
+                e.printStackTrace();
                 break;
             }
+            if (packetSize > buf.readableBytes()) {
+                buf.readerIndex(readerIndex);
+                lastBytes = new byte[buf.readableBytes()];
+                buf.readBytes(lastBytes);
+                return;
+            }
 
-            int readerIndex = buf.readerIndex();
+            readerIndex = buf.readerIndex();
 
             ByteBuf sliced = buf.slice(readerIndex, packetSize);
             //if (packetSize == 0) break;
             readBuf(ctx, sliced, packetSize);
             buf.readerIndex(readerIndex + packetSize);
         }
-        System.out.println("END OF PACKET");
+        //System.out.println("END OF PACKET");
     }
     public void readBuf(ChannelHandlerContext ctx, ByteBuf buf, int maxLength) {
-        //System.out.println("Buf Size " + buf.capacity());
         int packetType;
         try {
-            //readable = buf.readableBytes();
             packetType = PacketUtil.readVarInt(buf);
         } catch(IndexOutOfBoundsException e) {
             return;
         }
 
-        //needed sometimes?
-        //PacketUtil.readVarInt(buf);
-        System.out.println("Received packet with type " + packetType + " with " + handler.getNetworkState().toString());
-        //System.out.println("Total of " + readable);
-        System.out.println("Packet of " + maxLength);
+        //System.out.println("Received packet with type " + PacketUtil.toHex(packetType) + " with " + handler.getNetworkState().toString());
+        //System.out.println("Packet of size " + maxLength);
         try {
             Class<?> clazz = packetMap.get(handler.getNetworkState().calcOffset(packetType));
-            if (clazz == null) throw new ClassNotFoundException();
+            if (clazz == null) {
+                //System.err.println("Invalid/Unknown packet ID Packet Received, class is null");
+                return;
+            }
             S2CPacket packet = (S2CPacket) clazz.getDeclaredConstructors()[0].newInstance(buf, maxLength);
             packet.apply(packetHandler);
         } catch (IllegalArgumentException e) {
-            System.err.println("Failed to apply packet id : " + packetType);
+            System.err.println("Failed to apply packet id : " + PacketUtil.toHex(packetType));
             //e.printStackTrace();
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             System.err.println("Failed to decode packet");
-            //e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            System.err.println("Invalid/Unknown packet ID Packet Received, class is null");
+            e.printStackTrace();
         }
     }
     @Override
@@ -96,5 +112,12 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
         //play
         packetMap.put(KeepAliveS2CPacket.networkState.calcOffset(KeepAliveS2CPacket.typeID), KeepAliveS2CPacket.class);
+        packetMap.put(SetHealthS2CPacket.networkState.calcOffset(SetHealthS2CPacket.typeID), SetHealthS2CPacket.class);
+        packetMap.put(SetHeldItemS2CPacket.networkState.calcOffset(SetHeldItemS2CPacket.typeID), SetHeldItemS2CPacket.class);
+        packetMap.put(SynchronizePlayerPositionS2CPacket.networkState.calcOffset(SynchronizePlayerPositionS2CPacket.typeID), SynchronizePlayerPositionS2CPacket.class);
+        packetMap.put(SetCenterChunkS2CPacket.networkState.calcOffset(SetCenterChunkS2CPacket.typeID), SetCenterChunkS2CPacket.class);
+        packetMap.put(ChunkDataS2CPacket.networkState.calcOffset(ChunkDataS2CPacket.typeID), ChunkDataS2CPacket.class);
+        packetMap.put(BlockUpdateS2CPacket.networkState.calcOffset(BlockUpdateS2CPacket.typeID), BlockUpdateS2CPacket.class);
+        packetMap.put(UpdateBlockSectionS2CPacket.networkState.calcOffset(UpdateBlockSectionS2CPacket.typeID), UpdateBlockSectionS2CPacket.class);
     }
 }

@@ -1,7 +1,7 @@
 package client.networking;
 
 import client.networking.packets.S2C.configuration.*;
-import client.networking.packets.S2C.play.KeepAliveS2CPacket;
+import client.networking.packets.S2C.play.*;
 
 public interface ClientPacketListener extends PacketListener {
     //login
@@ -18,6 +18,13 @@ public interface ClientPacketListener extends PacketListener {
 
     //play
     void onKeepAlive(KeepAliveS2CPacket packet);
+    void onSetHealth(SetHealthS2CPacket packet);
+    void onSetHeldItem(SetHeldItemS2CPacket packet);
+    void onSynchronizePlayerPosition(SynchronizePlayerPositionS2CPacket packet);
+    void onSetCenterChunk(SetCenterChunkS2CPacket packet);
+    void onChunkData(ChunkDataS2CPacket packet);
+    void onBlockUpdate(BlockUpdateS2CPacket packet);
+    void onBlockSectionUpdate(UpdateBlockSectionS2CPacket packet);
 
 
 }

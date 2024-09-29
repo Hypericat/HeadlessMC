@@ -116,6 +116,7 @@ public class PacketUtil {
         byteCount = Math.min(buf.readableBytes(), byteCount == -1 ? Integer.MAX_VALUE : byteCount);
         byte[] byteArray = new byte[byteCount];
         buf.getBytes(readIndex, byteArray);
+        buf.readerIndex(readIndex + byteCount);
         return new String(byteArray, Charset.defaultCharset());
     }
 
@@ -130,5 +131,8 @@ public class PacketUtil {
             }
             System.out.println(str);
         }
+    }
+    public static String toHex(int i) {
+        return String.format("0x%02X", i);
     }
 }

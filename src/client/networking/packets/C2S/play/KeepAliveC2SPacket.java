@@ -27,6 +27,6 @@ public class KeepAliveC2SPacket extends C2SPacket {
     @Override
     public void encode(ByteBuf buf) {
         buf.writeByte(this.getTypeId());
-        PacketUtil.writeVarLong(buf, id);
+        buf.writeLong(this.id);
     }
 }

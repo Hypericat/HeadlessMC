@@ -4,7 +4,7 @@ public class Main {
     //make absolutely nothing static except for final variables in order to allow for multi clients
 
     public static void main(String[] args) {
-        makeInstance("Winston", "127.0.0.1", 1);
+        makeInstance("Player", "127.0.0.1", 1);
 
         int counter = 0;
         while (true) {
@@ -14,7 +14,7 @@ public class Main {
                 throw new RuntimeException(e);
             }
             counter ++;
-            System.out.println("Counter : "  + counter);
+            //System.out.println("Counter : "  + counter);
         }
     }
 
@@ -29,6 +29,9 @@ public class Main {
         Thread thread = new Thread(headless);
         thread.start();
     }
+
+
+
 
     //Todo
 

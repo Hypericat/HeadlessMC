@@ -17,7 +17,7 @@ public class ClientInformationC2SPacket extends C2SPacket {
     boolean allowServerListings;
 
     public ClientInformationC2SPacket() {
-        this((byte) 12);
+        this((byte) 2);
     }
 
     public ClientInformationC2SPacket(byte viewDistance) {

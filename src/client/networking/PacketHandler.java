@@ -1,13 +1,19 @@
 package client.networking;
 
+import client.game.ClientPlayerEntity;
+import client.game.World;
 import client.networking.packets.C2S.configuration.AcknowledgedFinishedConfigurationC2SPacket;
 import client.networking.packets.C2S.configuration.ClientInformationC2SPacket;
 import client.networking.packets.C2S.configuration.LoginAcknowledgedC2SPacket;
 import client.networking.packets.C2S.configuration.ServerBoundKnownPacksC2SPacket;
 import client.HeadlessInstance;
+import client.networking.packets.C2S.play.ConfirmTeleportationC2SPacket;
 import client.networking.packets.C2S.play.KeepAliveC2SPacket;
 import client.networking.packets.S2C.configuration.*;
-import client.networking.packets.S2C.play.KeepAliveS2CPacket;
+import client.networking.packets.S2C.play.*;
+import client.utils.Flag;
+import client.utils.Pair;
+import client.utils.Vec3i;
 
 import java.util.Arrays;
 
@@ -27,7 +33,7 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onCookieRequest(CookieRequestS2CPacket packet) {
-        System.out.println("test");
+
     }
 
     @Override
@@ -62,6 +68,7 @@ public class PacketHandler implements ClientPacketListener {
     public void onFinishConfiguration(FinishConfigurationS2CPacket packet) {
         instance.getNetworkHandler().setNetworkState(NetworkState.PLAY);
         instance.getNetworkHandler().sendPacket(new AcknowledgedFinishedConfigurationC2SPacket());
+        instance.initPlayer();
     }
 
     @Override
@@ -72,18 +79,62 @@ public class PacketHandler implements ClientPacketListener {
     @Override
     public void onKnowPacks(ClientBoundKnownPacksS2CPacket packet) {
         instance.getNetworkHandler().sendPacket(new ServerBoundKnownPacksC2SPacket(packet));
-
-
-        instance.getNetworkHandler().setNetworkState(NetworkState.PLAY);
-        instance.getNetworkHandler().sendPacket(new AcknowledgedFinishedConfigurationC2SPacket());
-
     }
-    int keepCount = 0;
+
 
     @Override
     public void onKeepAlive(KeepAliveS2CPacket packet) {
+        System.out.println("Received Keep Alive Packet, ID : " + packet.getId());
         instance.getNetworkHandler().sendPacket(new KeepAliveC2SPacket(packet.getId()));
-        keepCount ++;
-        System.out.println("KEEP COUNT : " + keepCount);
+    }
+
+    @Override
+    public void onSetHealth(SetHealthS2CPacket packet) {
+        instance.getPlayer().setHealth(packet.getHealth());
+    }
+
+    @Override
+    public void onSetHeldItem(SetHeldItemS2CPacket packet) {
+        instance.getPlayer().setSelectedSlot(packet.getSlot());
+    }
+
+    @Override
+    public void onSynchronizePlayerPosition(SynchronizePlayerPositionS2CPacket packet) {
+        Flag flags = packet.getFlags();
+        ClientPlayerEntity player = instance.getPlayer();
+        System.out.println("Setting Pos");
+
+        player.setX(flags.contains(0x01) ? player.getX() + packet.getX() : packet.getX());
+        player.setY(flags.contains(0x02) ? player.getY() + packet.getY() : packet.getY());
+        player.setZ(flags.contains(0x04) ? player.getZ() + packet.getZ() : packet.getZ());
+        player.setYaw(flags.contains(0x08) ? player.getYaw() + packet.getYaw() : packet.getYaw());
+        player.setPitch(flags.contains(0x10) ? player.getPitch() + packet.getPitch() : packet.getPitch());
+
+        instance.getNetworkHandler().sendPacket(new ConfirmTeleportationC2SPacket(packet.getTeleportID()));
+    }
+
+    @Override
+    public void onSetCenterChunk(SetCenterChunkS2CPacket packet) {
+        instance.getPlayer().setChunkX(packet.getChunkX());
+        instance.getPlayer().setChunkZ(packet.getChunkZ());
+    }
+
+    @Override
+    public void onChunkData(ChunkDataS2CPacket packet) {
+        World world = instance.getWorld();
+        world.addChunk(packet.getChunk());
+        System.out.println("Finished Loading Chunk at X : " + packet.getChunk().getChunkX() * 16 + " Z : " + packet.getChunk().getChunkZ() * 16);
+    }
+
+    @Override
+    public void onBlockUpdate(BlockUpdateS2CPacket packet) {
+        instance.getWorld().setBlock(packet.getPos(), packet.getBlockID());
+    }
+
+    @Override
+    public void onBlockSectionUpdate(UpdateBlockSectionS2CPacket packet) {
+        Pair<Integer, Vec3i>[] blocks = packet.getBlocks();
+        Vec3i chunkPos = packet.getChunkPos();
+        instance.getWorld().setBlocks(chunkPos, blocks);
     }
 }
