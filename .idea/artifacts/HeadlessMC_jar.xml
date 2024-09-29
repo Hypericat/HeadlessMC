@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="HeadlessMC:jar">
+    <output-path>$USER_HOME$/Downloads</output-path>
+    <root id="archive" name="HeadlessMC.jar">
+      <element id="module-output" name="HeadlessMC" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/dependencies/netty-all-5.0.0.Alpha2.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

@@ -4,7 +4,6 @@ import client.HeadlessInstance;
 import client.networking.packets.S2C.*;
 import client.networking.packets.S2C.configuration.*;
 import client.networking.packets.S2C.play.*;
-import client.utils.Vec3i;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -102,7 +101,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         packetMap = new HashMap<>();
         packetMap.put(StatusResponseS2CPacket.networkState.calcOffset(StatusResponseS2CPacket.typeID), StatusResponseS2CPacket.class);
         packetMap.put(CompressionRequestS2CPacket.networkState.calcOffset(CompressionRequestS2CPacket.typeID), CompressionRequestS2CPacket.class);
-        packetMap.put(LoginSuccessfulS2CPacket.networkState.calcOffset(LoginSuccessfulS2CPacket.typeID), LoginSuccessfulS2CPacket.class);
+        packetMap.put(LoginSuccessS2CPacket.networkState.calcOffset(LoginSuccessS2CPacket.typeID), LoginSuccessS2CPacket.class);
         packetMap.put(ClientBoundKnownPacksS2CPacket.networkState.calcOffset(ClientBoundKnownPacksS2CPacket.typeID), ClientBoundKnownPacksS2CPacket.class);
         packetMap.put(CookieRequestS2CPacket.networkState.calcOffset(CookieRequestS2CPacket.typeID), CookieRequestS2CPacket.class);
         packetMap.put(ClientBoundPluginMessageS2CPacket.networkState.calcOffset(ClientBoundPluginMessageS2CPacket.typeID), ClientBoundPluginMessageS2CPacket.class);
@@ -111,6 +110,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
 
         //play
+        packetMap.put(LoginPlayS2CPacket.networkState.calcOffset(LoginPlayS2CPacket.typeID), LoginPlayS2CPacket.class);
         packetMap.put(KeepAliveS2CPacket.networkState.calcOffset(KeepAliveS2CPacket.typeID), KeepAliveS2CPacket.class);
         packetMap.put(SetHealthS2CPacket.networkState.calcOffset(SetHealthS2CPacket.typeID), SetHealthS2CPacket.class);
         packetMap.put(SetHeldItemS2CPacket.networkState.calcOffset(SetHeldItemS2CPacket.typeID), SetHeldItemS2CPacket.class);
@@ -119,5 +119,12 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         packetMap.put(ChunkDataS2CPacket.networkState.calcOffset(ChunkDataS2CPacket.typeID), ChunkDataS2CPacket.class);
         packetMap.put(BlockUpdateS2CPacket.networkState.calcOffset(BlockUpdateS2CPacket.typeID), BlockUpdateS2CPacket.class);
         packetMap.put(UpdateBlockSectionS2CPacket.networkState.calcOffset(UpdateBlockSectionS2CPacket.typeID), UpdateBlockSectionS2CPacket.class);
+        packetMap.put(SetEntityVelocityS2CPacket.networkState.calcOffset(SetEntityVelocityS2CPacket.typeID), SetEntityVelocityS2CPacket.class);
+        packetMap.put(SpawnEntityS2CPacket.networkState.calcOffset(SpawnEntityS2CPacket.typeID), SpawnEntityS2CPacket.class);
+        packetMap.put(RemoveEntitiesS2CPacket.networkState.calcOffset(RemoveEntitiesS2CPacket.typeID), RemoveEntitiesS2CPacket.class);
+        packetMap.put(UpdateEntityRotationS2CPacket.networkState.calcOffset(UpdateEntityRotationS2CPacket.typeID), UpdateEntityRotationS2CPacket.class);
+        packetMap.put(UpdateEntityPositionS2CPacket.networkState.calcOffset(UpdateEntityPositionS2CPacket.typeID), UpdateEntityPositionS2CPacket.class);
+        packetMap.put(UpdateEntityPositionAndRotation.networkState.calcOffset(UpdateEntityPositionAndRotation.typeID), UpdateEntityPositionAndRotation.class);
+        packetMap.put(TeleportEntityS2CPacket.networkState.calcOffset(TeleportEntityS2CPacket.typeID), TeleportEntityS2CPacket.class);
     }
 }

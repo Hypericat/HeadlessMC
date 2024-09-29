@@ -8,6 +8,8 @@ import io.netty.util.CharsetUtil;
 import io.netty.util.internal.StringUtil;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.BitSet;
 
 
 public class PacketUtil {
@@ -118,6 +120,14 @@ public class PacketUtil {
         buf.getBytes(readIndex, byteArray);
         buf.readerIndex(readIndex + byteCount);
         return new String(byteArray, Charset.defaultCharset());
+    }
+    public static void writeBitSet(BitSet bitSet, int size, ByteBuf buf) {
+        if (bitSet.length() > size) {
+            throw new EncoderException("BitSet is larger than expected size (" + bitSet.length() + ">" + size + ")");
+        } else {
+            byte[] bs = bitSet.toByteArray();
+            buf.writeBytes(Arrays.copyOf(bs, Math.ceilDiv(size, 8)));
+        }
     }
 
     public static void debugBuf(ByteBuf buf) {

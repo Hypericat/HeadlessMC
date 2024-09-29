@@ -4,17 +4,16 @@ public class Main {
     //make absolutely nothing static except for final variables in order to allow for multi clients
 
     public static void main(String[] args) {
-        makeInstance("Player", "127.0.0.1", 1);
+        //makeInstance(args[0], args[1], Integer.parseInt(args[2]));
+        makeInstance("Player", "localhost", 1);
 
-        int counter = 0;
+
         while (true) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            counter ++;
-            //System.out.println("Counter : "  + counter);
         }
     }
 
@@ -25,6 +24,8 @@ public class Main {
     }
 
     public static void makeInstance(String name, String ip) {
+        if (ip.equalsIgnoreCase("localhost")) ip = "127.0.0.1";
+
         HeadlessInstance headless = new HeadlessInstance(name, ip);
         Thread thread = new Thread(headless);
         thread.start();

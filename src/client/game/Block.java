@@ -28,4 +28,18 @@ public class Block {
     public BlockStates getStates() {
         return states;
     }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        boolean wasLastSpace = true;
+        for (char c : name.toLowerCase().replaceAll("_", " ").replaceAll("minecraft:", "").toCharArray()) {
+            if (wasLastSpace) {
+                c = String.valueOf(c).toUpperCase().charAt(0);
+                wasLastSpace = false;
+            }
+            if (c == ' ') wasLastSpace = true;
+            builder.append(c);
+        }
+        return builder.toString();
+    }
 }

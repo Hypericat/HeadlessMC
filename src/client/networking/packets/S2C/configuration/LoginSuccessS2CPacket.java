@@ -1,16 +1,17 @@
 package client.networking.packets.S2C.configuration;
 
 import client.networking.packets.S2C.S2CPacket;
+import client.utils.UUID;
 import io.netty.buffer.ByteBuf;
 import client.networking.ClientPacketListener;
 import client.networking.NetworkState;
 
-public class LoginSuccessfulS2CPacket extends S2CPacket {
+public class LoginSuccessS2CPacket extends S2CPacket {
     public static final int typeID = 0x02;
     public final static NetworkState networkState = NetworkState.HANDSHAKE;
-    private String text;
+    private UUID uuid;
 
-    public LoginSuccessfulS2CPacket(ByteBuf buf, int size) throws IllegalArgumentException {
+    public LoginSuccessS2CPacket(ByteBuf buf, int size) throws IllegalArgumentException {
         super(buf, size);
     }
 
@@ -26,7 +27,10 @@ public class LoginSuccessfulS2CPacket extends S2CPacket {
 
     @Override
     public void decode(ByteBuf buf) {
-
+        uuid = UUID.fromBuf(buf);
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
 }

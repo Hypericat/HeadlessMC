@@ -14,6 +14,19 @@ public class Vec3i implements Comparable<Vec3i> {
         this.y = y;
         this.z = z;
     }
+    public Vec3i(Vec3i vec) {
+        this.x = vec.x;
+        this.y = vec.y;
+        this.z = vec.z;
+    }
+
+    public static Vec3i ofFloored(Vec3d vec3d) {
+        return new Vec3i(MathHelper.floor(vec3d.getX()), MathHelper.floor(vec3d.getY()), MathHelper.floor(vec3d.getZ()));
+    }
+
+    public static Vec3i ofCeil(Vec3d vec3d) {
+        return new Vec3i((int) Math.ceil(vec3d.getX()), (int) Math.ceil(vec3d.getY()), (int) Math.ceil(vec3d.getZ()));
+    }
 
     public boolean equals(Object o) {
         if (this == o) {

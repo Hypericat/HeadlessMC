@@ -1,22 +1,28 @@
 package client.game;
 
 import client.HeadlessInstance;
+import client.utils.Box;
 import client.utils.Vec3d;
 
-public abstract class Entity {
+public class Entity {
+    private int entityID;
     private Vec3d pos;
     private Vec3d velocity;
     private float yaw;
     private float pitch;
     private boolean onGround;
     private HeadlessInstance instance;
+    private Box boundingBox;
+    private final EntityType<?> entityType;
 
-    protected Entity(Vec3d pos, Vec3d velocity, float yaw, float pitch, boolean onGround, HeadlessInstance instance) {
+    public <T extends Entity> Entity(int entityID, Vec3d pos, Vec3d velocity, float yaw, float pitch, boolean onGround, EntityType<T> entityType, HeadlessInstance instance) {
+        this.entityID = entityID;
         this.pos = pos;
         this.velocity = velocity;
         this.yaw = yaw;
         this.pitch = pitch;
         this.onGround = onGround;
+        this.entityType = entityType;
         this.instance = instance;
     }
 
@@ -34,6 +40,9 @@ public abstract class Entity {
 
     public void setVelocity(Vec3d velocity) {
         this.velocity = velocity;
+    }
+    public void setVelocity(double x, double y, double z) {
+        setVelocity(new Vec3d(x, y, z));
     }
 
     public float getYaw() {
@@ -87,5 +96,44 @@ public abstract class Entity {
         pos = new Vec3d(pos.x, pos.y, z);
     }
 
-    public abstract void onTick();
+    public double getHeight() {
+        return entityType.getHeight();
+    }
+
+    public double getWidth() {
+        return entityType.getWidth();
+    }
+
+    public double getDepth() {
+        return entityType.getDepth();
+    }
+    public Box getBoundingBox() {
+        return this.boundingBox;
+    }
+
+    public int getEntityID() {
+        return entityID;
+    }
+    public void setEntityID(int entityID) {
+        this.entityID = entityID;
+    }
+
+    public void onTick() {
+
+    }
+
+    public void setPos(double x, double y, double z) {
+        setPos(new Vec3d(x, y, z));
+    }
+
+    public void calcBoundingBox() {
+        this.boundingBox = calcBoundingBox(getPos());
+    }
+    public Box calcBoundingBox(Vec3d offset) {
+        return entityType.getBoundingBox().offset(offset);
+    }
+
+    public <T extends Entity> EntityType<T> getEntityType() {
+        return (EntityType<T>) entityType;
+    }
 }

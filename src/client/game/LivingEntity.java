@@ -3,13 +3,13 @@ package client.game;
 import client.HeadlessInstance;
 import client.utils.Vec3d;
 
-public abstract class LivingEntity extends Entity {
+public class LivingEntity extends Entity {
 
     float maxHealth;
     float health;
 
-    protected LivingEntity(float maxHealth, float health, Vec3d pos, Vec3d velocity, float yaw, float pitch, boolean onGround, HeadlessInstance instance) {
-        super(pos, velocity, yaw, pitch, onGround, instance);
+    public <T extends LivingEntity> LivingEntity(int entityID, float maxHealth, float health, Vec3d pos, Vec3d velocity, float yaw, float pitch, boolean onGround, EntityType<T> type, HeadlessInstance instance) {
+        super(entityID, pos, velocity, yaw, pitch, onGround, type, instance);
         this.maxHealth = maxHealth;
         this.health = health;
     }
@@ -27,5 +27,10 @@ public abstract class LivingEntity extends Entity {
 
     public void setMaxHealth(float maxHealth) {
         this.maxHealth = maxHealth;
+    }
+    @Override
+    public void onTick() {
+        super.onTick();
+
     }
 }

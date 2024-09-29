@@ -70,6 +70,9 @@ public class Vec3d implements Position {
     public Vec3d subtract(double x, double y, double z) {
         return this.add(-x, -y, -z);
     }
+    public Vec3d subtract(double d) {
+        return subtract(d, d, d);
+    }
 
     public Vec3d add(Vec3d vec) {
         return this.add(vec.x, vec.y, vec.z);
@@ -77,6 +80,9 @@ public class Vec3d implements Position {
 
     public Vec3d add(double x, double y, double z) {
         return new Vec3d(this.x + x, this.y + y, this.z + z);
+    }
+    public Vec3d add(double d) {
+        return add(d, d, d);
     }
 
     public boolean isInRange(Vec3d pos, double radius) {

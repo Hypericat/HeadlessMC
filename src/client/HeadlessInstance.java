@@ -1,12 +1,15 @@
 package client;
 
 import client.game.ClientPlayerEntity;
+import client.game.Hand;
+import client.game.InteractionManager;
 import client.game.World;
 import client.networking.NetworkHandler;
 import client.networking.NetworkState;
 import client.networking.packets.C2S.configuration.HandShakeC2SPacket;
 import client.networking.packets.C2S.configuration.LoginStartC2SPacket;
 import client.networking.packets.C2S.play.ChatCommandC2SPacket;
+import client.utils.UUID;
 import client.utils.Vec3i;
 
 import java.util.Random;
@@ -24,6 +27,8 @@ public class HeadlessInstance implements Runnable {
 
     private ClientPlayerEntity player;
     private World world;
+    private InteractionManager interactionManager;
+    private UUID uuid;
 
 
     public HeadlessInstance(String userName, String ip) {
@@ -52,9 +57,18 @@ public class HeadlessInstance implements Runnable {
         //network.sendPacket(new ClientInformationC2SPacket());
     }
 
-    public void initPlayer() {
-         this.player = new ClientPlayerEntity(this);
-         this.world = new World();
+    public void initWorld() {
+        if (world != null) return;
+        this.world = new World();
+    }
+
+    public void initPlayer(int playerEntityID) {
+        if (this.player != null) {
+            player.setEntityID(playerEntityID);
+            return;
+        }
+        this.player = new ClientPlayerEntity(playerEntityID, this);
+        this.interactionManager = new InteractionManager(player, world, network, this);
     }
 
     public void run() {
@@ -67,7 +81,9 @@ public class HeadlessInstance implements Runnable {
 
         while (true) {
             sleep(50 - (System.currentTimeMillis() - lastTickTime));
-            onTick();
+            if (player != null) {
+                onTick();
+            }
             lastTickTime = System.currentTimeMillis();
         }
     }
@@ -96,25 +112,32 @@ public class HeadlessInstance implements Runnable {
     public ClientPlayerEntity getPlayer() {
         return player;
     }
+
     public World getWorld() {
         return world;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public InteractionManager getInteractionManager() {
+        return interactionManager;
     }
 
     private int tickCount = 0;
 
     public void onTick() {
         tickCount ++;
-        if (tickCount >= 50) {
-            Vec3i pos = this.player.getPos().toVec3i().subtract(new Vec3i(0 ,1, 0));
-            //System.out.println("Block at " + pos.toString() + " : " + world.getBlock(pos));
-            if (tickCount % 20 == 0) {
-                //network.sendPacket(new ChatCommandC2SPacket("setblock " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + " bedrock"));
-                network.sendPacket(new ChatCommandC2SPacket("say blocktype : " + world.getBlock(pos)));
-            }
-        }
-        if (this.player != null) {
-            this.player.onTick();
-        }
+        interactionManager.swingHand(Hand.MAIN);
+
+
+
+        this.player.onTick();
     }
 
 

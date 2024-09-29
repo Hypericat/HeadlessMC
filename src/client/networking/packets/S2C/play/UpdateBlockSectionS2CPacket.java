@@ -1,5 +1,7 @@
 package client.networking.packets.S2C.play;
 
+import client.game.Block;
+import client.game.Blocks;
 import client.networking.ClientPacketListener;
 import client.networking.NetworkState;
 import client.networking.packets.S2C.S2CPacket;
@@ -11,7 +13,7 @@ import io.netty.buffer.ByteBuf;
 public class UpdateBlockSectionS2CPacket extends S2CPacket {
     public static final int typeID = 0x49;
     public final static NetworkState networkState = NetworkState.PLAY;
-    Pair<Integer, Vec3i>[] blocks;
+    Pair<Block, Vec3i>[] blocks;
     private Vec3i chunkPos;
 
     public UpdateBlockSectionS2CPacket(ByteBuf buf, int size) throws IllegalArgumentException {
@@ -47,11 +49,11 @@ public class UpdateBlockSectionS2CPacket extends S2CPacket {
             int y = (int) (data & 0xF);
             int z = (int) ((data >> 4) & 0xF);
             Vec3i pos = new Vec3i(x, y, z);
-            blocks[i] = new Pair<>(blockStateId, pos);
+            blocks[i] = new Pair<>(Blocks.getBlockByID(blockStateId), pos);
         }
     }
 
-    public Pair<Integer, Vec3i>[] getBlocks() {
+    public Pair<Block, Vec3i>[] getBlocks() {
         return blocks;
     }
 

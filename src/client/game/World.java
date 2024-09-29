@@ -4,11 +4,14 @@ import client.utils.Pair;
 import client.utils.Vec3d;
 import client.utils.Vec3i;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class World {
     private int maxHeight;
     HashMap<Long, Chunk> chunks = new HashMap<>();
+    private final HashMap<Integer, Entity> entities = new HashMap<>();
 
     public World(int maxHeight) {
         this.maxHeight = maxHeight;
@@ -45,39 +48,67 @@ public class World {
         return chunks.get(getHash(chunkX, chunkZ));
     }
 
-    public int getBlock(Vec3d pos) {
+    public Block getBlock(Vec3d pos) {
         return getBlock(pos.toVec3i());
     }
 
-    public int getBlock(Vec3i pos) {
+    public Block getBlock(Vec3i pos) {
         return getBlock(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    private int getBlock(int x, int y, int z) {
+    private Block getBlock(int x, int y, int z) {
         Chunk chunk = getChunkAtCord(x, z);
         //air
-        if (chunk == null) return 0;
+        if (chunk == null) return Blocks.AIR;
         return chunk.getBlockAt(Math.floorMod(x, 16), y, (Math.floorMod(z, 16)));
     }
 
-    public void setBlock(Vec3i pos, int blockState) {
-        if (blockState <= 30) {
-            System.out.println("Set block at {" + pos + "} to " + blockState);
-        }
+    public void setBlock(Vec3i pos, Block blockState) {
+        //System.out.println("Set block at {" + pos + "} to " + blockState.toString());
         setBlock(pos.getX(), pos.getY(), pos.getZ(), blockState);
     }
 
-    private void setBlock(int x, int y, int z, int blockState) {
+    private void setBlock(int x, int y, int z, Block block) {
         Chunk chunk = getChunkAtCord(x, z);
         if (chunk == null) return;
 
 
-        chunk.setBlockAt(Math.floorMod(x, 16), y, (Math.floorMod(z, 16)), blockState);
+        chunk.setBlockAt(Math.floorMod(x, 16), y, (Math.floorMod(z, 16)), block);
     }
 
-    public void setBlocks(Vec3i chunkPos, Pair<Integer, Vec3i>[] blocks) {
+    public void setBlocks(Vec3i chunkPos, Pair<Block, Vec3i>[] blocks) {
         Chunk chunk = getChunkAt(chunkPos.getX(), chunkPos.getZ());
         if (chunk == null) return;
         chunk.setBlocksAt(chunkPos.getY(), blocks);
     }
+
+    public Entity getEntityByID(int id) {
+        return entities.get(id);
+    }
+
+    public void addEntity(Entity entity) {
+        int id = entity.getEntityID();
+        if (entities.containsKey(id)) return;
+        entities.put(id, entity);
+    }
+
+    public void removeEntity(Entity entity) {
+        removeEntity(entity.getEntityID());
+    }
+
+    public void removeEntity(int id) {
+        entities.remove(id);
+    }
+
+    public List<Entity> getEntitiesWithin(Vec3d origin, double radius) {
+        List<Entity> entities = new ArrayList<>();
+        for (Entity entity : this.entities.values()) {
+            if (entity.getEntityType().getEntityClass() == EntityTypes.PLAYER.getEntityClass()) {
+                System.out.println("Player POs " + entity.getPos());
+            }
+            if (entity.getPos().isInRange(origin, radius)) entities.add(entity);
+        }
+        return entities;
+    }
+
 }

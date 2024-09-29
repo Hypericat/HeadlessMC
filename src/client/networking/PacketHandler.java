@@ -1,7 +1,6 @@
 package client.networking;
 
-import client.game.ClientPlayerEntity;
-import client.game.World;
+import client.game.*;
 import client.networking.packets.C2S.configuration.AcknowledgedFinishedConfigurationC2SPacket;
 import client.networking.packets.C2S.configuration.ClientInformationC2SPacket;
 import client.networking.packets.C2S.configuration.LoginAcknowledgedC2SPacket;
@@ -13,12 +12,13 @@ import client.networking.packets.S2C.configuration.*;
 import client.networking.packets.S2C.play.*;
 import client.utils.Flag;
 import client.utils.Pair;
+import client.utils.Vec3d;
 import client.utils.Vec3i;
 
 import java.util.Arrays;
 
 public class PacketHandler implements ClientPacketListener {
-    private HeadlessInstance instance;
+    private final HeadlessInstance instance;
 
     public PacketHandler(HeadlessInstance instance) {
         this.instance = instance;
@@ -49,14 +49,14 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onCompression(CompressionRequestS2CPacket packet) {
-        int compressionType = packet.getCompressionType();
-        System.out.println("Received compression request from server");
-        System.out.println(compressionType);
+        int threshold = packet.getCompressionType();
+        System.out.println("Enabling compression with threshold : " + threshold);
+        instance.getNetworkHandler().setCompression(threshold);
     }
 
     @Override
-    public void onLoginSuccess(LoginSuccessfulS2CPacket packet) {
-        instance.getNetworkHandler().setCompressionEnabled(false);
+    public void onLoginSuccess(LoginSuccessS2CPacket packet) {
+        instance.setUuid(packet.getUuid());
         instance.getNetworkHandler().sendPacket(new LoginAcknowledgedC2SPacket());
         instance.getNetworkHandler().sendPacket(new ClientInformationC2SPacket());
 
@@ -66,9 +66,9 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onFinishConfiguration(FinishConfigurationS2CPacket packet) {
+        instance.initWorld();
         instance.getNetworkHandler().setNetworkState(NetworkState.PLAY);
         instance.getNetworkHandler().sendPacket(new AcknowledgedFinishedConfigurationC2SPacket());
-        instance.initPlayer();
     }
 
     @Override
@@ -89,8 +89,77 @@ public class PacketHandler implements ClientPacketListener {
     }
 
     @Override
+    public void onLoginPlay(LoginPlayS2CPacket packet) {
+        instance.initPlayer(packet.getEntityID());
+    }
+
+    @Override
     public void onSetHealth(SetHealthS2CPacket packet) {
         instance.getPlayer().setHealth(packet.getHealth());
+    }
+
+    @Override
+    public void onTeleportEntityS2CPacket(TeleportEntityS2CPacket packet) {
+        Entity entity = instance.getWorld().getEntityByID(packet.getEntityID());
+        if (entity == null) return;
+        entity.setPos(packet.getX(), packet.getY(), packet.getZ());
+        entity.setYaw(packet.getYaw());
+        entity.setPitch(packet.getPitch());
+        entity.setOnGround(packet.isOnGround());
+    }
+
+    @Override
+    public void onUpdateEntityPos(UpdateEntityPositionS2CPacket packet) {
+        Entity entity = instance.getWorld().getEntityByID(packet.getEntityID());
+        if (entity == null) return;
+        entity.setPos(entity.getPos().add(((double) packet.getDeltaX()) / 4096d, ((double) packet.getDeltaY()) / 4096d, ((double) packet.getDeltaZ()) / 4096d));
+        entity.setOnGround(packet.isOnGround());
+    }
+
+    @Override
+    public void onUpdateEntityPosAndRotation(UpdateEntityPositionAndRotation packet) {
+        Entity entity = instance.getWorld().getEntityByID(packet.getEntityID());
+        if (entity == null) return;
+        entity.setPos(entity.getPos().add(((double) packet.getDeltaX()) / 4096d, ((double) packet.getDeltaY()) / 4096d, ((double) packet.getDeltaZ()) / 4096d));
+        entity.setYaw(packet.getYaw());
+        entity.setPitch(packet.getPitch());
+        entity.setOnGround(packet.isOnGround());
+    }
+
+    @Override
+    public void onUpdateEntityRotation(UpdateEntityRotationS2CPacket packet) {
+        Entity entity = instance.getWorld().getEntityByID(packet.getEntityID());
+        if (entity == null) return;
+        entity.setYaw(packet.getYaw());
+        entity.setPitch(packet.getPitch());
+        entity.setOnGround(packet.isOnGround());
+    }
+
+    @Override
+    public<T extends Entity> void onSpawnEntity(SpawnEntityS2CPacket packet) {
+        EntityType<T> type = EntityTypes.getTypeByID(packet.getEntityType());
+        if (type == null) return;
+        Entity entity = null;
+        if (type.getEntityClass() == LivingEntity.class) {
+            entity = new LivingEntity(packet.getEntityID(), 20, 20, new Vec3d(packet.getX(), packet.getY(), packet.getZ()), new Vec3d(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ()), packet.getYaw(), packet.getPitch(), true, (EntityType<? extends LivingEntity>) type, instance);
+        } else if (type.getEntityClass() == Entity.class) {
+            entity = new Entity(packet.getEntityID(), new Vec3d(packet.getX(), packet.getY(), packet.getZ()), new Vec3d(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ()), packet.getYaw(), packet.getPitch(), true, (EntityType<? extends Entity>) type, instance);
+
+        }
+        if (entity == null) return;
+        System.out.println("ADDING ENTITY " + type.getId());
+        instance.getWorld().addEntity(entity);
+    }
+
+    @Override
+    public void onRemoveEntities(RemoveEntitiesS2CPacket packet) {
+        for (int i = 0; i < packet.getEntityIDs().length; i++) {
+            Entity ent = instance.getWorld().getEntityByID(packet.getEntityIDs()[i]);
+            if (ent != null) {
+                System.out.println("Removing entity : " + ent.getEntityType().getId());
+            }
+            instance.getWorld().removeEntity(packet.getEntityIDs()[i]);
+        }
     }
 
     @Override
@@ -102,7 +171,8 @@ public class PacketHandler implements ClientPacketListener {
     public void onSynchronizePlayerPosition(SynchronizePlayerPositionS2CPacket packet) {
         Flag flags = packet.getFlags();
         ClientPlayerEntity player = instance.getPlayer();
-        System.out.println("Setting Pos");
+        System.out.println("Server resetting client position!");
+        player.setVelocity(Vec3d.ZERO);
 
         player.setX(flags.contains(0x01) ? player.getX() + packet.getX() : packet.getX());
         player.setY(flags.contains(0x02) ? player.getY() + packet.getY() : packet.getY());
@@ -128,13 +198,19 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onBlockUpdate(BlockUpdateS2CPacket packet) {
-        instance.getWorld().setBlock(packet.getPos(), packet.getBlockID());
+        instance.getWorld().setBlock(packet.getPos(), Blocks.getBlockByID(packet.getBlockID()));
     }
 
     @Override
     public void onBlockSectionUpdate(UpdateBlockSectionS2CPacket packet) {
-        Pair<Integer, Vec3i>[] blocks = packet.getBlocks();
+        Pair<Block, Vec3i>[] blocks = packet.getBlocks();
         Vec3i chunkPos = packet.getChunkPos();
         instance.getWorld().setBlocks(chunkPos, blocks);
+    }
+
+    @Override
+    public void onSetEntityVelocity(SetEntityVelocityS2CPacket packet) {
+        if (packet.getEntityID() != instance.getPlayer().getEntityID()) return;
+        instance.getPlayer().setVelocity(packet.getX(), packet.getY(), packet.getZ());
     }
 }

@@ -1,5 +1,6 @@
 package client.utils;
 
+import client.game.Block;
 import io.netty.buffer.ByteBuf;
 
 public class ChunkSectionContainer {
@@ -103,14 +104,14 @@ public class ChunkSectionContainer {
 
         data[longIndex] = BitUtils.setBits(firstBitIndex, bpe, l, getMappingIndex(blockID));
     }
-    public void fillAtIDs(Pair<Integer, Vec3i>[] blocks) {
+    public void fillAtIDs(Pair<Block, Vec3i>[] blocks) {
         if (simpleID != -1) {
             simpleToIndirect();
         }
-        for (Pair<Integer, Vec3i> pair : blocks) {
-            int blockID = pair.getLeft();
+        for (Pair<Block, Vec3i> pair : blocks) {
+            int blockID = pair.getLeft().getStates().getDefault();
             Vec3i blockPos = pair.getRight();
-            System.out.println("Setting block at " + blockPos);
+            System.out.println("Setting block at " + blockPos + " to " + pair.getLeft());
 
             int dataIndex = blockPos.getX() + blockPos.getZ() * 16 + blockPos.getY() * 256;
             int dataPerLong = Long.SIZE / bpe;
