@@ -50,6 +50,7 @@ public class PacketHandler implements ClientPacketListener {
     @Override
     public void onCompression(CompressionRequestS2CPacket packet) {
         int threshold = packet.getCompressionType();
+        if (threshold < 0) return;
         System.out.println("Enabling compression with threshold : " + threshold);
         instance.getNetworkHandler().setCompression(threshold);
     }

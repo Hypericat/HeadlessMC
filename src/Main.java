@@ -5,7 +5,7 @@ public class Main {
 
     public static void main(String[] args) {
         //makeInstance(args[0], args[1], Integer.parseInt(args[2]));
-        makeInstance("Player", "localhost", 1);
+        makeInstance("Winston", "localhost", 1);
 
 
         while (true) {

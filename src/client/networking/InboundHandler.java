@@ -35,10 +35,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
             buf = newBuf;
             lastBytes = null;
         }
-        //System.out.println("RECEIVED REAL PACKET WITH SIZE " + buf.readableBytes());
 
-
-        //NetworkHandler.debugBuf(buf);
         while (buf.readableBytes() > 0) {
             int readerIndex = buf.readerIndex();
             int packetSize;

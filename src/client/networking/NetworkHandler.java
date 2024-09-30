@@ -3,6 +3,8 @@ package client.networking;
 import client.HeadlessInstance;
 import client.networking.packets.C2S.play.KeepAliveC2SPacket;
 import client.utils.PacketUtil;
+import com.jcraft.jzlib.JZlib;
+import com.jcraft.jzlib.ZStream;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -16,8 +18,10 @@ import io.netty.handler.codec.compression.JdkZlibEncoder;
 import io.netty.handler.codec.compression.ZlibCodecFactory;
 import io.netty.handler.codec.compression.ZlibEncoder;
 
+import java.io.ByteArrayOutputStream;
 import java.net.ConnectException;
 import java.util.Arrays;
+import java.util.zip.ZipOutputStream;
 
 public class NetworkHandler {
     private EventLoopGroup group;
@@ -49,14 +53,43 @@ public class NetworkHandler {
     }
     private void sendUncompressedPacket(C2SPacket packet, Channel channel) {
 
-        ByteBuf buf = Unpooled.buffer();
+        ByteBuf dataBuf = Unpooled.buffer();
         ByteBuf sizeBuf = Unpooled.buffer();
 
-        packet.encode(buf);
-        PacketUtil.writeVarInt(sizeBuf, buf.readableBytes());
+
+        packet.encode(dataBuf);
+
+        ByteBuf compressedBuf = compress(dataBuf);
+        if (compressedBuf.readableBytes() >= compressionThreshold) {
+            ByteBuf dataLengthUncompressed = Unpooled.buffer();
+            
+            int packetLength = dataLengthUncompressed.readableBytes() + compressedBuf.readableBytes();
+
+            ByteBuf packetLengthBuf = Unpooled.buffer();
+            PacketUtil.writeVarInt(packetLengthBuf, packetLength);
+
+            PacketUtil.writeVarInt(Unpooled.buffer(), compressedBuf.readableBytes());
+
+
+            PacketUtil.writeVarInt(sizeBuf, dataBuf.readableBytes());
+        }
 
         channel.write(sizeBuf);
-        channel.writeAndFlush(buf);
+        channel.writeAndFlush(dataBuf);
+    }
+
+    private ByteBuf compress(ByteBuf buf) {
+        ZStream stream = new ZStream();
+        stream.setInput(buf.array());
+        stream.inflate(6);
+        return Unpooled.buffer().writeBytes(stream.getNextOut());
+    }
+
+    private ByteBuf decompress(ByteBuf buf) {
+        ZStream stream = new ZStream();
+        stream.setInput(buf.array());
+        stream.deflate(6);
+        return Unpooled.buffer().writeBytes(stream.getNextOut());
     }
 
     public void flush() {
@@ -74,15 +107,12 @@ public class NetworkHandler {
 
             ByteBuf sizeBuf = Unpooled.buffer();
 
+
             //PacketUtil.readVarInt(buf.readableBytes());
 
             //channel.write();
             channel.writeAndFlush(buf);
         }
-
-    }
-
-    public void compress(ByteBuf buf) {
 
     }
 
@@ -140,7 +170,6 @@ public class NetworkHandler {
     public void setCompression(int threshold) {
         this.compressionEnabled = true;
         this.compressionThreshold = threshold;
-        channel.pipeline().addFirst(ZlibCodecFactory.newZlibDecoder());
     }
 
 
