@@ -19,22 +19,23 @@ public class HeadlessInstance implements Runnable {
     private final NetworkHandler network;
     private String currentAddress = "";
     private int currentPort = -1;
-    private String ip;
-    private static Random random = new Random();
-    private String userName;
+    private final String ip;
+    private final String userName;
     private long lastTickTime;
-    public static final long mspt = 50;
+    public static final long MSPT = 50;
 
     private ClientPlayerEntity player;
     private World world;
     private InteractionManager interactionManager;
     private UUID uuid;
+    private final Scheduler scheduler;
 
 
     public HeadlessInstance(String userName, String ip) {
         this.userName = userName;
         this.ip = ip;
         this.lastTickTime = System.currentTimeMillis();
+        this.scheduler = new Scheduler();
         network = new NetworkHandler(this);
     }
 
@@ -80,7 +81,8 @@ public class HeadlessInstance implements Runnable {
         login(userName);
 
         while (true) {
-            sleep(50 - (System.currentTimeMillis() - lastTickTime));
+            sleep(MSPT - (System.currentTimeMillis() - lastTickTime));
+            scheduler.onTick();
             if (player != null) {
                 onTick();
             }
@@ -133,11 +135,13 @@ public class HeadlessInstance implements Runnable {
 
     public void onTick() {
         tickCount ++;
-        interactionManager.swingHand(Hand.MAIN);
 
 
-
+        this.interactionManager.tick();
         this.player.onTick();
+    }
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
 

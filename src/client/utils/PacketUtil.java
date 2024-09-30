@@ -130,6 +130,18 @@ public class PacketUtil {
         }
     }
 
+    public static Vec3i readPosition(ByteBuf buf) {
+        long pos = buf.readLong();
+        int x = (int) (pos >> 38);
+        int y = (int) (pos << 52 >> 52);
+        int z = (int) (pos << 26 >> 38);
+
+        return new Vec3i(x, y, z);
+    }
+    public static void writePosition(ByteBuf buf, Vec3i pos) {
+        buf.writeLong(((long) (pos.getX() & 0x3FFFFFF) << 38) | ((long) (pos.getZ() & 0x3FFFFFF) << 12) | (pos.getY() & 0xFFF));
+    }
+
     public static void debugBuf(ByteBuf buf) {
         int index = buf.readerIndex();
         for (int i = index; i < buf.readableBytes(); i++) {

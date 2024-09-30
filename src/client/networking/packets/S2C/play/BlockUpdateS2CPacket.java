@@ -30,12 +30,7 @@ public class BlockUpdateS2CPacket extends S2CPacket {
 
     @Override
     public void decode(ByteBuf buf) {
-        long pos = buf.readLong();
-        int x = (int) (pos >> 38);
-        int y = (int) (pos << 52 >> 52);
-        int z = (int) (pos << 26 >> 38);
-
-        this.pos = new Vec3i(x, y, z);
+        this.pos = PacketUtil.readPosition(buf);
         this.blockID = PacketUtil.readVarInt(buf);
     }
 

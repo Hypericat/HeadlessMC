@@ -108,6 +108,7 @@ public class Entity {
         return entityType.getDepth();
     }
     public Box getBoundingBox() {
+        calcBoundingBox();
         return this.boundingBox;
     }
 
@@ -119,7 +120,7 @@ public class Entity {
     }
 
     public void onTick() {
-
+        calcBoundingBox();
     }
 
     public void setPos(double x, double y, double z) {
@@ -129,6 +130,7 @@ public class Entity {
     public void calcBoundingBox() {
         this.boundingBox = calcBoundingBox(getPos());
     }
+
     public Box calcBoundingBox(Vec3d offset) {
         return entityType.getBoundingBox().offset(offset);
     }

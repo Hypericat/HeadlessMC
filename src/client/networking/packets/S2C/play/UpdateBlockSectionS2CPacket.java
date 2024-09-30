@@ -40,7 +40,6 @@ public class UpdateBlockSectionS2CPacket extends S2CPacket {
 
         int blockArraySize = PacketUtil.readVarInt(buf);
         blocks = new Pair[blockArraySize];
-        System.out.println("Array size : " + blockArraySize);
 
         for (int i = 0; i < blockArraySize; i++) {
             long data = PacketUtil.readVarLong(buf);

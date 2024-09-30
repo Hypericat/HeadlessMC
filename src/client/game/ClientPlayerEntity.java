@@ -14,6 +14,7 @@ public class ClientPlayerEntity extends PlayerEntity{
     private int selectedSlot;
     private int chunkX;
     private int chunkZ;
+    private int attackCooldown = 0;
 
     public ClientPlayerEntity(int entityID, HeadlessInstance instance) {
         super(entityID, instance);
@@ -21,23 +22,41 @@ public class ClientPlayerEntity extends PlayerEntity{
     @Override
     public void onTick() {
         super.onTick();
-
-        for (Entity e : getInstance().getWorld().getEntitiesWithin(getPos(), 4d)) {
-            getInstance().getInteractionManager().sendChatMessage("Hey I see you " + e.getEntityType().getId());
-        }
         tickMovement();
+        decrementAttackCooldown();
+        doKillAura();
+
     }
 
     public int getChunkX() {
         return chunkX;
     }
 
+    public void resetAttackTicks() {
+        attackCooldown = 18;
+    }
+
     public void setChunkX(int chunkX) {
         this.chunkX = chunkX;
     }
 
+    public void doKillAura() {
+        for (Entity e : getInstance().getWorld().getEntitiesWithin(getBoundingBox().getCenter().add(getHeadPos()), 4d)) {
+            if ((e instanceof LivingEntity) && attackCooldown <= 0) {
+                getInstance().getInteractionManager().attackEntity(e);
+                getInstance().getInteractionManager().lookAt(e);
+                return;
+            }
+        }
+    }
+
     public int getChunkZ() {
         return chunkZ;
+    }
+
+    public void decrementAttackCooldown() {
+        if (attackCooldown <= 0) return;
+        attackCooldown --;
     }
 
     public void setChunkZ(int chunkZ) {
@@ -77,11 +96,6 @@ public class ClientPlayerEntity extends PlayerEntity{
     }
 
     public void tickMovement() {
-        calcBoundingBox();
-
-        doTestMovement();
-
-
         tickFalling(this.getVelocity());
         this.setVelocity(this.getVelocity().multiply(0.98d));
         if (this.isOnGround()) {

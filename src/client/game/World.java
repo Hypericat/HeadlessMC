@@ -103,10 +103,7 @@ public class World {
     public List<Entity> getEntitiesWithin(Vec3d origin, double radius) {
         List<Entity> entities = new ArrayList<>();
         for (Entity entity : this.entities.values()) {
-            if (entity.getEntityType().getEntityClass() == EntityTypes.PLAYER.getEntityClass()) {
-                System.out.println("Player POs " + entity.getPos());
-            }
-            if (entity.getPos().isInRange(origin, radius)) entities.add(entity);
+            if (entity.getBoundingBox().getCenter().add(entity.getPos()).isInRange(origin, radius)) entities.add(entity);
         }
         return entities;
     }

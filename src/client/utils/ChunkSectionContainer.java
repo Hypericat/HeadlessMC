@@ -111,7 +111,6 @@ public class ChunkSectionContainer {
         for (Pair<Block, Vec3i> pair : blocks) {
             int blockID = pair.getLeft().getStates().getDefault();
             Vec3i blockPos = pair.getRight();
-            System.out.println("Setting block at " + blockPos + " to " + pair.getLeft());
 
             int dataIndex = blockPos.getX() + blockPos.getZ() * 16 + blockPos.getY() * 256;
             int dataPerLong = Long.SIZE / bpe;

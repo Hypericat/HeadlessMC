@@ -112,10 +112,10 @@ public class Box {
     }
 
     public Vec3d getCenter() {
-        return new Vec3d(MathHelper.lerp(0.5d, minX, maxX), MathHelper.lerp(0.5d, minY, maxY), MathHelper.lerp(0.5d, minZ, maxZ));
+        return new Vec3d(MathHelper.lerp(1d, minX, maxX), -MathHelper.lerp(1d, minY, maxY), MathHelper.lerp(1d, minZ, maxZ));
     }
     public Vec3d getBottomCenter() {
-        return new Vec3d(MathHelper.lerp(0.5, this.minX, this.maxX), this.minY, MathHelper.lerp(0.5, this.minZ, this.maxZ));
+        return new Vec3d(MathHelper.lerp(1d, this.minX, this.maxX), this.minY, MathHelper.lerp(1d, this.minZ, this.maxZ));
     }
 
     public Box offset(double x, double y, double z) {
