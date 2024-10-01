@@ -11,9 +11,9 @@ import client.networking.packets.C2S.play.KeepAliveC2SPacket;
 import client.networking.packets.S2C.configuration.*;
 import client.networking.packets.S2C.play.*;
 import client.utils.Flag;
-import client.utils.Pair;
-import client.utils.Vec3d;
-import client.utils.Vec3i;
+import math.Pair;
+import math.Vec3d;
+import math.Vec3i;
 
 import java.util.Arrays;
 
@@ -148,7 +148,7 @@ public class PacketHandler implements ClientPacketListener {
 
         }
         if (entity == null) return;
-        System.out.println("ADDING ENTITY " + type.getId());
+        //System.out.println("ADDING ENTITY " + type.getId());
         instance.getWorld().addEntity(entity);
     }
 
@@ -156,9 +156,6 @@ public class PacketHandler implements ClientPacketListener {
     public void onRemoveEntities(RemoveEntitiesS2CPacket packet) {
         for (int i = 0; i < packet.getEntityIDs().length; i++) {
             Entity ent = instance.getWorld().getEntityByID(packet.getEntityIDs()[i]);
-            if (ent != null) {
-                System.out.println("Removing entity : " + ent.getEntityType().getId());
-            }
             instance.getWorld().removeEntity(packet.getEntityIDs()[i]);
         }
     }
@@ -173,7 +170,6 @@ public class PacketHandler implements ClientPacketListener {
         Flag flags = packet.getFlags();
         ClientPlayerEntity player = instance.getPlayer();
         System.out.println("Server resetting client position!");
-        player.setVelocity(Vec3d.ZERO);
 
         player.setX(flags.contains(0x01) ? player.getX() + packet.getX() : packet.getX());
         player.setY(flags.contains(0x02) ? player.getY() + packet.getY() : packet.getY());

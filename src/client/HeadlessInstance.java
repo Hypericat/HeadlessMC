@@ -1,18 +1,13 @@
 package client;
 
 import client.game.ClientPlayerEntity;
-import client.game.Hand;
 import client.game.InteractionManager;
 import client.game.World;
 import client.networking.NetworkHandler;
 import client.networking.NetworkState;
 import client.networking.packets.C2S.configuration.HandShakeC2SPacket;
 import client.networking.packets.C2S.configuration.LoginStartC2SPacket;
-import client.networking.packets.C2S.play.ChatCommandC2SPacket;
 import client.utils.UUID;
-import client.utils.Vec3i;
-
-import java.util.Random;
 
 public class HeadlessInstance implements Runnable {
 
@@ -29,6 +24,7 @@ public class HeadlessInstance implements Runnable {
     private InteractionManager interactionManager;
     private UUID uuid;
     private final Scheduler scheduler;
+    private boolean autoJump = true;
 
 
     public HeadlessInstance(String userName, String ip) {
@@ -129,6 +125,10 @@ public class HeadlessInstance implements Runnable {
 
     public InteractionManager getInteractionManager() {
         return interactionManager;
+    }
+
+    public boolean getAutoJump() {
+        return this.autoJump;
     }
 
     private int tickCount = 0;

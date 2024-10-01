@@ -1,14 +1,10 @@
 package client.networking.packets.C2S.play;
 
-import client.game.Entity;
-import client.game.Hand;
 import client.networking.ClientPacketListener;
 import client.networking.packets.C2S.C2SPacket;
 import client.utils.PacketUtil;
-import client.utils.Vec3i;
+import math.Vec3i;
 import io.netty.buffer.ByteBuf;
-
-import java.util.Optional;
 
 public class PlayerActionC2SPacket extends C2SPacket {
     public static final int typeID = 0x24;
@@ -26,23 +22,23 @@ public class PlayerActionC2SPacket extends C2SPacket {
     }
 
     public static PlayerActionC2SPacket cancelDigging(Vec3i blockPos, int sequence) {
-        return new PlayerActionC2SPacket(PlayerActionType.CANCEL_DIGGING, blockPos, BlockFace.BOTTOM, sequence);
+        return new PlayerActionC2SPacket(PlayerActionType.CANCEL_DIGGING, blockPos, BlockFace.DOWN, sequence);
     }
 
     public static PlayerActionC2SPacket dropStack() {
-        return new PlayerActionC2SPacket(PlayerActionType.DROP_ITEM_STACK, Vec3i.ZERO, BlockFace.BOTTOM, 0);
+        return new PlayerActionC2SPacket(PlayerActionType.DROP_ITEM_STACK, Vec3i.ZERO, BlockFace.DOWN, 0);
     }
 
     public static PlayerActionC2SPacket dropItem() {
-        return new PlayerActionC2SPacket(PlayerActionType.DROP_ITEM, Vec3i.ZERO, BlockFace.BOTTOM, 0);
+        return new PlayerActionC2SPacket(PlayerActionType.DROP_ITEM, Vec3i.ZERO, BlockFace.DOWN, 0);
     }
 
     public static PlayerActionC2SPacket updateHandState() {
-        return new PlayerActionC2SPacket(PlayerActionType.FINISH_EATING, Vec3i.ZERO, BlockFace.BOTTOM, 0);
+        return new PlayerActionC2SPacket(PlayerActionType.FINISH_EATING, Vec3i.ZERO, BlockFace.DOWN, 0);
     }
 
     public static PlayerActionC2SPacket swapHands() {
-        return new PlayerActionC2SPacket(PlayerActionType.SWAP_HANDS, Vec3i.ZERO, BlockFace.BOTTOM, 0);
+        return new PlayerActionC2SPacket(PlayerActionType.SWAP_HANDS, Vec3i.ZERO, BlockFace.DOWN, 0);
     }
 
 

@@ -1,4 +1,4 @@
-package client.utils;
+package math;
 
 public class Pair<V, K> {
     private final V left;

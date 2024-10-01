@@ -1,8 +1,8 @@
 package client.networking.packets.C2S.play;
 
 public enum BlockFace {
-    BOTTOM(0),
-    TOP(1),
+    DOWN(0),
+    UP(1),
     NORTH(2),
     SOUTH(3),
     WEST(4),
@@ -14,5 +14,10 @@ public enum BlockFace {
     }
     public byte getValue() {
         return value;
+    }
+
+    public static double getSign(BlockFace face) {
+        if (face == UP || face == SOUTH || face == EAST) return 1;
+        return -1;
     }
 }

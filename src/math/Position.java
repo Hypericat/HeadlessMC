@@ -1,4 +1,4 @@
-package client.utils;
+package math;
 
 public interface Position {
     double getX();

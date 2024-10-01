@@ -1,7 +1,7 @@
 package client.game;
 
 import client.HeadlessInstance;
-import client.utils.Vec3d;
+import math.Vec3d;
 
 public class LivingEntity extends Entity {
 

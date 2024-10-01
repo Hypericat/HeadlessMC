@@ -1,11 +1,9 @@
 package client.utils;
 
-import client.networking.NetworkHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.handler.codec.EncoderException;
-import io.netty.util.CharsetUtil;
-import io.netty.util.internal.StringUtil;
+import math.Vec3i;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;

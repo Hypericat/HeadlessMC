@@ -1,7 +1,7 @@
 package client.game;
 
-import client.utils.Box;
-import client.utils.Vec3d;
+import math.Box;
+import math.Vec3d;
 
 import java.util.HashMap;
 

@@ -1,8 +1,8 @@
 package client.game;
 
 import client.utils.ChunkSectionContainer;
-import client.utils.Pair;
-import client.utils.Vec3i;
+import math.Pair;
+import math.Vec3i;
 
 import java.util.ArrayList;
 import java.util.List;

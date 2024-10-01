@@ -1,4 +1,4 @@
-package client.utils;
+package math;
 
 public class MathHelper {
     public static double lerp(double delta, double a, double b) {

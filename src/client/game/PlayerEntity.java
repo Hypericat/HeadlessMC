@@ -1,7 +1,7 @@
 package client.game;
 
 import client.HeadlessInstance;
-import client.utils.Vec3d;
+import math.Vec3d;
 
 public class PlayerEntity extends LivingEntity{
     public static final float eyeHeight = 1.62F;

@@ -1,4 +1,4 @@
-package client.utils;
+package math;
 
 import java.util.Random;
 
@@ -88,6 +88,17 @@ public class Vec3d implements Position {
     public boolean isInRange(Vec3d pos, double radius) {
         return this.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ()) < radius * radius;
     }
+
+    public Vec3d setX(double x) {
+        return new Vec3d(x, this.getY(), this.getZ());
+    }
+    public Vec3d setY(double y) {
+        return new Vec3d(this.getX(), y, this.getZ());
+    }
+    public Vec3d setZ(double z) {
+        return new Vec3d(this.getX(), this.getY(), z);
+    }
+
 
     public double distanceTo(Vec3d vec) {
         double d = vec.x - this.x;

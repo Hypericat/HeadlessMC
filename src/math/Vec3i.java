@@ -1,6 +1,4 @@
-package client.utils;
-
-import java.util.stream.IntStream;
+package math;
 
 public class Vec3i implements Comparable<Vec3i> {
 

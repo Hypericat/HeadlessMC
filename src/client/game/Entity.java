@@ -1,8 +1,8 @@
 package client.game;
 
 import client.HeadlessInstance;
-import client.utils.Box;
-import client.utils.Vec3d;
+import math.Box;
+import math.Vec3d;
 
 public class Entity {
     private int entityID;

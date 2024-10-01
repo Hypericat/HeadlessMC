@@ -2,6 +2,8 @@ package client.utils;
 
 import client.game.Block;
 import io.netty.buffer.ByteBuf;
+import math.Pair;
+import math.Vec3i;
 
 public class ChunkSectionContainer {
 

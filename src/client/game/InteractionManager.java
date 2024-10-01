@@ -3,8 +3,8 @@ package client.game;
 import client.HeadlessInstance;
 import client.networking.NetworkHandler;
 import client.networking.packets.C2S.play.*;
-import client.utils.Vec3d;
-import client.utils.Vec3i;
+import math.Vec3d;
+import math.Vec3i;
 
 public class InteractionManager {
     private ClientPlayerEntity player;
@@ -63,7 +63,7 @@ public class InteractionManager {
     }
 
     public void startDestroyBlock(Vec3i blockPos) {
-        networkHandler.sendPacket(PlayerActionC2SPacket.startDigging(blockPos, BlockFace.TOP, 0));
+        networkHandler.sendPacket(PlayerActionC2SPacket.startDigging(blockPos, BlockFace.UP, 0));
         blockBreakingProgress = 0;
         currentBlockBreaking = blockPos;
     }
@@ -74,7 +74,7 @@ public class InteractionManager {
     }
 
     public void finishDestroyBlock(Vec3i blockPos) {
-        networkHandler.sendPacket(PlayerActionC2SPacket.finishDigging(blockPos, BlockFace.TOP, 0));
+        networkHandler.sendPacket(PlayerActionC2SPacket.finishDigging(blockPos, BlockFace.UP, 0));
         currentBlockBreaking = null;
     }
     public boolean playerSilentlyMineBlock(Vec3i blockPos) {

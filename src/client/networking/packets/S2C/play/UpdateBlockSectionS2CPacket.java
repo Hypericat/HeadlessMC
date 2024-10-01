@@ -6,8 +6,8 @@ import client.networking.ClientPacketListener;
 import client.networking.NetworkState;
 import client.networking.packets.S2C.S2CPacket;
 import client.utils.PacketUtil;
-import client.utils.Pair;
-import client.utils.Vec3i;
+import math.Pair;
+import math.Vec3i;
 import io.netty.buffer.ByteBuf;
 
 public class UpdateBlockSectionS2CPacket extends S2CPacket {

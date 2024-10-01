@@ -1,6 +1,6 @@
 package client.game;
 
-import client.utils.Box;
+import math.Box;
 
 public class EntityType<T extends Entity> {
     private final int type;
