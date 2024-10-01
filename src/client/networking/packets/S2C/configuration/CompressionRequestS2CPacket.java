@@ -7,7 +7,7 @@ import client.networking.NetworkState;
 import client.utils.PacketUtil;
 
 public class CompressionRequestS2CPacket extends S2CPacket {
-    public static final int typeID = 0x02;
+    public static final int typeID = 0x03;
     public final static NetworkState networkState = NetworkState.HANDSHAKE;
     private int compressionType;
 

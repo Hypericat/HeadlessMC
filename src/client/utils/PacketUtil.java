@@ -46,6 +46,18 @@ public class PacketUtil {
         }
     }
 
+    public static int getIntVarIntSize(int value) {
+        int byteSize = 0;
+        while (true) {
+            if ((value & ~SEGMENT_BITS) == 0) {
+                byteSize ++;
+                return byteSize;
+            }
+            byteSize ++;
+            value >>>= 7;
+        }
+    }
+
     public static void writeVarInt(ByteBuf buf, int value) {
         while (true) {
             if ((value & ~SEGMENT_BITS) == 0) {

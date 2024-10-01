@@ -17,8 +17,10 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final PacketHandler packetHandler;
     private HashMap<Long, Class<?>> packetMap;
     private NetworkHandler handler;
+    private boolean usedCompression;
     public InboundHandler(NetworkHandler handler, HeadlessInstance instance) {
         super();
+        usedCompression = false;
         packetHandler = new PacketHandler(instance);
         this.handler = handler;
         initPacketMap();
@@ -27,6 +29,11 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf buf) {
+        if (handler.isCompressionEnabled()) {
+            usedCompression = true;
+            buf = handleCompressedPacket(buf);
+        }
+
         if (lastBytes != null) {
             ByteBuf newBuf = Unpooled.buffer();
             newBuf.writeBytes(lastBytes);
@@ -38,13 +45,12 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
         while (buf.readableBytes() > 0) {
             int readerIndex = buf.readerIndex();
-            int packetSize;
-            try {
-                packetSize = PacketUtil.readVarInt(buf);
-            } catch (Exception e) {
-                e.printStackTrace();
-                break;
+            int packetSize = PacketUtil.readVarInt(buf);
+
+            if (!usedCompression && handler.isCompressionEnabled()) {
+                packetSize = packetSize - PacketUtil.getIntVarIntSize(PacketUtil.readVarInt(buf));
             }
+
             if (packetSize > buf.readableBytes()) {
                 buf.readerIndex(readerIndex);
                 lastBytes = new byte[buf.readableBytes()];
@@ -62,6 +68,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         //System.out.println("END OF PACKET");
     }
     public void readBuf(ChannelHandlerContext ctx, ByteBuf buf, int maxLength) {
+
         int packetType;
         try {
             packetType = PacketUtil.readVarInt(buf);
@@ -69,7 +76,8 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
             return;
         }
 
-        //System.out.println("Received packet with type " + PacketUtil.toHex(packetType) + " with " + handler.getNetworkState().toString());
+        System.out.println("Received packet with type " + PacketUtil.toHex(packetType) + " with " + handler.getNetworkState().toString());
+
         //System.out.println("Packet of size " + maxLength);
         try {
             Class<?> clazz = packetMap.get(handler.getNetworkState().calcOffset(packetType));
@@ -86,6 +94,29 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
             System.err.println("Failed to decode packet");
             e.printStackTrace();
         }
+    }
+
+    public ByteBuf handleCompressedPacket(ByteBuf buf) {
+        ByteBuf newBuff = Unpooled.buffer();
+        while (buf.readableBytes() > 0) {
+            int packetLength = PacketUtil.readVarInt(buf);
+            int dataLength = PacketUtil.readVarInt(buf);
+            if (dataLength == 0) {
+                dataLength = packetLength - PacketUtil.getIntVarIntSize(dataLength);
+                PacketUtil.writeVarInt(newBuff, dataLength);
+                byte[] data = new byte[dataLength];
+                newBuff.writeBytes(data);
+            } else {
+                PacketUtil.writeVarInt(newBuff, dataLength);
+                int compressedLength = packetLength - PacketUtil.getIntVarIntSize(dataLength);
+                byte[] data = new byte[compressedLength];
+                data = handler.decompress(data);
+                if (data.length != dataLength) System.out.println("DECOMPRESSION ERROR");
+                newBuff.writeBytes(data);
+            }
+            buf.readerIndex(buf.readerIndex() + dataLength);
+        }
+        return newBuff;
     }
     @Override
     public void channelInactive(ChannelHandlerContext context) {

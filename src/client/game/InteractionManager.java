@@ -43,7 +43,6 @@ public class InteractionManager {
 
     public void lookAt(Vec3d pos) {
         Vec3d delta = this.player.getHeadPos().subtract(pos);
-        System.out.println(pos);
         double radius = Math.sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
         float yaw = (float) Math.floorMod((int) (-Math.atan2(delta.x, delta.z) / Math.PI * 180) + 180, 360);
 
