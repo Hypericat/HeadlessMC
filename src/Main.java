@@ -5,8 +5,8 @@ public class Main {
 
     public static void main(String[] args) {
         //makeInstance(args[0], args[1], Integer.parseInt(args[2]));
-        //makeInstance("Winston", "127.0.0.1", 1);
-        makeInstance("Winston", "192.168.2.226", 1);
+        makeInstance("Winston", "127.0.0.1", 1);
+        //makeInstance("Winston", "192.168.2.226", 1);
 
 
         while (true) {

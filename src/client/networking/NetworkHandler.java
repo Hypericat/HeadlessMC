@@ -1,9 +1,7 @@
 package client.networking;
 
 import client.HeadlessInstance;
-import client.networking.packets.C2S.play.KeepAliveC2SPacket;
 import client.utils.PacketUtil;
-import com.jcraft.jzlib.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -12,15 +10,13 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import client.networking.packets.C2S.C2SPacket;
-import io.netty.handler.codec.compression.JdkZlibDecoder;
-import io.netty.handler.codec.compression.JdkZlibEncoder;
-import io.netty.handler.codec.compression.ZlibCodecFactory;
-import io.netty.handler.codec.compression.ZlibEncoder;
 
 import java.io.ByteArrayOutputStream;
 import java.net.ConnectException;
 import java.util.Arrays;
-import java.util.zip.ZipOutputStream;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 public class NetworkHandler {
     private EventLoopGroup group;
@@ -64,44 +60,54 @@ public class NetworkHandler {
 
     public ByteBuf compress(ByteBuf buf) {
         byte[] data = new byte[buf.readableBytes()];
+        int readerIndex = buf.readerIndex();
         buf.readBytes(data);
+        buf.readerIndex(readerIndex);
         return Unpooled.buffer().writeBytes(compress(data)).readerIndex(0);
     }
 
     public byte[] compress(byte[] buf) {
         Deflater deflater;
-        try {
-            deflater = new Deflater(7);
-        } catch (GZIPException e) {
-            throw new RuntimeException(e);
-        }
+        deflater = new Deflater(7);
         deflater.setInput(buf);
-        deflater.setOutput(new byte[1024]);
-        deflater.deflate(4);
-        System.out.println("Compressing data : " + Arrays.toString(buf));
-        byte[] compressedData = new byte[(int) deflater.total_out];
-        System.arraycopy(deflater.next_out, 0, compressedData, 0, compressedData.length);
-        System.out.println("Compressed finished data: " + Arrays.toString(compressedData));
-        return compressedData;
+        deflater.finish();
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byte[] outputBuffer = new byte[1024];
+
+        while (!deflater.finished()) {
+            int bytesCompressed = deflater.deflate(outputBuffer);
+            byteArrayOutputStream.write(outputBuffer, 0, bytesCompressed);
+        }
+        return byteArrayOutputStream.toByteArray();
     }
 
     public ByteBuf decompress(ByteBuf buf) {
         byte[] data = new byte[buf.readableBytes()];
+        int readerIndex = buf.readerIndex();
         buf.readBytes(data);
+        buf.readerIndex(readerIndex);
         return Unpooled.buffer().writeBytes(decompress(data)).readerIndex(0);
     }
 
     public byte[] decompress(byte[] buf) {
-        Inflater inflater;
-        inflater = new Inflater();
+        Inflater inflater = new Inflater();
         inflater.setInput(buf);
-        inflater.setOutput(new byte[1024]);
-        inflater.inflate(4);
 
-        byte[] uncompressedData = new byte[(int) inflater.total_out];
-        System.arraycopy(inflater.next_out, 0, uncompressedData, 0, uncompressedData.length);
-        System.out.println("Decompress data: ");
-        return uncompressedData;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        byte[] outputBuffer = new byte[1024];
+        while (!inflater.finished()) {
+            int bytesCompressed;
+            try {
+                bytesCompressed = inflater.inflate(outputBuffer);
+            } catch (DataFormatException e) {
+                throw new RuntimeException(e);
+            }
+            byteArrayOutputStream.write(outputBuffer, 0, bytesCompressed);
+        }
+        inflater.end();
+        return byteArrayOutputStream.toByteArray();
     }
 
 
@@ -121,11 +127,11 @@ public class NetworkHandler {
             PacketUtil.writeVarInt(dataLength, dataBuf.readableBytes());
             PacketUtil.writeVarInt(sizeBuf,dataLength.readableBytes() + compressedBuf.readableBytes());
             dataBuf = compressedBuf;
-            System.out.println("Sending compressed packet bigger than threshold");
+            //System.out.println("Sending compressed packet bigger than threshold");
         } else {
             PacketUtil.writeVarInt(dataLength, 0);
             PacketUtil.writeVarInt(sizeBuf,dataLength.readableBytes() + dataBuf.readableBytes());
-            System.out.println("Sending compressed packet smaller than threshold");
+          //  System.out.println("Sending compressed packet smaller than threshold");
 
         }
         channel.write(sizeBuf);

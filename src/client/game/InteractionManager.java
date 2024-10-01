@@ -77,14 +77,23 @@ public class InteractionManager {
         networkHandler.sendPacket(PlayerActionC2SPacket.finishDigging(blockPos, BlockFace.TOP, 0));
         currentBlockBreaking = null;
     }
-
-    public boolean playerMineBlock(Vec3i blockPos) {
+    public boolean playerSilentlyMineBlock(Vec3i blockPos) {
         if (isBreakingBlock()) return false;
         startDestroyBlock(blockPos);
         instance.getScheduler().schedule(6, o -> {
             finishDestroyBlock(blockPos);
         });
         return true;
+    }
+
+    public boolean playerMineBlock(Vec3i blockPos) {
+        boolean result = playerSilentlyMineBlock(blockPos);
+        if (result) {
+            startDestroyBlock(blockPos);
+            swingHand(Hand.MAIN);
+            lookAt(blockPos);
+        }
+        return result;
     }
 
     public void sendChatMessage(String message) {

@@ -91,7 +91,10 @@ public class Vec3i implements Comparable<Vec3i> {
 
 
     public Vec3i subtract(Vec3i vec) {
-        return this.add(-vec.getX(), -vec.getY(), -vec.getZ());
+        return this.subtract(vec.getX(), vec.getY(), vec.getZ());
+    }
+    public Vec3i subtract(int x, int y, int z) {
+        return this.add(-x, -y, -z);
     }
 
 

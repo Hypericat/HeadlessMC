@@ -19,8 +19,6 @@ public class Scheduler {
     public void onTick() {
         tickCounter ++;
         for (ScheduleEntry entry : schedules.values()) {
-            System.out.println("Entry time " + entry.getNextTime());
-            System.out.println("tick counter " + tickCounter);
             if (entry.getNextTime() <= tickCounter) {
                 entry.execute();
                 if (entry.getType() == Type.ONCE) {

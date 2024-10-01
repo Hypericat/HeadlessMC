@@ -3,13 +3,9 @@ package client.game;
 import client.HeadlessInstance;
 import client.networking.packets.C2S.play.ClientStatusC2SPacket;
 import client.networking.packets.C2S.play.PlayerMoveFullC2SPacket;
-import client.networking.packets.C2S.play.PlayerMoveRotC2SPacket;
 import client.utils.Box;
 import client.utils.Vec3d;
 import client.utils.Vec3i;
-
-import java.util.List;
-import java.util.Random;
 
 public class ClientPlayerEntity extends PlayerEntity{
     private int selectedSlot;
@@ -25,7 +21,9 @@ public class ClientPlayerEntity extends PlayerEntity{
         super.onTick();
         tickMovement();
         decrementAttackCooldown();
-        doKillAura();
+        boolean b = getInstance().getInteractionManager().playerMineBlock(Vec3i.ofFloored(this.getPos()).subtract(0, 1, 0));
+        System.out.println(b);
+        //doKillAura();
 
     }
 

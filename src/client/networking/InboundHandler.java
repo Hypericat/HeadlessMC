@@ -18,6 +18,9 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private HashMap<Long, Class<?>> packetMap;
     private NetworkHandler handler;
     private boolean usedCompression;
+    private byte[] lastBytes;
+    private byte[] lastCompressedBytes;
+
     public InboundHandler(NetworkHandler handler, HeadlessInstance instance) {
         super();
         usedCompression = false;
@@ -25,7 +28,6 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         this.handler = handler;
         initPacketMap();
     }
-    byte[] lastBytes;
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf buf) {
@@ -76,7 +78,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
             return;
         }
 
-        System.out.println("Received packet with type " + PacketUtil.toHex(packetType) + " with " + handler.getNetworkState().toString());
+        //System.out.println("Received packet with type " + PacketUtil.toHex(packetType) + " with " + handler.getNetworkState().toString());
 
         //System.out.println("Packet of size " + maxLength);
         try {
@@ -92,31 +94,52 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
             //e.printStackTrace();
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             System.err.println("Failed to decode packet");
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
     public ByteBuf handleCompressedPacket(ByteBuf buf) {
-        ByteBuf newBuff = Unpooled.buffer();
+        ByteBuf decompressedBuf = Unpooled.buffer();
+        if (lastCompressedBytes != null) {
+            ByteBuf newBuf = Unpooled.buffer();
+            newBuf.writeBytes(lastCompressedBytes);
+            newBuf.writeBytes(buf);
+            newBuf.readerIndex(0);
+            buf = newBuf;
+            lastCompressedBytes = null;
+        }
         while (buf.readableBytes() > 0) {
+            int readerIndex = buf.readerIndex();
+
             int packetLength = PacketUtil.readVarInt(buf);
+
+            if (packetLength > buf.readableBytes()) {
+                buf.readerIndex(readerIndex);
+                lastCompressedBytes = new byte[buf.readableBytes()];
+                buf.readBytes(lastCompressedBytes);
+                return decompressedBuf;
+            }
+
             int dataLength = PacketUtil.readVarInt(buf);
             if (dataLength == 0) {
                 dataLength = packetLength - PacketUtil.getIntVarIntSize(dataLength);
-                PacketUtil.writeVarInt(newBuff, dataLength);
+                PacketUtil.writeVarInt(decompressedBuf, dataLength);
                 byte[] data = new byte[dataLength];
-                newBuff.writeBytes(data);
+                buf.readBytes(data);
+                decompressedBuf.writeBytes(data);
             } else {
-                PacketUtil.writeVarInt(newBuff, dataLength);
                 int compressedLength = packetLength - PacketUtil.getIntVarIntSize(dataLength);
+
+                PacketUtil.writeVarInt(decompressedBuf, dataLength);
+
                 byte[] data = new byte[compressedLength];
+                buf.readBytes(data);
                 data = handler.decompress(data);
                 if (data.length != dataLength) System.out.println("DECOMPRESSION ERROR");
-                newBuff.writeBytes(data);
+                decompressedBuf.writeBytes(data);
             }
-            buf.readerIndex(buf.readerIndex() + dataLength);
         }
-        return newBuff;
+        return decompressedBuf;
     }
     @Override
     public void channelInactive(ChannelHandlerContext context) {
