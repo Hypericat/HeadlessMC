@@ -1,6 +1,7 @@
 package client.utils;
 
 import client.game.Block;
+import client.game.Blocks;
 import io.netty.buffer.ByteBuf;
 import math.Pair;
 import math.Vec3i;
@@ -68,9 +69,7 @@ public class ChunkSectionContainer {
     public int getIdAt(int x, int y, int z) {
         if (simpleID == -1 && data == null) throw new RuntimeException("Simple ID and Data have no data!");
         if (simpleID != -1) return simpleID;
-        //System.out.println("X : " + x);
-        //System.out.println("Y : " + y);
-        //System.out.println("Z : " + z);
+        if (x < 0 || y < 0 || z < 0) return Blocks.AIR.getStates().getDefault();
         int dataIndex = x + z * 16 + y * 256;
         int dataPerLong = Long.SIZE / bpe;
         int longIndex = dataIndex / dataPerLong;

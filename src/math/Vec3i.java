@@ -62,6 +62,16 @@ public class Vec3i implements Comparable<Vec3i> {
         return this.z;
     }
 
+    public Vec3i withX(int x) {
+        return new Vec3i(x, this.getY(), this.getZ());
+    }
+    public Vec3i withY(int y) {
+        return new Vec3i(this.getX(), y, this.getZ());
+    }
+    public Vec3i withZ(int z) {
+        return new Vec3i(this.getX(), this.getY(), z);
+    }
+
     protected Vec3i setX(int x) {
         this.x = x;
         return this;

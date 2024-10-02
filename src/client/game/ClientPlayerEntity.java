@@ -4,15 +4,12 @@ import client.HeadlessInstance;
 import client.networking.packets.C2S.play.BlockFace;
 import client.networking.packets.C2S.play.ClientStatusC2SPacket;
 import client.networking.packets.C2S.play.PlayerMoveFullC2SPacket;
-import math.BlockRaycastResult;
-import math.Box;
-import math.Vec3d;
-import math.Vec3i;
+import math.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClientPlayerEntity extends PlayerEntity{
+public class ClientPlayerEntity extends PlayerEntity {
     private int selectedSlot;
     private int chunkX;
     private int chunkZ;
@@ -21,6 +18,7 @@ public class ClientPlayerEntity extends PlayerEntity{
     public ClientPlayerEntity(int entityID, HeadlessInstance instance) {
         super(entityID, instance);
     }
+
     @Override
     public void onTick() {
         super.onTick();
@@ -57,7 +55,7 @@ public class ClientPlayerEntity extends PlayerEntity{
 
     public void decrementAttackCooldown() {
         if (attackCooldown <= 0) return;
-        attackCooldown --;
+        attackCooldown--;
     }
 
     public void setChunkZ(int chunkZ) {
@@ -107,49 +105,10 @@ public class ClientPlayerEntity extends PlayerEntity{
         updatePosPackets();
     }
 
-    public void onBlockCollision(Vec3i blockPos, World world, Box playerBoundingBox, Vec3d playerPos) {
-        Block block = world.getBlock(blockPos);
-        if (block == Blocks.AIR) return;
-        List<Box> boundingBoxes = new ArrayList<>();
-        boundingBoxes.add(playerBoundingBox);
-        boundingBoxes.add(new Box(Vec3d.ZERO, new Vec3d(1, 1, 1)).offset(blockPos));
-        BlockRaycastResult raycast = Box.raycast(boundingBoxes, playerBoundingBox.getRelativeCenter(), Vec3d.of(blockPos));
-        BlockFace direction = raycast.getFace();
-        System.out.println("Block type : " + block + " direction : " + direction);
-        if (direction == null) return;
-        validateCollision(direction, blockPos);
-        if (direction == BlockFace.DOWN) {
-            this.setOnGround(true);
-        }
 
-    }
     private void updateVelocity() {
         checkBlockCollision();
         this.setPos(this.getPos().add(this.getVelocity()));
-    }
-
-    private void validateCollision(BlockFace direction, Vec3i blockPos) {
-        double x = this.getVelocity().x;
-        double y = this.getVelocity().y;
-        double z = this.getVelocity().z;
-
-        if (direction == BlockFace.DOWN || direction == BlockFace.UP) {
-            this.setVelocity(x, 0, z);
-            this.setY(blockPos.getY() + 1 * BlockFace.getSign(direction));
-            return;
-        }
-        if (direction == BlockFace.EAST || direction == BlockFace.WEST) {
-            this.setVelocity(0, y, z);
-            this.setX(blockPos.getX() + 1 * BlockFace.getSign(direction));
-            //if (getInstance().getAutoJump()) jump();
-            return;
-        }
-        if (direction == BlockFace.NORTH || direction == BlockFace.SOUTH) {
-            this.setVelocity(x, y, 0);
-            this.setZ(blockPos.getZ() + 1 * BlockFace.getSign(direction));
-            //if (getInstance().getAutoJump()) jump();
-            return;
-        }
     }
 
     public void tickFalling(Vec3d velocity) {
@@ -160,10 +119,46 @@ public class ClientPlayerEntity extends PlayerEntity{
     }
 
     public void checkBlockCollision() {
-        Vec3d nextPos = getPos().add(this.getVelocity());
+        Vec3d velocity = this.getVelocity();
+        Vec3d playerPos = this.getPos();
+        Vec3i playerBlockPos = Vec3i.ofFloored(playerPos);
+
+
+        double yVelocity = velocity.y;
+        Vec3i endBlockPos = Vec3i.ofFloored(playerPos.add(0, yVelocity, 0));
+        int delta = playerBlockPos.getY() - endBlockPos.getY();
+        if (delta == 0) return;
+        //do this for every block in the hit box X/Z plane
+        Pair<Vec3i, Block> intersectingYBlock = getFirstBlockY(playerBlockPos, endBlockPos, delta);
+        if (intersectingYBlock != null) {
+            Vec3i blockPos = intersectingYBlock.getLeft();
+            Block block = intersectingYBlock.getRight();
+            Box blockBox = block.getBoundingBox().offset(blockPos);
+            System.out.println("Intersecting block " + block + " at position " + blockBox.getRelativeCenter());
+            this.setPos(this.getPos().setY(blockBox.getRelativeCenter().y + delta > 0 ? blockBox.getMaxPos().y : blockBox.getMinPos().y));
+            this.setVelocity(this.getVelocity().setY(0));
+        }
+
+
+    }
+
+    public Pair<Vec3i, Block> getFirstBlockY(Vec3i playerBlockPos, Vec3i endBlockPos, int delta) {
+        for (int i = playerBlockPos.getY(); delta < 0 ? i <= endBlockPos.getY() : i >= endBlockPos.getY(); i += delta < 0 ? 1 : -1) {
+            Vec3i blockPos = playerBlockPos.withY(i);
+            Block block = getInstance().getWorld().getBlock(blockPos);
+            if (block == Blocks.AIR) continue;
+            return new Pair<>(blockPos, block);
+        }
+        return null;
+    }
+
+
+    public void oldCheckBlockCollision() {
+        Vec3d velocity = this.getVelocity();
+        Vec3d nextPos = getPos().add(velocity);
         Box newBound = calcBoundingBox(nextPos);
-        Vec3d min = newBound.getMinPos().add(1.0E-7);
-        Vec3d max = newBound.getMaxPos().subtract(1.0E-7);
+        Vec3d min = newBound.getMinPos().add(Box.EPSILON);
+        Vec3d max = newBound.getMaxPos().subtract(Box.EPSILON);
         Vec3i bottom = Vec3i.ofFloored(min);
         Vec3i top = Vec3i.ofFloored(max);
 
@@ -171,12 +166,12 @@ public class ClientPlayerEntity extends PlayerEntity{
             for (int k = bottom.getY(); k <= top.getY(); k++) {
                 for (int j = bottom.getZ(); j <= top.getZ(); j++) {
                     Vec3i pos = new Vec3i(i, k, j);
-                    onBlockCollision(pos, getInstance().getWorld(), newBound, nextPos);
+
                 }
             }
         }
         this.setOnGround(false);
-
+        System.out.println("Set final velocity " + this.getVelocity());
     }
 
     public void jump() {

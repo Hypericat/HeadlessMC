@@ -1,5 +1,8 @@
 package client.game;
 
+import math.Box;
+import math.Vec3d;
+
 public class Block {
     private final String name;
     private final String type;
@@ -27,6 +30,9 @@ public class Block {
 
     public BlockStates getStates() {
         return states;
+    }
+    public Box getBoundingBox() {
+        return new Box(Vec3d.ZERO, new Vec3d(1, 1, 1));
     }
 
     public String toString() {

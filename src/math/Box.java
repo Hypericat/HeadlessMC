@@ -2,7 +2,10 @@ package math;
 
 import client.networking.packets.C2S.play.BlockFace;
 
+import java.util.Optional;
+
 public class Box {
+    public static final double EPSILON = 1.0E-7;
     double minX;
     double minY;
     double minZ;
@@ -160,7 +163,7 @@ public class Box {
         return new Vec3d(this.maxX, this.maxY, this.maxZ);
     }
 
-    public static BlockRaycastResult raycast(Iterable<Box> boxes, Vec3d from, Vec3d to) {
+    public static BlockRaycastResult raycast(Iterable<Box> boxes, Vec3d from, Vec3d to, Vec3i blockPos) {
         double[] ds = new double[]{1.0};
         BlockFace direction = null;
         double d = to.x - from.x;
@@ -168,7 +171,7 @@ public class Box {
         double f = to.z - from.z;
 
         for (Box box : boxes) {
-            direction = traceCollisionSide(box, from, ds, direction, d, e, f);
+            direction = traceCollisionSide(box.offset(blockPos), from, ds, direction, d, e, f);
         }
 
         if (direction == null) {
@@ -180,7 +183,11 @@ public class Box {
     }
 
     private static BlockFace traceCollisionSide(Box box, Vec3d intersectingVector, double[] traceDistanceResult, BlockFace approachDirection, double deltaX, double deltaY, double deltaZ) {
-        if (deltaX > 1.0E-7) {
+        System.out.println("dx : " + deltaX);
+        System.out.println("dy : " + deltaY);
+        System.out.println("dz : " + deltaZ);
+
+        if (deltaX > EPSILON) {
             approachDirection = traceCollisionSide(
                     traceDistanceResult,
                     approachDirection,
@@ -197,7 +204,7 @@ public class Box {
                     intersectingVector.y,
                     intersectingVector.z
             );
-        } else if (deltaX < -1.0E-7) {
+        } else if (deltaX < -EPSILON) {
             approachDirection = traceCollisionSide(
                     traceDistanceResult,
                     approachDirection,
@@ -216,7 +223,7 @@ public class Box {
             );
         }
 
-        if (deltaY > 1.0E-7) {
+        if (deltaY > EPSILON) {
             approachDirection = traceCollisionSide(
                     traceDistanceResult,
                     approachDirection,
@@ -233,7 +240,7 @@ public class Box {
                     intersectingVector.z,
                     intersectingVector.x
             );
-        } else if (deltaY < -1.0E-7) {
+        } else if (deltaY < -EPSILON) {
             approachDirection = traceCollisionSide(
                     traceDistanceResult,
                     approachDirection,
@@ -252,7 +259,7 @@ public class Box {
             );
         }
 
-        if (deltaZ > 1.0E-7) {
+        if (deltaZ > EPSILON) {
             approachDirection = traceCollisionSide(
                     traceDistanceResult,
                     approachDirection,
@@ -269,7 +276,7 @@ public class Box {
                     intersectingVector.x,
                     intersectingVector.y
             );
-        } else if (deltaZ < -1.0E-7) {
+        } else if (deltaZ < -EPSILON) {
             approachDirection = traceCollisionSide(
                     traceDistanceResult,
                     approachDirection,
@@ -289,6 +296,19 @@ public class Box {
         }
 
         return approachDirection;
+    }
+    public Vec3d getDelta(Box box) {
+        double dx = Math.max(Math.min(this.maxX, box.maxX) - Math.max(this.minX, box.minX), 0);
+        double dy = Math.max(Math.min(this.maxY, box.maxY) - Math.max(this.minY, box.minY), 0);
+        double dz = Math.max(Math.min(this.maxZ, box.maxZ) - Math.max(this.minZ, box.minZ), 0);
+        return new Vec3d(dx, dy, dz);
+    }
+
+    public Vec3d getClosestPointTo(Vec3d target) {
+        double d = Math.clamp(target.getX(), minX, maxX);
+        double e = Math.clamp(target.getY(), minY, maxY);
+        double f = Math.clamp(target.getZ(), minZ, maxZ);
+        return new Vec3d(d, e, f);
     }
 
     private static BlockFace traceCollisionSide(
@@ -310,11 +330,11 @@ public class Box {
         double d = (begin - startX) / deltaX;
         double e = startY + d * deltaY;
         double f = startZ + d * deltaZ;
-        if (0.0 < d && d < traceDistanceResult[0] && minX - 1.0E-7 < e && e < maxX + 1.0E-7 && minZ - 1.0E-7 < f && f < maxZ + 1.0E-7) {
+        if (0.0 < d && d < traceDistanceResult[0] && minX - EPSILON < e && e < maxX + EPSILON && minZ - EPSILON < f && f < maxZ + EPSILON) {
             traceDistanceResult[0] = d;
             return resultDirection;
         } else {
-            return approachDirection;
+            return resultDirection;
         }
     }
 
