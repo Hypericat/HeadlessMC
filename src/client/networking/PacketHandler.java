@@ -169,7 +169,7 @@ public class PacketHandler implements ClientPacketListener {
     public void onSynchronizePlayerPosition(SynchronizePlayerPositionS2CPacket packet) {
         Flag flags = packet.getFlags();
         ClientPlayerEntity player = instance.getPlayer();
-        //instance.getInteractionManager().sendChatMessage("Server resetting client position!");
+        instance.getInteractionManager().sendChatMessage("Server resetting client position!");
 
         player.setX(flags.contains(0x01) ? player.getX() + packet.getX() : packet.getX());
         player.setY(flags.contains(0x02) ? player.getY() + packet.getY() : packet.getY());

@@ -1,5 +1,7 @@
 package math;
 
+import client.networking.packets.C2S.play.BlockFace;
+
 public class Vec3i implements Comparable<Vec3i> {
 
     public static final Vec3i ZERO = new Vec3i(0, 0, 0);
@@ -121,6 +123,16 @@ public class Vec3i implements Comparable<Vec3i> {
                 this.getZ() * vec.getX() - this.getX() * vec.getZ(),
                 this.getX() * vec.getY() - this.getY() * vec.getX()
         );
+    }
+
+    public Vec3i with(BlockFace face, int value) {
+        if (face == BlockFace.DOWN || face == BlockFace.UP) {
+            this.withY(value);
+        }
+        if (face == BlockFace.EAST || face == BlockFace.WEST) {
+            return this.withX(value);
+        }
+        return this.withZ(value);
     }
 
 
