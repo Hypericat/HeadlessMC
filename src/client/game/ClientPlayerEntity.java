@@ -22,6 +22,10 @@ public class ClientPlayerEntity extends PlayerEntity {
     @Override
     public void onTick() {
         super.onTick();
+        List<Entity> players = getInstance().getWorld().getEntitiesByType(EntityTypes.PLAYER);
+        doTestMovement();
+        Vec3d newVelocity = getVelocityFromDir(0.75);
+        this.setVelocity(newVelocity.x, this.getVelocity().y, newVelocity.z);
         tickMovement();
         decrementAttackCooldown();
 
@@ -104,10 +108,13 @@ public class ClientPlayerEntity extends PlayerEntity {
         updatePosPackets();
     }
 
+    public Vec3d getVelocityFromDir(double velocity) {
+        return new Vec3d(-Math.sin(Math.toRadians(getYaw())), 0, Math.cos(Math.toRadians(getYaw()))).normalize().multiply(velocity);
+    }
+
 
     private void updateVelocity() {
         checkBlockCollision();
-        System.out.println("Velocity " + this.getVelocity());
         this.setPos(this.getPos().add(this.getVelocity()));
     }
 
@@ -133,10 +140,10 @@ public class ClientPlayerEntity extends PlayerEntity {
         Vec3i playerBlockPos = Vec3i.ofFloored(playerPos);
         Vec3d min = this.getBoundingBox().getMinPos().add(Box.EPSILON);
         Vec3d max = this.getBoundingBox().getMaxPos().subtract(Box.EPSILON);
-        Vec3i maxBlock = Vec3i.ofFloored(min);
-        Vec3i minBlock = Vec3i.ofFloored(max);
+        Vec3i maxBlock = Vec3i.ofFloored(max);
+        Vec3i minBlock = Vec3i.ofFloored(min);
         List<Vec3i> sideBlocks = new ArrayList<>();
-        for (int k = minBlock.getX(); k <= maxBlock.getY(); k++) {
+        for (int k = minBlock.getX(); k <= maxBlock.getX(); k++) {
             for (int j = minBlock.getY(); j <= maxBlock.getY(); j++) {
                 sideBlocks.add(new Vec3i(k, j, 0));
             }
@@ -152,8 +159,7 @@ public class ClientPlayerEntity extends PlayerEntity {
             Vec3i blockPos = intersectingBlock.getLeft();
             Block block = intersectingBlock.getRight();
             Box blockBox = block.getBoundingBox().offset(blockPos);
-            System.out.println("Intersecting block Z " + block + " at position " + blockBox.getRelativeCenter());
-            this.setPos(this.getPos().setZ(blockBox.getRelativeCenter().z + delta > 0 ? blockBox.getMaxPos().z : blockBox.getMinPos().z));
+            this.setPos(this.getPos().setZ(delta > 0 ? blockBox.getMaxPos().z  + this.getBoundingBox().getLengthZ() : blockBox.getMinPos().z - this.getBoundingBox().getLengthZ() / 2d));
             this.setVelocity(this.getVelocity().setZ(0));
         }
     }
@@ -161,8 +167,8 @@ public class ClientPlayerEntity extends PlayerEntity {
         Vec3i playerBlockPos = Vec3i.ofFloored(playerPos);
         Vec3d min = this.getBoundingBox().getMinPos().add(Box.EPSILON);
         Vec3d max = this.getBoundingBox().getMaxPos().subtract(Box.EPSILON);
-        Vec3i maxBlock = Vec3i.ofFloored(min);
-        Vec3i minBlock = Vec3i.ofFloored(max);
+        Vec3i maxBlock = Vec3i.ofFloored(max);
+        Vec3i minBlock = Vec3i.ofFloored(min);
         List<Vec3i> sideBlocks = new ArrayList<>();
         for (int k = minBlock.getY(); k <= maxBlock.getY(); k++) {
             for (int j = minBlock.getZ(); j <= maxBlock.getZ(); j++) {
@@ -175,13 +181,13 @@ public class ClientPlayerEntity extends PlayerEntity {
         int delta = playerBlockPos.getX() - endBlockPos.getX();
         if (delta == 0) return;
         //do this for every block in the hit box Y/Z plane
-        Pair<Vec3i, Block> intersectingBlock = getFirstBlock(playerBlockPos.getX(), endBlockPos.getZ(), delta, sideBlocks, BlockFace.EAST);
+        Pair<Vec3i, Block> intersectingBlock = getFirstBlock(playerBlockPos.getX(), endBlockPos.getX(), delta, sideBlocks, BlockFace.EAST);
         if (intersectingBlock != null) {
             Vec3i blockPos = intersectingBlock.getLeft();
             Block block = intersectingBlock.getRight();
             Box blockBox = block.getBoundingBox().offset(blockPos);
-            System.out.println("Intersecting block X " + block + " at position " + blockBox.getRelativeCenter());
-            this.setPos(this.getPos().setX(blockBox.getRelativeCenter().x + delta > 0 ? blockBox.getMaxPos().x : blockBox.getMinPos().x));
+            Vec3d newPos = this.getPos().setX(delta > 0 ? blockBox.getMaxPos().x  + this.getBoundingBox().getLengthX() / 2d : blockBox.getMinPos().x - this.getBoundingBox().getLengthX() / 2d);
+            this.setPos(newPos);
             this.setVelocity(this.getVelocity().setX(0));
         }
     }
@@ -190,10 +196,10 @@ public class ClientPlayerEntity extends PlayerEntity {
         Vec3i playerBlockPos = Vec3i.ofFloored(playerPos);
         Vec3d min = this.getBoundingBox().getMinPos().add(Box.EPSILON);
         Vec3d max = this.getBoundingBox().getMaxPos().subtract(Box.EPSILON);
-        Vec3i maxBlock = Vec3i.ofFloored(min);
-        Vec3i minBlock = Vec3i.ofFloored(max);
+        Vec3i maxBlock = Vec3i.ofFloored(max);
+        Vec3i minBlock = Vec3i.ofFloored(min);
         List<Vec3i> sideBlocks = new ArrayList<>();
-        for (int k = minBlock.getX(); k <= maxBlock.getY(); k++) {
+        for (int k = minBlock.getX(); k <= maxBlock.getX(); k++) {
             for (int j = minBlock.getZ(); j <= maxBlock.getZ(); j++) {
                 sideBlocks.add(new Vec3i(k, 0, j));
             }
@@ -205,48 +211,33 @@ public class ClientPlayerEntity extends PlayerEntity {
         if (delta == 0) return;
         //do this for every block in the hit box X/Z plane
         Pair<Vec3i, Block> intersectingYBlock = getFirstBlock(playerBlockPos.getY(), endBlockPos.getY(), delta, sideBlocks, BlockFace.DOWN);
-        if (intersectingYBlock != null) {
-            Vec3i blockPos = intersectingYBlock.getLeft();
-            Block block = intersectingYBlock.getRight();
-            Box blockBox = block.getBoundingBox().offset(blockPos);
-            System.out.println("Intersecting block Y " + block + " at position " + blockBox.getRelativeCenter());
-            this.setPos(this.getPos().setY(blockBox.getRelativeCenter().y + delta > 0 ? blockBox.getMaxPos().y : blockBox.getMinPos().y));
-            this.setVelocity(this.getVelocity().setY(0));
+        if (intersectingYBlock == null) {
+            this.setOnGround(false);
+            return;
         }
+        Vec3i blockPos = intersectingYBlock.getLeft();
+        Block block = intersectingYBlock.getRight();
+        Box blockBox = block.getBoundingBox().offset(blockPos);
+        this.setPos(this.getPos().setY(blockBox.getRelativeCenter().y + delta > 0 ? blockBox.getMaxPos().y : blockBox.getMinPos().y));
+        this.setVelocity(this.getVelocity().setY(0));
+        this.setOnGround(true);
     }
 
     public Pair<Vec3i, Block> getFirstBlock(int blockPosStart, int blockPosEnd, int delta, List<Vec3i> sideBlocks, BlockFace faceAxis) {
-        for (int i = blockPosStart; delta < 0 ? i <= blockPosEnd : i >= blockPosEnd; i += delta < 0 ? 1 : -1) {
+        if (delta < 0) blockPosEnd ++;
+        else blockPosEnd --; //add one extra range to make sure bounding box is checked anyways
+        for (int i = blockPosStart; delta > 0 ? i >= blockPosEnd : i <= blockPosEnd; i += (delta > 0 ? -1 : 1)) {
             for (Vec3i sideBlock : sideBlocks) {
                 Vec3i blockPos = sideBlock.with(faceAxis, i);
                 Block block = getInstance().getWorld().getBlock(blockPos);
+                Box playerBox = this.calcBoundingBox(Vec3d.of(blockPos));
+                Box blockBox = block.getBoundingBox().offset(blockPos);
+                if (!playerBox.intersects(blockBox)) continue;
                 if (block == Blocks.AIR) continue;
                 return new Pair<>(blockPos, block);
             }
         }
         return null;
-    }
-
-
-    public void oldCheckBlockCollision() {
-        Vec3d velocity = this.getVelocity();
-        Vec3d nextPos = getPos().add(velocity);
-        Box newBound = calcBoundingBox(nextPos);
-        Vec3d min = newBound.getMinPos().add(Box.EPSILON);
-        Vec3d max = newBound.getMaxPos().subtract(Box.EPSILON);
-        Vec3i bottom = Vec3i.ofFloored(min);
-        Vec3i top = Vec3i.ofFloored(max);
-
-        for (int i = bottom.getX(); i <= top.getX(); i++) {
-            for (int k = bottom.getY(); k <= top.getY(); k++) {
-                for (int j = bottom.getZ(); j <= top.getZ(); j++) {
-                    Vec3i pos = new Vec3i(i, k, j);
-
-                }
-            }
-        }
-        this.setOnGround(false);
-        System.out.println("Set final velocity " + this.getVelocity());
     }
 
     public void jump() {

@@ -127,7 +127,7 @@ public class Vec3i implements Comparable<Vec3i> {
 
     public Vec3i with(BlockFace face, int value) {
         if (face == BlockFace.DOWN || face == BlockFace.UP) {
-            this.withY(value);
+            return this.withY(value);
         }
         if (face == BlockFace.EAST || face == BlockFace.WEST) {
             return this.withX(value);

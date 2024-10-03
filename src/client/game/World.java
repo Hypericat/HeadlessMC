@@ -34,8 +34,7 @@ public class World {
 
     public void addChunk(Chunk chunk) {
         long hash = getHash(chunk);
-        if (chunks.containsKey(hash)) return;
-
+        chunks.remove(hash);
         chunks.put(hash, chunk);
     }
 
@@ -104,6 +103,14 @@ public class World {
         List<Entity> entities = new ArrayList<>();
         for (Entity entity : this.entities.values()) {
             if (entity.getBoundingBox().getCenter().add(entity.getPos()).isInRange(origin, radius)) entities.add(entity);
+        }
+        return entities;
+    }
+
+    public <T extends Entity> List<T> getEntitiesByType(EntityType<?> type) {
+        List<T> entities = new ArrayList<>();
+        for (Entity entity : this.entities.values()) {
+            if (entity.getEntityType().getEntityClass() == type.getEntityClass()) entities.add((T) entity);
         }
         return entities;
     }
