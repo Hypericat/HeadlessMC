@@ -13,12 +13,7 @@ public class ClientBoundKnownPacksS2CPacket extends S2CPacket {
     public ClientBoundKnownPacksS2CPacket(ByteBuf buf, int size) throws IllegalArgumentException {
         super(buf, size);
 
-        //System.out.println("buf length " + buf.capacity());
-        //System.out.println("reader index " + buf.readerIndex());
-        //System.out.println("remaining bytes " + buf.readableBytes());
-
         this.buf = buf.slice().copy();
-        //System.out.println(PacketUtil.readString(buf));
     }
 
     @Override

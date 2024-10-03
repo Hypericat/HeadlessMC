@@ -1,5 +1,6 @@
 package client.game;
 
+import client.HeadlessInstance;
 import math.Pair;
 import math.Vec3d;
 import math.Vec3i;
@@ -12,13 +13,15 @@ public class World {
     private int maxHeight;
     HashMap<Long, Chunk> chunks = new HashMap<>();
     private final HashMap<Integer, Entity> entities = new HashMap<>();
+    private HeadlessInstance instance;
 
-    public World(int maxHeight) {
+    public World(int maxHeight, HeadlessInstance instance) {
         this.maxHeight = maxHeight;
+        this.instance = instance;
     }
 
-    public World() {
-        this(384);
+    public World(HeadlessInstance instance) {
+        this(384, instance);
     }
 
     public int getMaxHeight() {
@@ -63,7 +66,7 @@ public class World {
     }
 
     public void setBlock(Vec3i pos, Block blockState) {
-        //System.out.println("Set block at {" + pos + "} to " + blockState.toString());
+        //System("Set block at {" + pos + "} to " + blockState.toString());
         setBlock(pos.getX(), pos.getY(), pos.getZ(), blockState);
     }
 
@@ -73,6 +76,10 @@ public class World {
 
 
         chunk.setBlockAt(Math.floorMod(x, 16), y, (Math.floorMod(z, 16)), block);
+    }
+
+    public HeadlessInstance getInstance() {
+        return instance;
     }
 
     public void setBlocks(Vec3i chunkPos, Pair<Block, Vec3i>[] blocks) {

@@ -183,10 +183,6 @@ public class Box {
     }
 
     private static BlockFace traceCollisionSide(Box box, Vec3d intersectingVector, double[] traceDistanceResult, BlockFace approachDirection, double deltaX, double deltaY, double deltaZ) {
-        System.out.println("dx : " + deltaX);
-        System.out.println("dy : " + deltaY);
-        System.out.println("dz : " + deltaZ);
-
         if (deltaX > EPSILON) {
             approachDirection = traceCollisionSide(
                     traceDistanceResult,

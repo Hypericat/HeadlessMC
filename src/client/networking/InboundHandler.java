@@ -63,11 +63,9 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
             readerIndex = buf.readerIndex();
 
             ByteBuf sliced = buf.slice(readerIndex, packetSize);
-            //if (packetSize == 0) break;
             readBuf(ctx, sliced, packetSize);
             buf.readerIndex(readerIndex + packetSize);
         }
-        //System.out.println("END OF PACKET");
     }
     public void readBuf(ChannelHandlerContext ctx, ByteBuf buf, int maxLength) {
 
@@ -78,9 +76,6 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
             return;
         }
 
-        //System.out.println("Received packet with type " + PacketUtil.toHex(packetType) + " with " + handler.getNetworkState().toString());
-
-        //System.out.println("Packet of size " + maxLength);
         try {
             Class<?> clazz = packetMap.get(handler.getNetworkState().calcOffset(packetType));
             if (clazz == null) {
@@ -135,7 +130,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 byte[] data = new byte[compressedLength];
                 buf.readBytes(data);
                 data = handler.decompress(data);
-                if (data.length != dataLength) System.out.println("DECOMPRESSION ERROR");
+                if (data.length != dataLength) System.err.println("DECOMPRESSION ERROR");
                 decompressedBuf.writeBytes(data);
             }
         }
@@ -144,7 +139,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelInactive(ChannelHandlerContext context) {
         //dc
-        handler.getChannel().close().awaitUninterruptibly();
+        handler.onDisconnect();
     }
 
     private void initPacketMap() {

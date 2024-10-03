@@ -26,10 +26,12 @@ public class NetworkHandler {
     private HeadlessInstance instance;
     private boolean compressionEnabled;
     private int compressionThreshold;
+    private boolean connected;
 
     public NetworkHandler(HeadlessInstance instance) {
         networkState = NetworkState.HANDSHAKE;
         compressionEnabled = false;
+        this.connected = true;
         this.compressionThreshold = -1;
         this.instance = instance;
     }
@@ -127,16 +129,21 @@ public class NetworkHandler {
             PacketUtil.writeVarInt(dataLength, dataBuf.readableBytes());
             PacketUtil.writeVarInt(sizeBuf,dataLength.readableBytes() + compressedBuf.readableBytes());
             dataBuf = compressedBuf;
-            //System.out.println("Sending compressed packet bigger than threshold");
+            //instance.getLogger().debug("Sending compressed packet bigger than threshold");
         } else {
             PacketUtil.writeVarInt(dataLength, 0);
             PacketUtil.writeVarInt(sizeBuf,dataLength.readableBytes() + dataBuf.readableBytes());
-          //  System.out.println("Sending compressed packet smaller than threshold");
+            //instance.getLogger().debug("Sending compressed packet smaller than threshold");
 
         }
         channel.write(sizeBuf);
         channel.write(dataLength);
         channel.writeAndFlush(dataBuf);
+    }
+
+    public void onDisconnect() {
+        channel.close().awaitUninterruptibly();
+        this.connected = false;
     }
 
 
@@ -169,7 +176,7 @@ public class NetworkHandler {
             }
 
         });
-        System.out.println("Attempting to connect to server!");
+        instance.getLogger().logUser("Attempting to connect to server!");
         try {
             ChannelFuture future = bootstrap.connect(address, port).sync();
             channel = future.channel();
@@ -179,11 +186,14 @@ public class NetworkHandler {
             throw new RuntimeException(e);
         }
 
-        System.out.println("Successfully connected to server!");
+        instance.getLogger().logUser("Successfully connected to server!");
     }
 
     public Channel getChannel() {
         return channel;
+    }
+    public boolean isConnected() {
+        return this.connected;
     }
 
     public boolean isCompressionEnabled() {

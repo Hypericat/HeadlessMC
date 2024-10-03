@@ -24,11 +24,13 @@ public class HeadlessInstance implements Runnable {
     private InteractionManager interactionManager;
     private UUID uuid;
     private final Scheduler scheduler;
+    private final Logger logger;
     private boolean autoJump = true;
 
 
-    public HeadlessInstance(String userName, String ip) {
-        this.userName = userName;
+    public HeadlessInstance(String userName, String ip, int id, boolean dev) {
+        this.userName = userName + id;
+        this.logger = new Logger(userName, id, dev);
         this.ip = ip;
         this.lastTickTime = System.currentTimeMillis();
         this.scheduler = new Scheduler();
@@ -56,7 +58,7 @@ public class HeadlessInstance implements Runnable {
 
     public void initWorld() {
         if (world != null) return;
-        this.world = new World();
+        this.world = new World(this);
     }
 
     public void initPlayer(int playerEntityID) {
@@ -69,14 +71,14 @@ public class HeadlessInstance implements Runnable {
     }
 
     public void run() {
-        System.out.println("Running!");
+        getLogger().logUser("Starting instance!");
 
         if (!this.connect(ip)) return;
 
         network.setNetworkState(NetworkState.HANDSHAKE);
         login(userName);
 
-        while (true) {
+        while (network.isConnected()) {
             sleep(MSPT - (System.currentTimeMillis() - lastTickTime));
             scheduler.onTick();
             if (player != null) {
@@ -84,6 +86,7 @@ public class HeadlessInstance implements Runnable {
             }
             lastTickTime = System.currentTimeMillis();
         }
+        logger.logUser("Terminating Instance!");
     }
 
     public static void sleep(long time) {
@@ -142,6 +145,10 @@ public class HeadlessInstance implements Runnable {
     }
     public Scheduler getScheduler() {
         return scheduler;
+    }
+
+    public Logger getLogger() {
+        return this.logger;
     }
 
 

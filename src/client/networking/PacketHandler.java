@@ -27,8 +27,8 @@ public class PacketHandler implements ClientPacketListener {
     @Override
     public void onStatus(StatusResponseS2CPacket packet) {
         String response = packet.getString();
-        System.out.println("Received status response from server");
-        System.out.println(response);
+        instance.getLogger().debug("Received status response from server");
+        instance.getLogger().debug(response);
     }
 
     @Override
@@ -38,20 +38,20 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onEncryption(EncryptionRequestS2CPacket packet) {
-        System.out.println("Received encryption packet from server");
-        System.out.println("Server id " + packet.getServerID());
-        System.out.println("Public Key Length " + packet.getPublicKeyLength());
-        System.out.println("Public Key " + Arrays.toString(packet.getPublicKey()));
-        System.out.println("Token Length " + packet.getVerifyTokenLength());
-        System.out.println("Token " + Arrays.toString(packet.getVerifyToken()));
-        System.out.println("Should Authenticate " + packet.isShouldAuthenticate());
+        instance.getLogger().debug("Received encryption packet from server");
+        instance.getLogger().debug("Server id " + packet.getServerID());
+        instance.getLogger().debug("Public Key Length " + packet.getPublicKeyLength());
+        instance.getLogger().debug("Public Key " + Arrays.toString(packet.getPublicKey()));
+        instance.getLogger().debug("Token Length " + packet.getVerifyTokenLength());
+        instance.getLogger().debug("Token " + Arrays.toString(packet.getVerifyToken()));
+        instance.getLogger().debug("Should Authenticate " + packet.isShouldAuthenticate());
     }
 
     @Override
     public void onCompression(CompressionRequestS2CPacket packet) {
         int threshold = packet.getCompressionType();
         if (threshold < 0) return;
-        System.out.println("Enabling compression with threshold : " + threshold);
+        instance.getLogger().debug("Enabling compression with threshold : " + threshold);
         instance.getNetworkHandler().setCompression(threshold);
     }
 
@@ -74,7 +74,7 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onClientPluginMessage(ClientBoundPluginMessageS2CPacket packet) {
-        System.out.println("Received server brand : " + packet.getText());
+        instance.getLogger().debug("Received server brand : " + packet.getText());
     }
 
     @Override
@@ -85,7 +85,7 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onKeepAlive(KeepAliveS2CPacket packet) {
-        System.out.println("Received Keep Alive Packet, ID : " + packet.getId());
+        instance.getLogger().debug("Received Keep Alive Packet, ID : " + packet.getId());
         instance.getNetworkHandler().sendPacket(new KeepAliveC2SPacket(packet.getId()));
     }
 
@@ -148,7 +148,7 @@ public class PacketHandler implements ClientPacketListener {
 
         }
         if (entity == null) return;
-        //System.out.println("ADDING ENTITY " + type.getId());
+        //instance.getLogger().debug("ADDING ENTITY " + type.getId());
         instance.getWorld().addEntity(entity);
     }
 
@@ -190,7 +190,7 @@ public class PacketHandler implements ClientPacketListener {
     public void onChunkData(ChunkDataS2CPacket packet) {
         World world = instance.getWorld();
         world.addChunk(packet.getChunk());
-        System.out.println("Finished Loading Chunk at X : " + packet.getChunk().getChunkX() * 16 + " Z : " + packet.getChunk().getChunkZ() * 16);
+        instance.getLogger().debug("Finished Loading Chunk at X : " + packet.getChunk().getChunkX() * 16 + " Z : " + packet.getChunk().getChunkZ() * 16);
     }
 
     @Override

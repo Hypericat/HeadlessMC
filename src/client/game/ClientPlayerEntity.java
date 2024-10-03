@@ -78,7 +78,7 @@ public class ClientPlayerEntity extends PlayerEntity {
     @Override
     public void setHealth(float health) {
         super.setHealth(health);
-        System.out.println("Set health to " + health);
+        getInstance().getLogger().logUser("Set health to " + health);
         if (this.getHealth() <= 0) {
             respawn();
         }
@@ -94,7 +94,7 @@ public class ClientPlayerEntity extends PlayerEntity {
 
     public void respawn() {
         setHealth(20);
-        System.out.println("Respawning!");
+        getInstance().getLogger().logUser("Respawning!");
         this.getInstance().getNetworkHandler().sendPacket(new ClientStatusC2SPacket(0));
     }
 
