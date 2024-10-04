@@ -24,7 +24,7 @@ public class Logger {
         if (!logFile.exists()) logFile.createNewFile();
         FileWriter writer = new FileWriter(logFile, true);
         for (String str : logBuffer) {
-            writer.write(str);
+            writer.write(str + '\n');
         }
         logBuffer.clear();
     }

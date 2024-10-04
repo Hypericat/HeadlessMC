@@ -1,4 +1,5 @@
 import client.HeadlessInstance;
+import commands.TerminalHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,12 +7,18 @@ import java.util.List;
 public class Main {
     //make absolutely nothing static except for final variables in order to allow for multi clients
     public static final boolean dev = true;
-    private static List<Thread> threads = new ArrayList<>();
+    private static final List<Thread> threads = new ArrayList<>();
+    private static TerminalHandler terminal;
 
     public static void main(String[] args) {
+        terminal = new TerminalHandler();
+        Thread terminalThread = new Thread(terminal);
+
         //makeInstance(args[0], args[1], Integer.parseInt(args[2]));
-        makeInstances("Winsto", "127.0.0.1", 20);
+        makeInstances("Winsto", "127.0.0.1", 1);
         //makeInstance("Winston", "192.168.2.226", 1);
+
+        terminalThread.start();
 
 
         loop : while (true) {
@@ -20,8 +27,11 @@ public class Main {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            for (Thread thread : threads) {
-                if (thread.isAlive()) continue loop;;
+            for (int i = 0; i < threads.size(); i++) {
+                Thread thread = threads.get(i);
+                if (thread.isAlive()) continue;
+                threads.remove(i);
+                i--;
             }
             break;
         }
@@ -44,6 +54,7 @@ public class Main {
         Thread thread = new Thread(headless);
         threads.add(thread);
         thread.start();
+        terminal.addInstance(headless);
     }
 
 
