@@ -1,19 +1,9 @@
 package commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MineBlockCommand extends Command {
-    private final List<CommandSyntax> syntaxes = new ArrayList<>();
-
-    @Override
-    public List<String> getStarts() {
-        return syntaxes.stream().collect();
-    }
-
     @Override
     public Command initSyntax() {
-        syntaxes.add(CommandSyntax.builder
+        getSyntaxes().add(CommandSyntax.builder
                 .name("Mine")
                 .argument(new IntArgument())
                 .argument(new IntArgument())
@@ -26,11 +16,6 @@ public class MineBlockCommand extends Command {
     }
 
     public void execute(int x, int y, int z) {
-
-    }
-
-    @Override
-    public void execute(String s) {
 
     }
 }

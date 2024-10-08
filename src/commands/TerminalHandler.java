@@ -41,7 +41,12 @@ public class TerminalHandler implements Runnable {
 
     private void pollInput() {
         String in = systemIn.nextLine();
-
+        for (Command command : commands) {
+            CommandSyntax[] commandSyntaxes = command.getSyntaxes(in);
+            if (commandSyntaxes == null) continue;
+            command.execute(commandSyntaxes);
+        }
+        System.err.println("Error invalid command name : " + in);
     }
 
     @Override
