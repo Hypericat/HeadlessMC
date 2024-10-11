@@ -1,13 +1,14 @@
 import client.HeadlessInstance;
 import commands.TerminalHandler;
+import math.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
     //make absolutely nothing static except for final variables in order to allow for multi clients
-    public static final boolean dev = true;
-    private static final List<Thread> threads = new ArrayList<>();
+    public static final boolean dev = false;
+    private static final List<Pair<HeadlessInstance, Thread>> instances = new ArrayList<>();
     private static TerminalHandler terminal;
 
     public static void main(String[] args) {
@@ -15,7 +16,7 @@ public class Main {
         Thread terminalThread = new Thread(terminal);
 
         //makeInstance(args[0], args[1], Integer.parseInt(args[2]));
-        makeInstances("Winsto", "127.0.0.1", 1);
+        makeInstances("Winsto", "127.0.0.1", 10);
         //makeInstance("Winston", "192.168.2.226", 1);
 
         terminalThread.start();
@@ -27,10 +28,10 @@ public class Main {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            for (int i = 0; i < threads.size(); i++) {
-                Thread thread = threads.get(i);
-                if (thread.isAlive()) continue;
-                threads.remove(i);
+            for (int i = 0; i < instances.size(); i++) {
+                Thread thread = instances.get(i).getRight();
+                if (thread.isAlive()) continue loop;
+                instances.remove(i);
                 i--;
             }
             break;
@@ -52,7 +53,7 @@ public class Main {
 
         HeadlessInstance headless = new HeadlessInstance(name, ip, id, isDev());
         Thread thread = new Thread(headless);
-        threads.add(thread);
+        instances.add(new Pair<>(headless, thread));
         thread.start();
         terminal.addInstance(headless);
     }

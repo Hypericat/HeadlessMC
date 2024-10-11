@@ -86,6 +86,10 @@ public class InteractionManager {
         return true;
     }
 
+    public boolean playerMineBlock(int x, int y, int z) {
+        return playerMineBlock(new Vec3i(x, y, z));
+    }
+
     public boolean playerMineBlock(Vec3i blockPos) {
         boolean result = playerSilentlyMineBlock(blockPos);
         if (result) {

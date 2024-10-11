@@ -39,12 +39,14 @@ public class TerminalHandler implements Runnable {
         return instances;
     }
 
-    private void pollInput() {
+    private void pollInput(List<HeadlessInstance> instances) {
         String in = systemIn.nextLine();
         for (Command command : commands) {
-            CommandSyntax[] commandSyntaxes = command.getSyntaxes(in);
-            if (commandSyntaxes == null) continue;
-            command.execute(commandSyntaxes);
+            List<CommandSyntax> commandSyntaxes = command.getSyntaxes(in);
+            if (commandSyntaxes.isEmpty()) continue;
+            System.out.println(commandSyntaxes.get(0).getName());
+            command.execute(commandSyntaxes, in, instances);
+            return;
         }
         System.err.println("Error invalid command name : " + in);
     }
@@ -52,7 +54,7 @@ public class TerminalHandler implements Runnable {
     @Override
     public void run() {
         while (instances.stream().anyMatch(instance -> instance.getNetworkHandler().isConnected())) {
-            pollInput();
+            pollInput(instances);
         }
     }
 }

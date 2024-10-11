@@ -20,6 +20,10 @@ public class Vec3i implements Comparable<Vec3i> {
         this.z = vec.z;
     }
 
+    public static Vec3i ofRounded(Vec3d vec3d) {
+        return new Vec3i((int) Math.round(vec3d.getX()), (int) Math.round(vec3d.getY()), (int) Math.round(vec3d.getZ()));
+    }
+
     public static Vec3i ofFloored(Vec3d vec3d) {
         return new Vec3i(MathHelper.floor(vec3d.getX()), MathHelper.floor(vec3d.getY()), MathHelper.floor(vec3d.getZ()));
     }

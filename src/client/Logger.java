@@ -20,6 +20,10 @@ public class Logger {
        this.isDev = dev;
     }
 
+    public static void sysLog(Object object) {
+        System.out.println("[SYSLOG] " + object);
+    }
+
     private void flushInternal() throws IOException {
         if (!logFile.exists()) logFile.createNewFile();
         FileWriter writer = new FileWriter(logFile, true);

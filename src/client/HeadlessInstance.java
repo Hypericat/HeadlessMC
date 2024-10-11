@@ -137,6 +137,7 @@ public class HeadlessInstance implements Runnable {
     private int tickCount = 0;
 
     public void onTick() {
+        if (interactionManager == null || player == null) return;
         tickCount ++;
 
 

@@ -24,8 +24,8 @@ public class ClientPlayerEntity extends PlayerEntity {
         super.onTick();
         List<Entity> players = getInstance().getWorld().getEntitiesByType(EntityTypes.PLAYER);
         doTestMovement();
-        Vec3d newVelocity = getVelocityFromDir(0.75);
-        this.setVelocity(newVelocity.x, this.getVelocity().y, newVelocity.z);
+        //Vec3d newVelocity = getVelocityFromDir(0.75);
+        //this.setVelocity(newVelocity.x, this.getVelocity().y, newVelocity.z);
         tickMovement();
         decrementAttackCooldown();
 
@@ -41,6 +41,10 @@ public class ClientPlayerEntity extends PlayerEntity {
 
     public void setChunkX(int chunkX) {
         this.chunkX = chunkX;
+    }
+
+    public Vec3i getBlockPos() {
+        return Vec3i.ofFloored(this.getPos());
     }
 
     public void doKillAura() {
