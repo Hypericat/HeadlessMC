@@ -1,5 +1,7 @@
 package client.networking.packets.S2C.configuration;
 
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
 import io.netty.buffer.ByteBuf;
 import client.networking.ClientPacketListener;
@@ -7,8 +9,8 @@ import client.networking.NetworkState;
 import client.utils.PacketUtil;
 
 public class EncryptionRequestS2CPacket extends S2CPacket {
-    public static final int typeID = 0x03;
-    public final static NetworkState networkState = NetworkState.HANDSHAKE;
+    public final static PacketID packetID = PacketIDS.HELLO_LOGIN_S2C;
+
     private String serverID;
     private int publicKeyLength;
     private byte[] publicKey;
@@ -26,8 +28,8 @@ public class EncryptionRequestS2CPacket extends S2CPacket {
     }
 
     @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     @Override

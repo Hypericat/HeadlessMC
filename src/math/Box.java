@@ -1,8 +1,6 @@
 package math;
 
-import client.networking.packets.C2S.play.BlockFace;
-
-import java.util.Optional;
+import client.game.BlockFace;
 
 public class Box {
     public static final double EPSILON = 1.0E-7;

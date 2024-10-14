@@ -2,16 +2,14 @@ package client.networking.packets.C2S.play;
 
 import client.game.Hand;
 import client.networking.ClientPacketListener;
-import client.networking.PacketHandler;
 import client.networking.packets.C2S.C2SPacket;
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
 
-import java.util.BitSet;
-import java.util.Optional;
-
 public class SwingArmC2SPacket extends C2SPacket {
-    public static final int typeID = 0x36;
+    public final static PacketID packetID = PacketIDS.SWING_PLAY_C2S;
     private final Hand hand;
 
 
@@ -26,13 +24,13 @@ public class SwingArmC2SPacket extends C2SPacket {
     }
 
     @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     @Override
     public void encode(ByteBuf buf) {
-        buf.writeByte(this.getTypeId());
+        buf.writeByte(this.getTypeID());
         PacketUtil.writeVarInt(buf, hand.getValue());
     }
 

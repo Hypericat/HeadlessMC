@@ -1,12 +1,15 @@
 package client.networking.packets.C2S.configuration;
 
 import client.networking.packets.C2S.C2SPacket;
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import io.netty.buffer.ByteBuf;
 import client.networking.ClientPacketListener;
 import client.utils.PacketUtil;
 
 public class HandShakeC2SPacket extends C2SPacket {
-    public static final int typeID = 0x00;
+    public final static PacketID packetID = PacketIDS.INTENTION_HANDSHAKE_C2S;
+
     private int protocolNumber;
     private String serverAddress;
     private short serverPort;
@@ -38,13 +41,13 @@ public class HandShakeC2SPacket extends C2SPacket {
     }
 
     @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     @Override
     public void encode(ByteBuf buf) {
-        PacketUtil.writeVarInt(buf, getTypeId());
+        PacketUtil.writeVarInt(buf, this.getTypeID());
         PacketUtil.writeVarInt(buf, this.protocolNumber);
         PacketUtil.writeString(buf, this.serverAddress);
         buf.writeShort(this.serverPort);

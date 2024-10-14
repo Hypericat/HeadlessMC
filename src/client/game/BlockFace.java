@@ -1,4 +1,4 @@
-package client.networking.packets.C2S.play;
+package client.game;
 
 import math.Vec3d;
 

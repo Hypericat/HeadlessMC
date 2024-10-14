@@ -4,6 +4,8 @@ import client.game.Chunk;
 import client.networking.ClientPacketListener;
 import client.networking.NetworkHandler;
 import client.networking.NetworkState;
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
 import client.utils.BiomeSectionContainer;
 import client.utils.ChunkSectionContainer;
@@ -15,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChunkDataS2CPacket extends S2CPacket {
-    public static final int typeID = 0x27;
-    public final static NetworkState networkState = NetworkState.PLAY;
+    public final static PacketID packetID = PacketIDS.LEVEL_CHUNK_WITH_LIGHT_PLAY_S2C;
+
     private Chunk chunk;
 
     public ChunkDataS2CPacket(ByteBuf buf, int size) throws IllegalArgumentException {
@@ -28,9 +30,8 @@ public class ChunkDataS2CPacket extends S2CPacket {
         listener.onChunkData(this);
     }
 
-    @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     @Override

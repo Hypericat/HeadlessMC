@@ -12,4 +12,8 @@ public abstract class C2SPacket implements Packet<ClientPacketListener> {
 
     public abstract void encode(ByteBuf buf);
 
+    public int getTypeID() {
+        return this.getPacketID().getPacketID();
+    }
+
 }

@@ -2,11 +2,14 @@ package client.networking.packets.C2S.play;
 
 import client.networking.ClientPacketListener;
 import client.networking.packets.C2S.C2SPacket;
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
 
 public class ClientStatusC2SPacket extends C2SPacket {
-    public static final int typeID = 0x09;
+    public final static PacketID packetID = PacketIDS.RESPAWN_PLAY_S2C;
+
     //0 -> respawn
     //1 -> request stats
     private int status;
@@ -22,13 +25,13 @@ public class ClientStatusC2SPacket extends C2SPacket {
     }
 
     @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     @Override
     public void encode(ByteBuf buf) {
-        buf.writeByte(this.getTypeId());
+        buf.writeByte(this.getTypeID());
         PacketUtil.writeVarInt(buf, status);
     }
 }

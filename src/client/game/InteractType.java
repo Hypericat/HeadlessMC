@@ -1,4 +1,4 @@
-package client.networking.packets.C2S.play;
+package client.game;
 
 public enum InteractType {
     INTERACT(0),

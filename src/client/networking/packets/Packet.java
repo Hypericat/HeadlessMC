@@ -5,5 +5,7 @@ import client.networking.PacketListener;
 public interface Packet<T extends PacketListener> {
     void apply(T listener);
 
-    int getTypeId();
+    int getTypeID();
+
+    PacketID getPacketID();
 }

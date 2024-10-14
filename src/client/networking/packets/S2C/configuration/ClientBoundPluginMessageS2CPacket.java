@@ -2,13 +2,14 @@ package client.networking.packets.S2C.configuration;
 
 import client.networking.ClientPacketListener;
 import client.networking.NetworkState;
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
 import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
 
 public class ClientBoundPluginMessageS2CPacket extends S2CPacket {
-    public static final int typeID = 0x01;
-    public final static NetworkState networkState = NetworkState.CONFIGURATION;
+    public final static PacketID packetID = PacketIDS.CUSTOM_PAYLOAD_CONFIGURATION_S2C;
     private String text;
 
     public ClientBoundPluginMessageS2CPacket(ByteBuf buf, int size) throws IllegalArgumentException {
@@ -20,9 +21,8 @@ public class ClientBoundPluginMessageS2CPacket extends S2CPacket {
         listener.onClientPluginMessage(this);
     }
 
-    @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     @Override

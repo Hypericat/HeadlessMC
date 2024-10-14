@@ -1,6 +1,6 @@
 package math;
 
-import client.networking.packets.C2S.play.BlockFace;
+import client.game.BlockFace;
 
 public class BlockRaycastResult {
     private final Vec3i blockPos;

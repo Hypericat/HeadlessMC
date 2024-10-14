@@ -1,13 +1,18 @@
 package client.networking.packets.C2S.play;
 
+import client.game.BlockFace;
+import client.networking.PlayerActionType;
 import client.networking.ClientPacketListener;
 import client.networking.packets.C2S.C2SPacket;
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import client.utils.PacketUtil;
 import math.Vec3i;
 import io.netty.buffer.ByteBuf;
 
 public class PlayerActionC2SPacket extends C2SPacket {
-    public static final int typeID = 0x24;
+    public final static PacketID packetID = PacketIDS.PLAYER_ACTION_PLAY_C2S;
+
     private final int actionType;
     private final Vec3i blockPos;
     private final byte face;
@@ -55,13 +60,13 @@ public class PlayerActionC2SPacket extends C2SPacket {
     }
 
     @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     @Override
     public void encode(ByteBuf buf) {
-        buf.writeByte(this.getTypeId());
+        buf.writeByte(this.getTypeID());
         PacketUtil.writeVarInt(buf, actionType);
         PacketUtil.writePosition(buf, blockPos);
         buf.writeByte(face);

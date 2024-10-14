@@ -1,7 +1,6 @@
 package client.game;
 
 import client.HeadlessInstance;
-import client.networking.packets.C2S.play.BlockFace;
 import client.networking.packets.C2S.play.ClientStatusC2SPacket;
 import client.networking.packets.C2S.play.PlayerMoveFullC2SPacket;
 import math.*;

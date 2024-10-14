@@ -2,11 +2,14 @@ package client.networking.packets.C2S.configuration;
 
 import client.networking.ClientPacketListener;
 import client.networking.packets.C2S.C2SPacket;
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
 
 public class ClientInformationC2SPacket extends C2SPacket {
-    public static final int typeID = 0x00;
+    public final static PacketID packetID = PacketIDS.CLIENT_INFORMATION_CONFIGURATION_C2S;
+
     private String locale;
     byte viewDistance;
     int chatMode; //0 for enabled, 1 for commands only, 2 for hidden
@@ -41,13 +44,13 @@ public class ClientInformationC2SPacket extends C2SPacket {
     }
 
     @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     @Override
     public void encode(ByteBuf buf) {
-        PacketUtil.writeVarInt(buf, getTypeId());
+        PacketUtil.writeVarInt(buf, this.getTypeID());
         PacketUtil.writeString(buf, locale);
         buf.writeByte(viewDistance);
         PacketUtil.writeVarInt(buf, chatMode);

@@ -1,6 +1,6 @@
 package math;
 
-import client.networking.packets.C2S.play.BlockFace;
+import client.game.BlockFace;
 
 public class Vec3i implements Comparable<Vec3i> {
 

@@ -2,16 +2,19 @@ package client.networking.packets.C2S.play;
 
 import client.game.Entity;
 import client.game.Hand;
+import client.game.InteractType;
 import client.networking.ClientPacketListener;
-import client.networking.PacketHandler;
 import client.networking.packets.C2S.C2SPacket;
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.util.Optional;
 
 public class InteractC2SPacket extends C2SPacket {
-    public static final int typeID = 0x16;
+    public final static PacketID packetID = PacketIDS.INTERACT_PLAY_C2S;
+
     private final int entityID;
     private final int interactType;
     private final Optional<Float> targetX;
@@ -58,8 +61,8 @@ public class InteractC2SPacket extends C2SPacket {
     }
 
     @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     public static Optional<Float> getEmpty() {
@@ -68,7 +71,7 @@ public class InteractC2SPacket extends C2SPacket {
 
     @Override
     public void encode(ByteBuf buf) {
-        buf.writeByte(this.getTypeId());
+        buf.writeByte(this.getTypeID());
         PacketUtil.writeVarInt(buf, entityID);
         PacketUtil.writeVarInt(buf, interactType);
         if (interactType == InteractType.INTERACT_AT.getValue()) {

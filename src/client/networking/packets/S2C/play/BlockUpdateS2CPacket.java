@@ -2,14 +2,15 @@ package client.networking.packets.S2C.play;
 
 import client.networking.ClientPacketListener;
 import client.networking.NetworkState;
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
 import client.utils.PacketUtil;
 import math.Vec3i;
 import io.netty.buffer.ByteBuf;
 
 public class BlockUpdateS2CPacket extends S2CPacket {
-    public static final int typeID = 0x09;
-    public final static NetworkState networkState = NetworkState.PLAY;
+    public final static PacketID packetID = PacketIDS.BLOCK_UPDATE_PLAY_S2C;
     private Vec3i pos;
     private int blockID;
 
@@ -22,9 +23,8 @@ public class BlockUpdateS2CPacket extends S2CPacket {
         listener.onBlockUpdate(this);
     }
 
-    @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     @Override

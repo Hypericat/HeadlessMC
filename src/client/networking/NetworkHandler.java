@@ -1,6 +1,7 @@
 package client.networking;
 
 import client.HeadlessInstance;
+import client.networking.packets.PacketIDS;
 import client.utils.PacketUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -28,6 +29,9 @@ public class NetworkHandler {
     private int compressionThreshold;
     private boolean connected;
 
+    public static final boolean logIn = true;
+    public static final boolean logOut = true;
+
     public NetworkHandler(HeadlessInstance instance) {
         networkState = NetworkState.HANDSHAKE;
         compressionEnabled = false;
@@ -42,6 +46,9 @@ public class NetworkHandler {
     }
 
     public void sendPacket(C2SPacket packet, Channel channel) {
+        if (logOut)
+            logPacket(Boundness.C2S, packet.getTypeID());
+
         if (!isCompressionEnabled() || compressionThreshold < 0) {
             sendUncompressedPacket(packet, channel);
             return;
@@ -92,6 +99,10 @@ public class NetworkHandler {
         return Unpooled.buffer().writeBytes(decompress(data)).readerIndex(0);
     }
 
+    protected void logPacket(Boundness boundness, int packetID) {
+        instance.getLogger().debug(boundness == Boundness.C2S ? "Sending packet : " : "Receiving packet : " + PacketIDS.get(packetID, getNetworkState(), boundness));
+    }
+
     public byte[] decompress(byte[] buf) {
         Inflater inflater = new Inflater();
         inflater.setInput(buf);
@@ -112,6 +123,9 @@ public class NetworkHandler {
         return byteArrayOutputStream.toByteArray();
     }
 
+    public HeadlessInstance getInstance() {
+        return instance;
+    }
 
     public void flush() {
         channel.flush();

@@ -3,7 +3,9 @@ package client.networking;
 public enum NetworkState {
     HANDSHAKE(Integer.MAX_VALUE),
     CONFIGURATION(((long) Integer.MAX_VALUE) << 1),
-    PLAY(((long) Integer.MAX_VALUE) << 2);
+    PLAY(((long) Integer.MAX_VALUE) << 2),
+    LOGIN(((long) Integer.MAX_VALUE) << 3),
+    STATUS(((long) Integer.MAX_VALUE) << 4);
 
 
 

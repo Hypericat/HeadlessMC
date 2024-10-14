@@ -2,13 +2,14 @@ package client.networking.packets.S2C.play;
 
 import client.networking.ClientPacketListener;
 import client.networking.NetworkState;
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
 import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
 
 public class TeleportEntityS2CPacket extends S2CPacket {
-    public static final int typeID = 0x70;
-    public final static NetworkState networkState = NetworkState.PLAY;
+    public final static PacketID packetID = PacketIDS.TELEPORT_ENTITY_PLAY_S2C;
     private int entityID;
     private double x;
     private double y;
@@ -26,9 +27,8 @@ public class TeleportEntityS2CPacket extends S2CPacket {
         listener.onTeleportEntityS2CPacket(this);
     }
 
-    @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     @Override

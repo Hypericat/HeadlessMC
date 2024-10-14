@@ -1,4 +1,4 @@
-package client.networking.packets.C2S.play;
+package client.networking;
 
 public enum PlayerActionType {
     START_DIGGING(0),

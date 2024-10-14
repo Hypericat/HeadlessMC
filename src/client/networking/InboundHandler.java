@@ -1,6 +1,8 @@
 package client.networking;
 
 import client.HeadlessInstance;
+import client.Logger;
+import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.*;
 import client.networking.packets.S2C.configuration.*;
 import client.networking.packets.S2C.play.*;
@@ -20,6 +22,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private boolean usedCompression;
     private byte[] lastBytes;
     private byte[] lastCompressedBytes;
+
 
     public InboundHandler(NetworkHandler handler, HeadlessInstance instance) {
         super();
@@ -83,6 +86,9 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 return;
             }
             S2CPacket packet = (S2CPacket) clazz.getDeclaredConstructors()[0].newInstance(buf, maxLength);
+            if (NetworkHandler.logIn) {
+                handler.logPacket(Boundness.S2C, packetType);
+            }
             packet.apply(packetHandler);
         } catch (IllegalArgumentException e) {
             System.err.println("Failed to apply packet id : " + PacketUtil.toHex(packetType));
@@ -145,32 +151,32 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private void initPacketMap() {
         //login / configuration
         packetMap = new HashMap<>();
-        packetMap.put(StatusResponseS2CPacket.networkState.calcOffset(StatusResponseS2CPacket.typeID), StatusResponseS2CPacket.class);
-        packetMap.put(CompressionRequestS2CPacket.networkState.calcOffset(CompressionRequestS2CPacket.typeID), CompressionRequestS2CPacket.class);
-        packetMap.put(LoginSuccessS2CPacket.networkState.calcOffset(LoginSuccessS2CPacket.typeID), LoginSuccessS2CPacket.class);
-        packetMap.put(ClientBoundKnownPacksS2CPacket.networkState.calcOffset(ClientBoundKnownPacksS2CPacket.typeID), ClientBoundKnownPacksS2CPacket.class);
-        packetMap.put(CookieRequestS2CPacket.networkState.calcOffset(CookieRequestS2CPacket.typeID), CookieRequestS2CPacket.class);
-        packetMap.put(ClientBoundPluginMessageS2CPacket.networkState.calcOffset(ClientBoundPluginMessageS2CPacket.typeID), ClientBoundPluginMessageS2CPacket.class);
-        packetMap.put(FinishConfigurationS2CPacket.networkState.calcOffset(FinishConfigurationS2CPacket.typeID), FinishConfigurationS2CPacket.class);
+        packetMap.put(StatusResponseS2CPacket.packetID.getOffset(), StatusResponseS2CPacket.class);
+        packetMap.put(CompressionRequestS2CPacket.packetID.getOffset(), CompressionRequestS2CPacket.class);
+        packetMap.put(LoginSuccessS2CPacket.packetID.getOffset(), LoginSuccessS2CPacket.class);
+        packetMap.put(ClientBoundKnownPacksS2CPacket.packetID.getOffset(), ClientBoundKnownPacksS2CPacket.class);
+        packetMap.put(CookieRequestS2CPacket.packetID.getOffset(), CookieRequestS2CPacket.class);
+        packetMap.put(ClientBoundPluginMessageS2CPacket.packetID.getOffset(), ClientBoundPluginMessageS2CPacket.class);
+        packetMap.put(FinishConfigurationS2CPacket.packetID.getOffset(), FinishConfigurationS2CPacket.class);
         //packetMap.put(EncryptionRequestS2CPacket.getTypeIdOffset(), EncryptionRequestS2CPacket.class);
 
 
         //play
-        packetMap.put(LoginPlayS2CPacket.networkState.calcOffset(LoginPlayS2CPacket.typeID), LoginPlayS2CPacket.class);
-        packetMap.put(KeepAliveS2CPacket.networkState.calcOffset(KeepAliveS2CPacket.typeID), KeepAliveS2CPacket.class);
-        packetMap.put(SetHealthS2CPacket.networkState.calcOffset(SetHealthS2CPacket.typeID), SetHealthS2CPacket.class);
-        packetMap.put(SetHeldItemS2CPacket.networkState.calcOffset(SetHeldItemS2CPacket.typeID), SetHeldItemS2CPacket.class);
-        packetMap.put(SynchronizePlayerPositionS2CPacket.networkState.calcOffset(SynchronizePlayerPositionS2CPacket.typeID), SynchronizePlayerPositionS2CPacket.class);
-        packetMap.put(SetCenterChunkS2CPacket.networkState.calcOffset(SetCenterChunkS2CPacket.typeID), SetCenterChunkS2CPacket.class);
-        packetMap.put(ChunkDataS2CPacket.networkState.calcOffset(ChunkDataS2CPacket.typeID), ChunkDataS2CPacket.class);
-        packetMap.put(BlockUpdateS2CPacket.networkState.calcOffset(BlockUpdateS2CPacket.typeID), BlockUpdateS2CPacket.class);
-        packetMap.put(UpdateBlockSectionS2CPacket.networkState.calcOffset(UpdateBlockSectionS2CPacket.typeID), UpdateBlockSectionS2CPacket.class);
-        packetMap.put(SetEntityVelocityS2CPacket.networkState.calcOffset(SetEntityVelocityS2CPacket.typeID), SetEntityVelocityS2CPacket.class);
-        packetMap.put(SpawnEntityS2CPacket.networkState.calcOffset(SpawnEntityS2CPacket.typeID), SpawnEntityS2CPacket.class);
-        packetMap.put(RemoveEntitiesS2CPacket.networkState.calcOffset(RemoveEntitiesS2CPacket.typeID), RemoveEntitiesS2CPacket.class);
-        packetMap.put(UpdateEntityRotationS2CPacket.networkState.calcOffset(UpdateEntityRotationS2CPacket.typeID), UpdateEntityRotationS2CPacket.class);
-        packetMap.put(UpdateEntityPositionS2CPacket.networkState.calcOffset(UpdateEntityPositionS2CPacket.typeID), UpdateEntityPositionS2CPacket.class);
-        packetMap.put(UpdateEntityPositionAndRotation.networkState.calcOffset(UpdateEntityPositionAndRotation.typeID), UpdateEntityPositionAndRotation.class);
-        packetMap.put(TeleportEntityS2CPacket.networkState.calcOffset(TeleportEntityS2CPacket.typeID), TeleportEntityS2CPacket.class);
+        packetMap.put(LoginPlayS2CPacket.packetID.getOffset(), LoginPlayS2CPacket.class);
+        packetMap.put(KeepAliveS2CPacket.packetID.getOffset(), KeepAliveS2CPacket.class);
+        packetMap.put(SetHealthS2CPacket.packetID.getOffset(), SetHealthS2CPacket.class);
+        packetMap.put(SetHeldItemS2CPacket.packetID.getOffset(), SetHeldItemS2CPacket.class);
+        packetMap.put(SynchronizePlayerPositionS2CPacket.packetID.getOffset(), SynchronizePlayerPositionS2CPacket.class);
+        packetMap.put(SetCenterChunkS2CPacket.packetID.getOffset(), SetCenterChunkS2CPacket.class);
+        packetMap.put(ChunkDataS2CPacket.packetID.getOffset(), ChunkDataS2CPacket.class);
+        packetMap.put(BlockUpdateS2CPacket.packetID.getOffset(), BlockUpdateS2CPacket.class);
+        packetMap.put(UpdateBlockSectionS2CPacket.packetID.getOffset(), UpdateBlockSectionS2CPacket.class);
+        packetMap.put(SetEntityVelocityS2CPacket.packetID.getOffset(), SetEntityVelocityS2CPacket.class);
+        packetMap.put(SpawnEntityS2CPacket.packetID.getOffset(), SpawnEntityS2CPacket.class);
+        packetMap.put(RemoveEntitiesS2CPacket.packetID.getOffset(), RemoveEntitiesS2CPacket.class);
+        packetMap.put(UpdateEntityRotationS2CPacket.packetID.getOffset(), UpdateEntityRotationS2CPacket.class);
+        packetMap.put(UpdateEntityPositionS2CPacket.packetID.getOffset(), UpdateEntityPositionS2CPacket.class);
+        packetMap.put(UpdateEntityPositionAndRotation.packetID.getOffset(), UpdateEntityPositionAndRotation.class);
+        packetMap.put(TeleportEntityS2CPacket.packetID.getOffset(), TeleportEntityS2CPacket.class);
     }
 }

@@ -4,6 +4,8 @@ import client.game.Block;
 import client.game.Blocks;
 import client.networking.ClientPacketListener;
 import client.networking.NetworkState;
+import client.networking.packets.PacketID;
+import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
 import client.utils.PacketUtil;
 import math.Pair;
@@ -11,8 +13,8 @@ import math.Vec3i;
 import io.netty.buffer.ByteBuf;
 
 public class UpdateBlockSectionS2CPacket extends S2CPacket {
-    public static final int typeID = 0x49;
-    public final static NetworkState networkState = NetworkState.PLAY;
+    public final static PacketID packetID = PacketIDS.SECTION_BLOCKS_UPDATE_PLAY_S2C;
+
     Pair<Block, Vec3i>[] blocks;
     private Vec3i chunkPos;
 
@@ -25,9 +27,8 @@ public class UpdateBlockSectionS2CPacket extends S2CPacket {
         listener.onBlockSectionUpdate(this);
     }
 
-    @Override
-    public int getTypeId() {
-        return typeID;
+    public PacketID getPacketID() {
+        return packetID;
     }
 
     @Override
