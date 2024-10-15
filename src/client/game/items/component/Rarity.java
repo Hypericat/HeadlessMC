@@ -6,10 +6,10 @@ public enum Rarity {
     RARE("rare"),
     EPIC("epic");
 
-    private String rarity;
+    private final String rarity;
 
     Rarity(String rarity) {
-
+        this.rarity = rarity;
     }
     public String toString() {
         return rarity;

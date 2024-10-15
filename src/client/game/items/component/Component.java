@@ -374,6 +374,126 @@ public class Component {
             this.writableBookContent = null;
         }
 
+        public AttributeModifiers getModifiers() {
+            return modifiers;
+        }
+
+        public Enchantments getEnchantments() {
+            return enchantments;
+        }
+
+        public Lore getLore() {
+            return lore;
+        }
+
+        public int getMaxStackSize() {
+            return maxStackSize;
+        }
+
+        public Rarity getRarity() {
+            return rarity;
+        }
+
+        public int getRepairCost() {
+            return repairCost;
+        }
+
+        public boolean isFireResistant() {
+            return fireResistant;
+        }
+
+        public Food getFood() {
+            return food;
+        }
+
+        public boolean isBucketEntityData() {
+            return bucketEntityData;
+        }
+
+        public Container getContainer() {
+            return container;
+        }
+
+        public Bees getBees() {
+            return bees;
+        }
+
+        public BannerPatterns getBannerPatterns() {
+            return bannerPatterns;
+        }
+
+        public int getDamage() {
+            return damage;
+        }
+
+        public int getMaxDamage() {
+            return maxDamage;
+        }
+
+        public BundleContents getContents() {
+            return contents;
+        }
+
+        public ChargedProjectiles getProjectiles() {
+            return projectiles;
+        }
+
+        public DebugStickState getDebugStickState() {
+            return debugStickState;
+        }
+
+        public boolean isEnchantmentGlintOverride() {
+            return enchantmentGlintOverride;
+        }
+
+        public PotDecorations getPotDecorations() {
+            return potDecorations;
+        }
+
+        public Tool getTool() {
+            return tool;
+        }
+
+        public StoredEnchantments getStoredEnchantments() {
+            return storedEnchantments;
+        }
+
+        public int getMapColor() {
+            return mapColor;
+        }
+
+        public MapDecorations getDecorations() {
+            return decorations;
+        }
+
+        public Fireworks getFireworks() {
+            return fireworks;
+        }
+
+        public Recipes getRecipes() {
+            return recipes;
+        }
+
+        public PotionContents getPotionContents() {
+            return potionContents;
+        }
+
+        public JukeboxPlayable getJukeboxPlayable() {
+            return jukeboxPlayable;
+        }
+
+        public int getOminousBottleAmplifier() {
+            return ominousBottleAmplifier;
+        }
+
+        public SuspiciousStewEffects getEffects() {
+            return effects;
+        }
+
+        public WritableBookContent getWritableBookContent() {
+            return writableBookContent;
+        }
+
         public builder setModifiers(AttributeModifiers modifiers) {
             this.modifiers = modifiers;
             return this;
