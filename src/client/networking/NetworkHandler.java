@@ -29,8 +29,8 @@ public class NetworkHandler {
     private int compressionThreshold;
     private boolean connected;
 
-    public static final boolean logIn = true;
-    public static final boolean logOut = true;
+    public static final boolean logIn = false;
+    public static final boolean logOut = false;
 
     public NetworkHandler(HeadlessInstance instance) {
         networkState = NetworkState.HANDSHAKE;
@@ -46,8 +46,9 @@ public class NetworkHandler {
     }
 
     public void sendPacket(C2SPacket packet, Channel channel) {
-        if (logOut)
+        if (logOut) {
             logPacket(Boundness.C2S, packet.getTypeID());
+        }
 
         if (!isCompressionEnabled() || compressionThreshold < 0) {
             sendUncompressedPacket(packet, channel);
@@ -100,7 +101,7 @@ public class NetworkHandler {
     }
 
     protected void logPacket(Boundness boundness, int packetID) {
-        instance.getLogger().debug(boundness == Boundness.C2S ? "Sending packet : " : "Receiving packet : " + PacketIDS.get(packetID, getNetworkState(), boundness));
+        instance.getLogger().debug((boundness == Boundness.C2S ? "Sending packet : " : "Receiving packet : ") + PacketIDS.get(packetID, getNetworkState(), boundness).getIdentifier());
     }
 
     public byte[] decompress(byte[] buf) {

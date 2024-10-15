@@ -48,6 +48,7 @@ public class HeadlessInstance implements Runnable {
     }
     public void login(String userName) {
         network.sendPacket(new HandShakeC2SPacket(this.getCurrentAddress(), getCurrentPort(), 2));
+        network.setNetworkState(NetworkState.LOGIN);
         network.sendPacket(new LoginStartC2SPacket(userName));
     }
 
@@ -74,7 +75,6 @@ public class HeadlessInstance implements Runnable {
         getLogger().logUser("Starting instance!");
 
         if (!this.connect(ip)) return;
-
         network.setNetworkState(NetworkState.HANDSHAKE);
         login(userName);
 

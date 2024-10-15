@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Main {
     //make absolutely nothing static except for final variables in order to allow for multi clients
-    public static final boolean dev = false;
+    public static final boolean dev = true;
     private static final List<Pair<HeadlessInstance, Thread>> instances = new ArrayList<>();
     private static TerminalHandler terminal;
 
@@ -16,7 +16,7 @@ public class Main {
         Thread terminalThread = new Thread(terminal);
 
         //makeInstance(args[0], args[1], Integer.parseInt(args[2]));
-        makeInstances("Winsto", "127.0.0.1", 10);
+        makeInstances("Winston", "127.0.0.1", 1);
         //makeInstance("Winston", "192.168.2.226", 1);
 
         terminalThread.start();

@@ -78,6 +78,9 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         } catch(IndexOutOfBoundsException e) {
             return;
         }
+        if (NetworkHandler.logIn) {
+            handler.logPacket(Boundness.S2C, packetType);
+        }
 
         try {
             Class<?> clazz = packetMap.get(handler.getNetworkState().calcOffset(packetType));
@@ -86,9 +89,6 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 return;
             }
             S2CPacket packet = (S2CPacket) clazz.getDeclaredConstructors()[0].newInstance(buf, maxLength);
-            if (NetworkHandler.logIn) {
-                handler.logPacket(Boundness.S2C, packetType);
-            }
             packet.apply(packetHandler);
         } catch (IllegalArgumentException e) {
             System.err.println("Failed to apply packet id : " + PacketUtil.toHex(packetType));

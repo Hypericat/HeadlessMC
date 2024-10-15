@@ -8,7 +8,7 @@ import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
 
 public class ClientStatusC2SPacket extends C2SPacket {
-    public final static PacketID packetID = PacketIDS.RESPAWN_PLAY_S2C;
+    public final static PacketID packetID = PacketIDS.CLIENT_COMMAND_PLAY_C2S;
 
     //0 -> respawn
     //1 -> request stats
