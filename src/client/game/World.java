@@ -12,7 +12,7 @@ import java.util.List;
 public class World {
     private int maxHeight;
     HashMap<Long, Chunk> chunks = new HashMap<>();
-    private final HashMap<Integer, Entity> entities = new HashMap<>();
+    private volatile HashMap<Integer, Entity> entities = new HashMap<>();
     private HeadlessInstance instance;
 
     public World(int maxHeight, HeadlessInstance instance) {

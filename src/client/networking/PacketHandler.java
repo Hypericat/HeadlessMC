@@ -199,6 +199,11 @@ public class PacketHandler implements ClientPacketListener {
     }
 
     @Override
+    public void onSetContainerContent(SetContainerContentS2CPacket packet) {
+
+    }
+
+    @Override
     public void onBlockSectionUpdate(UpdateBlockSectionS2CPacket packet) {
         Pair<Block, Vec3i>[] blocks = packet.getBlocks();
         Vec3i chunkPos = packet.getChunkPos();

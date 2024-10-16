@@ -1348,6 +1348,10 @@ public class Items {
         return item;
     }
 
+    public static List<ItemType> toList() {
+        return map.values().stream().toList();
+    }
+
     public static ItemType fromIdentifier(String identifier) {
         return map.get(identifier);
     }

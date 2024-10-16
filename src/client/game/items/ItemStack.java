@@ -14,7 +14,7 @@ public class ItemStack {
 
     public ItemStack(ItemType itemType, int stackSize) {
         this.type = itemType;
-        this.stackSize = stackSize;
+        this.stackSize = Math.clamp(stackSize, 1, itemType.getComponent().getMaxStackSize());
     }
 
     public ItemType getType() {

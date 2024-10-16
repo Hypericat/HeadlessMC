@@ -1,6 +1,8 @@
 package client.game;
 
 import client.HeadlessInstance;
+import client.game.items.ItemType;
+import client.game.items.Items;
 import client.networking.packets.C2S.play.ClientStatusC2SPacket;
 import client.networking.packets.C2S.play.PlayerMoveFullC2SPacket;
 import math.*;
@@ -99,6 +101,10 @@ public class ClientPlayerEntity extends PlayerEntity {
         setHealth(20);
         getInstance().getLogger().logUser("Respawning!");
         this.getInstance().getNetworkHandler().sendPacket(new ClientStatusC2SPacket(0));
+
+        for (ItemType type : Items.toList()) {
+            getInstance().getInteractionManager().sendCommand("/give @p " + type.getIdentifier() + " 1");
+        }
     }
 
     public void tickMovement() {

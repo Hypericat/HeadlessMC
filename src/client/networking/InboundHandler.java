@@ -36,7 +36,13 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf buf) {
         if (handler.isCompressionEnabled()) {
             usedCompression = true;
-            buf = handleCompressedPacket(buf);
+            try {
+                buf = handleCompressedPacket(buf);
+            } catch (IndexOutOfBoundsException exception) {
+                lastBytes = null;
+                lastCompressedBytes = null;
+                exception.printStackTrace();
+            }
         }
 
         if (lastBytes != null) {
@@ -178,5 +184,6 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         packetMap.put(UpdateEntityPositionS2CPacket.packetID.getOffset(), UpdateEntityPositionS2CPacket.class);
         packetMap.put(UpdateEntityPositionAndRotation.packetID.getOffset(), UpdateEntityPositionAndRotation.class);
         packetMap.put(TeleportEntityS2CPacket.packetID.getOffset(), TeleportEntityS2CPacket.class);
+        packetMap.put(SetContainerContentS2CPacket.packetID.getOffset(), SetContainerContentS2CPacket.class);
     }
 }
