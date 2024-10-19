@@ -1,37 +1,33 @@
 package client.networking.packets.S2C.play;
 
-import client.Logger;
 import client.game.items.ItemStack;
 import client.game.items.ItemType;
 import client.networking.ClientPacketListener;
-import client.networking.ItemID;
 import client.networking.ItemIDs;
 import client.networking.packets.PacketID;
 import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
 import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
-import math.Vec3i;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SetContainerContentS2CPacket extends S2CPacket {
-    public final static PacketID packetID = PacketIDS.CONTAINER_SET_CONTENT_PLAY_S2C;
+public class SetContainerSlotS2CPacket extends S2CPacket {
+    public final static PacketID packetID = PacketIDS.CONTAINER_SET_SLOT_PLAY_S2C;
 
     private short windowID;
     private int stateID;
-    private int count;
-    private List<ItemStack> items;
-    private ItemStack carriedStack;
+    private short slot;
+    private ItemStack itemStack;
 
-    public SetContainerContentS2CPacket(ByteBuf buf, int size) throws IllegalArgumentException {
+    public SetContainerSlotS2CPacket(ByteBuf buf, int size) throws IllegalArgumentException {
         super(buf, size);
     }
 
     @Override
     public void apply(ClientPacketListener listener) {
-        listener.onSetContainerContent(this);
+        listener.onSetContainerSlot(this);
     }
 
     public PacketID getPacketID() {
@@ -42,12 +38,8 @@ public class SetContainerContentS2CPacket extends S2CPacket {
     public void decode(ByteBuf buf) {
         windowID = buf.readByte();
         stateID = PacketUtil.readVarInt(buf);
-        count = PacketUtil.readVarInt(buf);
-        items = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            items.add(readSlot(buf));
-        }
-        carriedStack = readSlot(buf);
+        this.slot = buf.readShort();
+        itemStack = readSlot(buf);
     }
 
     public ItemStack readSlot(ByteBuf buf) {
@@ -77,15 +69,11 @@ public class SetContainerContentS2CPacket extends S2CPacket {
         return stateID;
     }
 
-    public int getCount() {
-        return count;
+    public int getSlot() {
+        return slot;
     }
 
-    public List<ItemStack> getItems() {
-        return items;
-    }
-
-    public ItemStack getCarriedStack() {
-        return carriedStack;
+    public ItemStack getItemStack() {
+        return itemStack;
     }
 }

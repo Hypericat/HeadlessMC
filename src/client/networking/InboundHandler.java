@@ -185,5 +185,6 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         packetMap.put(UpdateEntityPositionAndRotation.packetID.getOffset(), UpdateEntityPositionAndRotation.class);
         packetMap.put(TeleportEntityS2CPacket.packetID.getOffset(), TeleportEntityS2CPacket.class);
         packetMap.put(SetContainerContentS2CPacket.packetID.getOffset(), SetContainerContentS2CPacket.class);
+        packetMap.put(SetContainerSlotS2CPacket.packetID.getOffset(), SetContainerSlotS2CPacket.class);
     }
 }

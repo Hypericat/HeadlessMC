@@ -200,7 +200,14 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onSetContainerContent(SetContainerContentS2CPacket packet) {
+        if (!packet.isClientInventory()) return;
+        instance.getPlayer().getInventory().setSlots(0, packet.getItems());
+    }
 
+    @Override
+    public void onSetContainerSlot(SetContainerSlotS2CPacket packet) {
+        if (!packet.isClientInventory()) return;
+        instance.getPlayer().getInventory().setSlot(packet.getSlot(), packet.getItemStack());
     }
 
     @Override

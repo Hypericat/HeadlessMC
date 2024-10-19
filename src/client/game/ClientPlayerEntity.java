@@ -1,6 +1,7 @@
 package client.game;
 
 import client.HeadlessInstance;
+import client.game.items.ItemStack;
 import client.game.items.ItemType;
 import client.game.items.Items;
 import client.networking.packets.C2S.play.ClientStatusC2SPacket;
@@ -29,7 +30,6 @@ public class ClientPlayerEntity extends PlayerEntity {
         //this.setVelocity(newVelocity.x, this.getVelocity().y, newVelocity.z);
         tickMovement();
         decrementAttackCooldown();
-
     }
 
     public int getChunkX() {

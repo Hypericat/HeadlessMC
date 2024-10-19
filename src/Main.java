@@ -37,6 +37,8 @@ public class Main {
             break;
         }
         System.out.println("All instances terminated, terminating program!");
+        instances.clear();
+        return;
     }
 
     public static void makeInstances(String name, String ip, int count) {
