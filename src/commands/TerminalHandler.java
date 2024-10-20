@@ -1,6 +1,8 @@
 package commands;
 
 import client.HeadlessInstance;
+import commands.command.GotoCommand;
+import commands.command.MineBlockCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ public class TerminalHandler implements Runnable {
 
     private void initCommands() {
         commands.add(new MineBlockCommand());
+        commands.add(new GotoCommand());
     }
 
     private Command getCommand(String in) {

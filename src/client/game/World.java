@@ -1,6 +1,8 @@
 package client.game;
 
 import client.HeadlessInstance;
+import client.pathing.PathNode;
+import client.pathing.IWorldProvider;
 import math.Pair;
 import math.Vec3d;
 import math.Vec3i;
@@ -9,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class World {
+public class World implements IWorldProvider {
     private int maxHeight;
     HashMap<Long, Chunk> chunks = new HashMap<>();
     private volatile HashMap<Integer, Entity> entities = new HashMap<>();
@@ -58,9 +60,8 @@ public class World {
         return getBlock(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    private Block getBlock(int x, int y, int z) {
+    public Block getBlock(int x, int y, int z) {
         Chunk chunk = getChunkAtCord(x, z);
-        //air
         if (chunk == null) return Blocks.AIR;
         return chunk.getBlockAt(Math.floorMod(x, 16), y, (Math.floorMod(z, 16)));
     }
@@ -122,4 +123,17 @@ public class World {
         return entities;
     }
 
+    @Override
+    public boolean isLoaded(int chunkX, int chunkZ) {
+        return getChunkAt(chunkX, chunkZ) != null;
+    }
+
+    public DimensionType getDimensionType() {
+        return DimensionType.OVERWORLD;
+    }
+
+    @Override
+    public World getWorld() {
+        return this;
+    }
 }

@@ -1,6 +1,10 @@
-package commands;
+package commands.command;
 
 import client.HeadlessInstance;
+import commands.Command;
+import commands.CommandSyntax;
+import commands.IntArgument;
+import commands.RelativePositionArgument;
 import math.Vec3i;
 
 import java.util.List;

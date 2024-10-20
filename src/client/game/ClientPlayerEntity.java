@@ -1,11 +1,13 @@
 package client.game;
 
 import client.HeadlessInstance;
-import client.game.items.ItemStack;
+import client.Scheduler;
 import client.game.items.ItemType;
 import client.game.items.Items;
 import client.networking.packets.C2S.play.ClientStatusC2SPacket;
 import client.networking.packets.C2S.play.PlayerMoveFullC2SPacket;
+import client.pathing.IPath;
+import client.pathing.PathNode;
 import math.*;
 
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ public class ClientPlayerEntity extends PlayerEntity {
     private int chunkX;
     private int chunkZ;
     private int attackCooldown = 0;
+    List<Vec3i> pathNodes;
 
     public ClientPlayerEntity(int entityID, HeadlessInstance instance) {
         super(entityID, instance);
@@ -30,6 +33,21 @@ public class ClientPlayerEntity extends PlayerEntity {
         //this.setVelocity(newVelocity.x, this.getVelocity().y, newVelocity.z);
         tickMovement();
         decrementAttackCooldown();
+    }
+
+    public void setPathGoal(IPath path) {
+        this.pathNodes = new ArrayList<>(path.positions());
+        gotoBlock(pathNodes);
+    }
+
+    public void gotoBlock(List<Vec3i> pos) {
+        if (pos.isEmpty()) {
+            System.out.println("Done pathing!");
+            return;
+        }
+        this.setPos(Vec3d.of(pos.removeFirst()));
+        List<Vec3i> finalPos = pos;
+        getInstance().getScheduler().schedule(1, Scheduler.Type.ONCE, consumer -> gotoBlock(finalPos));
     }
 
     public int getChunkX() {

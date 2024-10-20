@@ -32,6 +32,22 @@ public class Vec3i implements Comparable<Vec3i> {
         return new Vec3i((int) Math.ceil(vec3d.getX()), (int) Math.ceil(vec3d.getY()), (int) Math.ceil(vec3d.getZ()));
     }
 
+    public static long longHash(int x, int y, int z) {
+        long hash = 3241;
+        hash = 3457689L * hash + x;
+        hash = 8734625L * hash + y;
+        hash = 2873465L * hash + z;
+        return hash;
+    }
+
+    public long longHash() {
+        long hash = 3241;
+        hash = 3457689L * hash + x;
+        hash = 8734625L * hash + y;
+        hash = 2873465L * hash + z;
+        return hash;
+    }
+
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -42,6 +58,54 @@ public class Vec3i implements Comparable<Vec3i> {
         } else {
             return this.getY() != vec3i.getY() ? false : this.getZ() == vec3i.getZ();
         }
+    }
+
+    public Vec3i above() {
+        return new Vec3i(x, y + 1, z);
+    }
+
+    public Vec3i above(int amt) {
+        return amt == 0 ? this : new Vec3i(x, y + amt, z);
+    }
+
+    public Vec3i below() {
+        return new Vec3i(x, y - 1, z);
+    }
+
+    public Vec3i below(int amt) {
+        return amt == 0 ? this : new Vec3i(x, y - amt, z);
+    }
+
+    public Vec3i north() {
+        return new Vec3i(x, y, z - 1);
+    }
+
+    public Vec3i north(int amt) {
+        return amt == 0 ? this : new Vec3i(x, y, z - amt);
+    }
+
+    public Vec3i south() {
+        return new Vec3i(x, y, z + 1);
+    }
+
+    public Vec3i south(int amt) {
+        return amt == 0 ? this : new Vec3i(x, y, z + amt);
+    }
+
+    public Vec3i east() {
+        return new Vec3i(x + 1, y, z);
+    }
+
+    public Vec3i east(int amt) {
+        return amt == 0 ? this : new Vec3i(x + amt, y, z);
+    }
+
+    public Vec3i west() {
+        return new Vec3i(x - 1, y, z);
+    }
+
+    public Vec3i west(int amt) {
+        return amt == 0 ? this : new Vec3i(x - amt, y, z);
     }
 
     public int hashCode() {

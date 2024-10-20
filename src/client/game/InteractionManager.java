@@ -3,8 +3,15 @@ package client.game;
 import client.HeadlessInstance;
 import client.networking.NetworkHandler;
 import client.networking.packets.C2S.play.*;
+import client.pathing.GoalXZ;
+import client.pathing.IPath;
+import client.pathing.PathNode;
+import client.pathing.Pathfinder;
 import math.Vec3d;
 import math.Vec3i;
+
+import java.util.List;
+import java.util.Optional;
 
 public class InteractionManager {
     private ClientPlayerEntity player;
@@ -50,6 +57,12 @@ public class InteractionManager {
 
         this.player.setYaw(yaw);
         this.player.setPitch(-pitch);
+    }
+
+    public void pathTo(Vec3i vec) {
+        Pathfinder pathfinder = new Pathfinder(player.getBlockPos(), new GoalXZ(vec.getX(), vec.getZ()), world);
+        Optional<IPath> path = pathfinder.getPath(4000L, 5000L);
+        player.setPathGoal(path.orElseThrow());
     }
 
     public void attackEntity(Entity entity) {
