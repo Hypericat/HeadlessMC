@@ -15,9 +15,14 @@ public abstract class Movement {
         return context.getWorld().getBlock(x, y, z) == Blocks.AIR ? ActionCosts.FALL_N_BLOCKS_COST[1] : ActionCosts.COST_INF;
     }
 
+    public static double costUp(CalculationContext context, int x, int y, int z) {
+        return context.getWorld().getBlock(x, y, z) == Blocks.AIR ? ActionCosts.JUMP_ONE_BLOCK_COST : ActionCosts.COST_INF;
+    }
+
     public static void costDiagonal(CalculationContext context, int x, int y, int z, int destX, int destZ, MutableMoveResult res) {
         res.x = destX;
         res.z = destZ;
         res.cost = context.getWorld().getBlock(x, y, z) != Blocks.AIR ? ActionCosts.WALK_ONE_BLOCK_COST * new Vec3d(x, 0, z).distanceTo(new Vec3d(destX, 0, destZ)) : ActionCosts.COST_INF;
+        Moves.applyFloatingPenalty(context, res);
     }
 }

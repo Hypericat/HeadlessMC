@@ -23,6 +23,10 @@ public class Vec3d implements Position {
         return new Vec3d((double)vec.getX() + deltaX, (double)vec.getY() + deltaY, (double)vec.getZ() + deltaZ);
     }
 
+    public static Vec3d fromBlock(Vec3i vec) {
+        return new Vec3d(vec.getX() + 0.5d, vec.getY(), vec.getZ() + 0.5d);
+    }
+
     public static Vec3d ofCenter(Vec3i vec) {
         return add(vec, 0.5, 0.5, 0.5);
     }

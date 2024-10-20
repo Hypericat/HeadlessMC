@@ -7,6 +7,7 @@ import math.Vec3i;
 
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 public class Pathfinder {
     protected PathNode startNode;
@@ -23,25 +24,25 @@ public class Pathfinder {
 
     private final Goal goal;
     private final Vec3i start;
-    private final IWorldProvider world;
+    private final CalculationContext ctx;
 
-    public Pathfinder(final Vec3i start, Goal goal, final IWorldProvider world) {
+    public Pathfinder(final Vec3i start, Goal goal, CalculationContext ctx) {
         this.start = start;
         this.goal = goal;
-        this.world = world;
+        this.ctx = ctx;
         map = new HashMap<>();
     }
 
 
     public Optional<IPath> getPath(long primaryTimeout, long failureTimeout) {
-        int minY = world.getDimensionType().getMinY();
-        int height = world.getDimensionType().getHeight();
-        startNode = getNodeAtPosition(start.getX(), start.getY(), start.getZ(), start.longHash());
-        startNode.cost = 0;
-        startNode.combinedCost = startNode.heuristic;
-        BinaryHeapOpenSet openSet = new BinaryHeapOpenSet();
-        openSet.insert(startNode);
-        double[] bestHeuristicSoFar = new double[COEFFICIENTS.length];//keep track of the best node by the metric of (estimatedCostToGoal + cost / COEFFICIENTS[i])
+        int minY = ctx.getWorld().getDimensionType().getMinY();
+        int height = ctx.getWorld().getDimensionType().getHeight();
+        this.startNode = getNodeAtPosition(start);
+        this.startNode.cost = 0;
+        this.startNode.combinedCost = this.startNode.heuristic;
+        BinaryHeapOpenSet open = new BinaryHeapOpenSet();
+        open.insert(startNode);
+        double[] bestHeuristicSoFar = new double[COEFFICIENTS.length];
         for (int i = 0; i < bestHeuristicSoFar.length; i++) {
             bestHeuristicSoFar[i] = startNode.heuristic;
             bestSoFar[i] = startNode;
@@ -56,29 +57,29 @@ public class Pathfinder {
         int numEmptyChunk = 0;
         int timeCheckInterval = 1 << 6;
         int pathingMaxChunkBorderFetch = 50;
-        double minimumImprovement = MIN_IMPROVEMENT;
         Moves[] allMoves = Moves.values();
-        while (!openSet.isEmpty() && numEmptyChunk < pathingMaxChunkBorderFetch && !cancelRequested) {
+        while(!open.isEmpty() && numEmptyChunk < pathingMaxChunkBorderFetch && !cancelRequested) {
             if ((numNodes & (timeCheckInterval - 1)) == 0) { // only call this once every 64 nodes (about half a millisecond)
                 long now = System.currentTimeMillis(); // since nanoTime is slow on windows (takes many microseconds)
                 if (now - failureTimeoutTime >= 0 || (!failing && now - primaryTimeoutTime >= 0)) {
+                    System.out.println("RAN OUT OF TIME!");
                     break;
                 }
             }
-            PathNode currentNode = openSet.removeLowest();
+            PathNode currentNode = open.removeLowest();
             mostRecentConsidered = currentNode;
             numNodes++;
             if (goal.isInGoal(currentNode.x, currentNode.y, currentNode.z)) {
+                System.out.println("TESTY");
                 logDebug("Took " + (System.currentTimeMillis() - startTime) + "ms, " + numMovementsConsidered + " movements considered");
                 return Optional.of(new Path(start, startNode, currentNode, numNodes, goal));
             }
-            CalculationContext context = new CalculationContext(world);
 
             for (Moves moves : allMoves) {
                 int newX = currentNode.x + moves.xOffset;
                 int newZ = currentNode.z + moves.zOffset;
-                if ((newX >> 4 != currentNode.x >> 4 || newZ >> 4 != currentNode.z >> 4) && !world.isLoaded(newX, newZ)) {
-                    //i only need to check if the destination is a loaded chunk f it's in a different chunk than the start of the movement
+                if ((newX >> 4 != currentNode.x >> 4 || newZ >> 4 != currentNode.z >> 4) && !ctx.getWorld().isLoaded(newX, newZ)) {
+                    //only  check if the destination is in a loaded chunk if it's in a different chunk than the start of the movement
                     if (!moves.dynamicXZ) { // only increment the counter if the movement would have gone out of bounds guaranteed
                         numEmptyChunk++;
                     }
@@ -88,7 +89,7 @@ public class Pathfinder {
                     continue;
                 }
                 res.reset();
-                moves.apply(context, currentNode.x, currentNode.y, currentNode.z, res);
+                moves.apply(ctx, currentNode.x, currentNode.y, currentNode.z, res);
                 numMovementsConsidered++;
                 double actionCost = res.cost;
                 if (actionCost >= ActionCosts.COST_INF) {
@@ -106,18 +107,18 @@ public class Pathfinder {
                 long hashCode = Vec3i.longHash(res.x, res.y, res.z);
                 PathNode neighbor = getNodeAtPosition(res.x, res.y, res.z, hashCode);
                 double tentativeCost = currentNode.cost + actionCost;
-                if (neighbor.cost - tentativeCost > minimumImprovement) {
+                if (neighbor.cost - tentativeCost > MIN_IMPROVEMENT) {
                     neighbor.previous = currentNode;
                     neighbor.cost = tentativeCost;
                     neighbor.combinedCost = tentativeCost + neighbor.heuristic;
                     if (neighbor.isOpen()) {
-                        openSet.update(neighbor);
+                        open.update(neighbor);
                     } else {
-                        openSet.insert(neighbor);//dont double count, dont insert into open set if it's already there
+                        open.insert(neighbor);
                     }
                     for (int i = 0; i < COEFFICIENTS.length; i++) {
                         double heuristic = neighbor.heuristic + neighbor.cost / COEFFICIENTS[i];
-                        if (bestHeuristicSoFar[i] - heuristic > minimumImprovement) {
+                        if (bestHeuristicSoFar[i] - heuristic > MIN_IMPROVEMENT) {
                             bestHeuristicSoFar[i] = heuristic;
                             bestSoFar[i] = neighbor;
                             if (failing && getDistFromStartSq(neighbor) > MIN_DIST_PATH * MIN_DIST_PATH) {
@@ -132,8 +133,8 @@ public class Pathfinder {
             return Optional.empty();
         }
         System.out.println(numMovementsConsidered + " movements considered");
-        System.out.println("Open set size: " + openSet.size());
-        System.out.println("PathNode map size: " + mapSize());
+        System.out.println("Open set size: " + open.size());
+        System.out.println("PathNode map size: " + getMapSize());
         System.out.println((int) (numNodes * 1.0 / ((System.currentTimeMillis() - startTime) / 1000F)) + " nodes per second");
         Optional<IPath> result = bestSoFar(true, numNodes);
         if (result.isPresent()) {
@@ -142,20 +143,26 @@ public class Pathfinder {
         return result;
     }
 
-    protected double getDistFromStartSq(PathNode n) {
+    private double getDistFromStartSq(PathNode n) {
         int xDiff = n.x - start.getX();
         int yDiff = n.y - start.getY();
         int zDiff = n.z - start.getZ();
         return xDiff * xDiff + yDiff * yDiff + zDiff * zDiff;
     }
 
-    protected PathNode getNodeAtPosition(int x, int y, int z, long hashCode) {
+
+    //this is used for caching nodes instead of creating many of the same nodes
+    private PathNode getNodeAtPosition(int x, int y, int z, long hashCode) {
         PathNode node = map.get(hashCode);
         if (node == null) {
             node = new PathNode(x, y, z, goal);
             map.put(hashCode, node);
         }
         return node;
+    }
+
+    private PathNode getNodeAtPosition(Vec3i pos) {
+        return getNodeAtPosition(pos.getX(), pos.getY(), pos.getZ(), pos.longHash());
     }
 
     public Optional<IPath> pathToMostRecentNodeConsidered() {
@@ -166,7 +173,7 @@ public class Pathfinder {
         return bestSoFar(false, 0);
     }
 
-    protected Optional<IPath> bestSoFar(boolean logInfo, int numNodes) {
+    private Optional<IPath> bestSoFar(boolean logInfo, int numNodes) {
         if (startNode == null) {
             return Optional.empty();
         }
@@ -179,7 +186,7 @@ public class Pathfinder {
             if (dist > bestDist) {
                 bestDist = dist;
             }
-            if (dist > MIN_DIST_PATH * MIN_DIST_PATH) { // square the comparison since distFromStartSq is squared
+            if (dist > MIN_DIST_PATH * MIN_DIST_PATH) {
                 if (logInfo) {
                     if (COEFFICIENTS[i] >= 3) {
                         System.out.println("Warning: cost coefficient is greater than three! Probably means that");
@@ -215,7 +222,7 @@ public class Pathfinder {
         return start;
     }
 
-    protected int mapSize() {
+    private int getMapSize() {
         return map.size();
     }
 }

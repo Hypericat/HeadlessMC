@@ -37,6 +37,9 @@ public class ClientPlayerEntity extends PlayerEntity {
 
     public void setPathGoal(IPath path) {
         this.pathNodes = new ArrayList<>(path.positions());
+        //for (Vec3i node : pathNodes) {
+        //    node.setBlock(getInstance().getInteractionManager(), Blocks.GLASS);
+        //}
         gotoBlock(pathNodes);
     }
 
@@ -45,7 +48,7 @@ public class ClientPlayerEntity extends PlayerEntity {
             System.out.println("Done pathing!");
             return;
         }
-        this.setPos(Vec3d.of(pos.removeFirst()));
+        this.setPos(Vec3d.fromBlock(pos.removeFirst()));
         List<Vec3i> finalPos = pos;
         getInstance().getScheduler().schedule(1, Scheduler.Type.ONCE, consumer -> gotoBlock(finalPos));
     }
@@ -119,10 +122,6 @@ public class ClientPlayerEntity extends PlayerEntity {
         setHealth(20);
         getInstance().getLogger().logUser("Respawning!");
         this.getInstance().getNetworkHandler().sendPacket(new ClientStatusC2SPacket(0));
-
-        for (ItemType type : Items.toList()) {
-            getInstance().getInteractionManager().sendCommand("/give @p " + type.getIdentifier() + " 1");
-        }
     }
 
     public void tickMovement() {

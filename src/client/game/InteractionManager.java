@@ -3,10 +3,7 @@ package client.game;
 import client.HeadlessInstance;
 import client.networking.NetworkHandler;
 import client.networking.packets.C2S.play.*;
-import client.pathing.GoalXZ;
-import client.pathing.IPath;
-import client.pathing.PathNode;
-import client.pathing.Pathfinder;
+import client.pathing.*;
 import math.Vec3d;
 import math.Vec3i;
 
@@ -60,7 +57,7 @@ public class InteractionManager {
     }
 
     public void pathTo(Vec3i vec) {
-        Pathfinder pathfinder = new Pathfinder(player.getBlockPos(), new GoalXZ(vec.getX(), vec.getZ()), world);
+        Pathfinder pathfinder = new Pathfinder(player.getBlockPos(), new GoalXYZ(vec.getX(), vec.getY(), vec.getZ()), new CalculationContext(world));
         Optional<IPath> path = pathfinder.getPath(4000L, 5000L);
         player.setPathGoal(path.orElseThrow());
     }

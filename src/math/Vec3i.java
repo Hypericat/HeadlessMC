@@ -1,6 +1,8 @@
 package math;
 
+import client.game.Block;
 import client.game.BlockFace;
+import client.game.InteractionManager;
 
 public class Vec3i implements Comparable<Vec3i> {
 
@@ -75,6 +77,7 @@ public class Vec3i implements Comparable<Vec3i> {
     public Vec3i below(int amt) {
         return amt == 0 ? this : new Vec3i(x, y - amt, z);
     }
+
 
     public Vec3i north() {
         return new Vec3i(x, y, z - 1);
@@ -239,6 +242,10 @@ public class Vec3i implements Comparable<Vec3i> {
         float g = (float)Math.abs(vec.getY() - this.getY());
         float h = (float)Math.abs(vec.getZ() - this.getZ());
         return (int)(f + g + h);
+    }
+
+    public void setBlock(InteractionManager interactionManager, Block block) {
+        interactionManager.sendCommand("/setblock " + this.getX() + " " + this.getY() + " " + this.getZ() + " " + block.getName());
     }
 
     public String toString() {

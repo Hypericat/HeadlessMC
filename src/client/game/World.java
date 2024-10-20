@@ -124,8 +124,8 @@ public class World implements IWorldProvider {
     }
 
     @Override
-    public boolean isLoaded(int chunkX, int chunkZ) {
-        return getChunkAt(chunkX, chunkZ) != null;
+    public boolean isLoaded(int x, int z) {
+        return getChunkAtCord(x, z  ) != null;
     }
 
     public DimensionType getDimensionType() {

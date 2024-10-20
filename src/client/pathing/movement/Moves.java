@@ -1,16 +1,23 @@
 package client.pathing.movement;
 
-import client.game.BlockFace;
+import client.game.Blocks;
+import client.pathing.ActionCosts;
 import client.pathing.CalculationContext;
 import client.pathing.movement.movements.*;
 import client.pathing.openset.MutableMoveResult;
-import math.Vec3i;
 
 public enum Moves {
     DOWNWARD(0, -1, 0) {
         @Override
         public double cost(CalculationContext context, int x, int y, int z) {
             return MovementDownward.costDown(context, x, y, z);
+        }
+    },
+
+    UPWARD(0, +1, 0) {
+        @Override
+        public double cost(CalculationContext context, int x, int y, int z) {
+            return MovementUpward.costUp(context, x, y, z);
         }
     },
 
@@ -88,6 +95,7 @@ public enum Moves {
     Moves(int x, int y, int z) {
         this(x, y, z, false, false);
     }
+
     public void apply(CalculationContext context, int x, int y, int z, MutableMoveResult result) {
         if (dynamicXZ || dynamicY) {
             throw new UnsupportedOperationException();
@@ -96,6 +104,19 @@ public enum Moves {
         result.y = y + yOffset;
         result.z = z + zOffset;
         result.cost = cost(context, x, y, z);
+        applyFloatingPenalty(context, result);
+    }
+
+    public static void applyFloatingPenalty(CalculationContext context, MutableMoveResult result) {
+        if (isFloating(context, result.x, result.y, result.z)) {
+            //floating penalty
+            float floatingPenaltyMultiplier = 2;
+            result.cost = result.cost * floatingPenaltyMultiplier;
+        }
+    }
+
+    public static boolean isFloating(CalculationContext context, int x, int y, int z) {
+        return context.getWorld().getBlock(x, y - 1, z) == Blocks.AIR;
     }
 
     public double cost(CalculationContext context, int x, int y, int z) {
