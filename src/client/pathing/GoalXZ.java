@@ -26,7 +26,7 @@ public class GoalXZ implements Goal {
     }
 
     @Override
-    public double heuristic(int x, int y, int z) {//mostly copied from GoalBlock
+    public double heuristic(int x, int y, int z) {
         int xDiff = x - this.x;
         int zDiff = z - this.z;
         return calculate(xDiff, zDiff);

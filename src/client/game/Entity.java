@@ -1,6 +1,7 @@
 package client.game;
 
 import client.HeadlessInstance;
+import client.utils.UUID;
 import math.Box;
 import math.Vec3d;
 
@@ -11,11 +12,12 @@ public class Entity {
     private float yaw;
     private float pitch;
     private boolean onGround;
-    private HeadlessInstance instance;
+    private final UUID uuid;
+    private final HeadlessInstance instance;
     private Box boundingBox;
     private final EntityType<?> entityType;
 
-    public <T extends Entity> Entity(int entityID, Vec3d pos, Vec3d velocity, float yaw, float pitch, boolean onGround, EntityType<T> entityType, HeadlessInstance instance) {
+    public <T extends Entity> Entity(int entityID, Vec3d pos, Vec3d velocity, float yaw, float pitch, boolean onGround, EntityType<T> entityType, UUID uuid, HeadlessInstance instance) {
         this.entityID = entityID;
         this.pos = pos;
         this.velocity = velocity;
@@ -23,6 +25,7 @@ public class Entity {
         this.pitch = pitch;
         this.onGround = onGround;
         this.entityType = entityType;
+        this.uuid = uuid;
         this.instance = instance;
     }
 
@@ -70,6 +73,10 @@ public class Entity {
     }
     public HeadlessInstance getInstance() {
         return this.instance;
+    }
+
+    public UUID getUuid() {
+        return this.uuid;
     }
 
     public double getX() {

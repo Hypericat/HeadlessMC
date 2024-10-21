@@ -1,4 +1,5 @@
 import client.HeadlessInstance;
+import client.game.Block;
 import commands.TerminalHandler;
 import math.Pair;
 
@@ -16,8 +17,11 @@ public class Main {
         Thread terminalThread = new Thread(terminal);
 
         //makeInstance(args[0], args[1], Integer.parseInt(args[2]));
-        makeInstances("Winston", "127.0.0.1", 15);
+        makeInstances("Winston", "127.0.0.1", 10);
         //makeInstance("Winston", "192.168.2.226", 1);
+
+        //don't remove this
+        Block.initCollisions();
 
         terminalThread.start();
 
@@ -53,7 +57,7 @@ public class Main {
     public static void makeInstance(String name, String ip, int id) {
         if (ip.equalsIgnoreCase("localhost")) ip = "127.0.0.1";
 
-        HeadlessInstance headless = new HeadlessInstance(name, ip, id, isDev());
+        HeadlessInstance headless = new HeadlessInstance(name, ip, id, 5, isDev());
         Thread thread = new Thread(headless);
         instances.add(new Pair<>(headless, thread));
         thread.start();
@@ -65,5 +69,8 @@ public class Main {
 
     //Todo
 
-    //work with login compression
+    //process unload chunk packets
+    //if not done this could cause chunks to get desynced because we wont receieve block updates ^^
+
+    //fix GoalXZ
 }

@@ -3,6 +3,7 @@ package client.game;
 import client.HeadlessInstance;
 import client.pathing.PathNode;
 import client.pathing.IWorldProvider;
+import client.utils.UUID;
 import math.Pair;
 import math.Vec3d;
 import math.Vec3i;
@@ -115,6 +116,13 @@ public class World implements IWorldProvider {
         return entities;
     }
 
+    public Entity getEntityByUUID(UUID uuid) {
+        for (Entity entity : this.entities.values()) {
+            if (entity.getUuid().equals(uuid)) return entity;
+        }
+        return null;
+    }
+
     public <T extends Entity> List<T> getEntitiesByType(EntityType<?> type) {
         List<T> entities = new ArrayList<>();
         for (Entity entity : this.entities.values()) {
@@ -125,7 +133,7 @@ public class World implements IWorldProvider {
 
     @Override
     public boolean isLoaded(int x, int z) {
-        return getChunkAtCord(x, z  ) != null;
+        return getChunkAtCord(x, z) != null;
     }
 
     public DimensionType getDimensionType() {

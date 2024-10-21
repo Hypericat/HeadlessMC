@@ -59,7 +59,7 @@ public class PacketHandler implements ClientPacketListener {
     public void onLoginSuccess(LoginSuccessS2CPacket packet) {
         instance.setUuid(packet.getUuid());
         instance.getNetworkHandler().sendPacket(new LoginAcknowledgedC2SPacket());
-        instance.getNetworkHandler().sendPacket(new ClientInformationC2SPacket());
+        instance.getNetworkHandler().sendPacket(new ClientInformationC2SPacket(instance.getViewDistance()));
 
         instance.getNetworkHandler().setNetworkState(NetworkState.CONFIGURATION);
         instance.config();
@@ -85,7 +85,6 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onKeepAlive(KeepAliveS2CPacket packet) {
-        instance.getLogger().debug("Received Keep Alive Packet, ID : " + packet.getId());
         instance.getNetworkHandler().sendPacket(new KeepAliveC2SPacket(packet.getId()));
     }
 
@@ -142,9 +141,9 @@ public class PacketHandler implements ClientPacketListener {
         if (type == null) return;
         Entity entity = null;
         if (type.getEntityClass() == LivingEntity.class) {
-            entity = new LivingEntity(packet.getEntityID(), 20, 20, new Vec3d(packet.getX(), packet.getY(), packet.getZ()), new Vec3d(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ()), packet.getYaw(), packet.getPitch(), true, (EntityType<? extends LivingEntity>) type, instance);
+            entity = new LivingEntity(packet.getEntityID(), 20, 20, new Vec3d(packet.getX(), packet.getY(), packet.getZ()), new Vec3d(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ()), packet.getYaw(), packet.getPitch(), true, (EntityType<? extends LivingEntity>) type, packet.getEntityUuid(), instance);
         } else if (type.getEntityClass() == Entity.class) {
-            entity = new Entity(packet.getEntityID(), new Vec3d(packet.getX(), packet.getY(), packet.getZ()), new Vec3d(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ()), packet.getYaw(), packet.getPitch(), true, (EntityType<? extends Entity>) type, instance);
+            entity = new Entity(packet.getEntityID(), new Vec3d(packet.getX(), packet.getY(), packet.getZ()), new Vec3d(packet.getVelocityX(), packet.getVelocityY(), packet.getVelocityZ()), packet.getYaw(), packet.getPitch(), true, (EntityType<? extends Entity>) type, packet.getEntityUuid(), instance);
 
         }
         if (entity == null) return;
@@ -190,12 +189,17 @@ public class PacketHandler implements ClientPacketListener {
     public void onChunkData(ChunkDataS2CPacket packet) {
         World world = instance.getWorld();
         world.addChunk(packet.getChunk());
-        instance.getLogger().debug("Finished Loading Chunk at X : " + packet.getChunk().getChunkX() * 16 + " Z : " + packet.getChunk().getChunkZ() * 16);
+        instance.getLogger().logToFile("Finished Loading Chunk at X : " + packet.getChunk().getChunkX() * 16 + " Z : " + packet.getChunk().getChunkZ() * 16);
     }
 
     @Override
     public void onBlockUpdate(BlockUpdateS2CPacket packet) {
         instance.getWorld().setBlock(packet.getPos(), Blocks.getBlockByID(packet.getBlockID()));
+    }
+
+    @Override
+    public void onChatMessageS2C(PlayerChatMessageS2C packet) {
+        instance.getInteractionManager().onReceiveChatMessage(packet.getSenderUUID(), packet.getMessage());
     }
 
     @Override

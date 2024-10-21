@@ -1,12 +1,13 @@
 package client.pathing;
 
+import client.pathing.movement.Moves;
 import math.Vec3i;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class Path extends PathBase {
+public class Path extends PathBase {
 
     private final Vec3i start;
     private final Vec3i end;
@@ -44,11 +45,6 @@ class Path extends PathBase {
     }
 
     @Override
-    public List<IMovement> movements() {
-        return List.of();
-    }
-
-    @Override
     public List<Vec3i> positions() {
         return Collections.unmodifiableList(path);
     }
@@ -76,11 +72,6 @@ class Path extends PathBase {
     @Override
     public Vec3i getDest() {
         return end;
-    }
-
-    @Override
-    public double ticksRemainingFrom(int pathPosition) {
-        return super.ticksRemainingFrom(pathPosition);
     }
 
     @Override

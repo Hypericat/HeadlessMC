@@ -5,7 +5,7 @@ import client.game.World;
 
 public interface IWorldProvider {
 
-    boolean isLoaded(int chunkX, int chunkZ);
+    boolean isLoaded(int blockX, int blockZ);
     DimensionType getDimensionType();
     World getWorld();
 

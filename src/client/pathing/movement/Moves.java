@@ -52,28 +52,28 @@ public enum Moves {
     DIAGONAL_NORTHEAST(+1, 0, -1, false, true) {
         @Override
         public void apply(CalculationContext context, int x, int y, int z, MutableMoveResult result) {
-            MovementDiagonal.costDiagonal(context, x, y, z, x + 1, z - 1, result);
+            MovementDiagonal.costDiagonal(context, x, y, z, x + 1, z - 1, result, this);
         }
     },
 
     DIAGONAL_NORTHWEST(-1, 0, -1, false, true) {
         @Override
         public void apply(CalculationContext context, int x, int y, int z, MutableMoveResult result) {
-            MovementDiagonal.costDiagonal(context, x, y, z, x - 1, z - 1, result);
+            MovementDiagonal.costDiagonal(context, x, y, z, x - 1, z - 1, result, this);
         }
     },
 
     DIAGONAL_SOUTHEAST(+1, 0, +1, false, true) {
         @Override
         public void apply(CalculationContext context, int x, int y, int z, MutableMoveResult result) {
-            MovementDiagonal.costDiagonal(context, x, y, z, x + 1, z + 1, result);
+            MovementDiagonal.costDiagonal(context, x, y, z, x + 1, z + 1, result, this);
         }
     },
 
     DIAGONAL_SOUTHWEST(-1, 0, +1, false, true) {
         @Override
         public void apply(CalculationContext context, int x, int y, int z, MutableMoveResult result) {
-            MovementDiagonal.costDiagonal(context, x, y, z, x - 1, z + 1, result);
+            MovementDiagonal.costDiagonal(context, x, y, z, x - 1, z + 1, result, this);
         }
     };
 
@@ -104,19 +104,23 @@ public enum Moves {
         result.y = y + yOffset;
         result.z = z + zOffset;
         result.cost = cost(context, x, y, z);
-        applyFloatingPenalty(context, result);
+        applyFloatingPenalty(context, result, this);
     }
 
-    public static void applyFloatingPenalty(CalculationContext context, MutableMoveResult result) {
+    public static void applyFloatingPenalty(CalculationContext context, MutableMoveResult result, Moves move) {
+        //dont remove if going down
+        if (!move.dynamicY && move.yOffset < 0) {
+            return;
+        }
+
         if (isFloating(context, result.x, result.y, result.z)) {
-            //floating penalty
-            float floatingPenaltyMultiplier = 2;
+            float floatingPenaltyMultiplier = 5;
             result.cost = result.cost * floatingPenaltyMultiplier;
         }
     }
 
     public static boolean isFloating(CalculationContext context, int x, int y, int z) {
-        return context.getWorld().getBlock(x, y - 1, z) == Blocks.AIR;
+        return context.getWorld().getBlock(x, y - 1, z).hasNoCollision();
     }
 
     public double cost(CalculationContext context, int x, int y, int z) {

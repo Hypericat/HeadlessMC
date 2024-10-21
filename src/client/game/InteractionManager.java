@@ -1,14 +1,17 @@
 package client.game;
 
 import client.HeadlessInstance;
+import client.Logger;
 import client.networking.NetworkHandler;
 import client.networking.packets.C2S.play.*;
 import client.pathing.*;
+import client.utils.UUID;
 import math.Vec3d;
 import math.Vec3i;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 public class InteractionManager {
     private ClientPlayerEntity player;
@@ -57,9 +60,11 @@ public class InteractionManager {
     }
 
     public void pathTo(Vec3i vec) {
-        Pathfinder pathfinder = new Pathfinder(player.getBlockPos(), new GoalXYZ(vec.getX(), vec.getY(), vec.getZ()), new CalculationContext(world));
-        Optional<IPath> path = pathfinder.getPath(4000L, 5000L);
-        player.setPathGoal(path.orElseThrow());
+        instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalXYZ(vec.getX(), vec.getY(), vec.getZ()), instance));
+    }
+
+    public void drawPathTo(Vec3i vec) {
+        instance.getPlayer().setPathfinderExecutor(PathfinderExecutor.draw(new GoalXYZ(vec.getX(), vec.getY(), vec.getZ()), instance));
     }
 
     public void attackEntity(Entity entity) {
@@ -95,6 +100,35 @@ public class InteractionManager {
         });
         return true;
     }
+
+    public void onReceiveChatMessage(UUID senderUUID, String chatMessage) {
+        instance.getLogger().logUser("Receieved chat message : " + chatMessage);
+        if (chatMessage.startsWith("goto ")) {
+            chatMessage = chatMessage.replace("goto ", "");
+            String[] pos = chatMessage.split(" ");
+            pathTo(new Vec3i(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2])));
+            return;
+        }
+
+        if (chatMessage.startsWith("drawTo ")) {
+            chatMessage = chatMessage.replace("drawTo ", "");
+            String[] pos = chatMessage.split(" ");
+            drawPathTo(new Vec3i(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2])));
+            return;
+        }
+
+        Entity sender = world.getEntityByUUID(senderUUID);
+        if (sender == null) return;
+        if (chatMessage.equalsIgnoreCase("here")) {
+            pathTo(Vec3i.ofFloored(sender.getPos()));
+            return;
+        }
+        if (chatMessage.equalsIgnoreCase("draw")) {
+            drawPathTo(Vec3i.ofFloored(sender.getPos()));
+            return;
+        }
+    }
+
 
     public boolean playerMineBlock(int x, int y, int z) {
         return playerMineBlock(new Vec3i(x, y, z));

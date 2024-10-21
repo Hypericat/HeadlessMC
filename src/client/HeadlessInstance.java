@@ -19,6 +19,7 @@ public class HeadlessInstance implements Runnable {
     private long lastTickTime;
     public static final long MSPT = 50;
 
+    private final byte viewDistance;
     private ClientPlayerEntity player;
     private World world;
     private InteractionManager interactionManager;
@@ -28,9 +29,10 @@ public class HeadlessInstance implements Runnable {
     private boolean autoJump = true;
 
 
-    public HeadlessInstance(String userName, String ip, int id, boolean dev) {
+    public HeadlessInstance(String userName, String ip, int id, int viewDistance, boolean dev) {
         this.userName = userName + id;
         this.logger = new Logger(userName, id, dev);
+        this.viewDistance = (byte) viewDistance;
         this.ip = ip;
         this.lastTickTime = System.currentTimeMillis();
         this.scheduler = new Scheduler();
@@ -132,6 +134,10 @@ public class HeadlessInstance implements Runnable {
 
     public boolean getAutoJump() {
         return this.autoJump;
+    }
+
+    public byte getViewDistance() {
+        return viewDistance;
     }
 
     private int tickCount = 0;

@@ -2,12 +2,12 @@ package client.game;
 
 import client.HeadlessInstance;
 import client.Scheduler;
-import client.game.items.ItemType;
-import client.game.items.Items;
 import client.networking.packets.C2S.play.ClientStatusC2SPacket;
 import client.networking.packets.C2S.play.PlayerMoveFullC2SPacket;
+import client.pathing.CutoffPath;
 import client.pathing.IPath;
-import client.pathing.PathNode;
+import client.pathing.Path;
+import client.pathing.PathfinderExecutor;
 import math.*;
 
 import java.util.ArrayList;
@@ -18,10 +18,10 @@ public class ClientPlayerEntity extends PlayerEntity {
     private int chunkX;
     private int chunkZ;
     private int attackCooldown = 0;
-    List<Vec3i> pathNodes;
+    private PathfinderExecutor pathfinderExecutor;
 
     public ClientPlayerEntity(int entityID, HeadlessInstance instance) {
-        super(entityID, instance);
+        super(entityID, instance.getUuid(), instance);
     }
 
     @Override
@@ -29,29 +29,19 @@ public class ClientPlayerEntity extends PlayerEntity {
         super.onTick();
         List<Entity> players = getInstance().getWorld().getEntitiesByType(EntityTypes.PLAYER);
         doTestMovement();
-        //Vec3d newVelocity = getVelocityFromDir(0.75);
-        //this.setVelocity(newVelocity.x, this.getVelocity().y, newVelocity.z);
+
         tickMovement();
         decrementAttackCooldown();
     }
 
-    public void setPathGoal(IPath path) {
-        this.pathNodes = new ArrayList<>(path.positions());
-        //for (Vec3i node : pathNodes) {
-        //    node.setBlock(getInstance().getInteractionManager(), Blocks.GLASS);
-        //}
-        gotoBlock(pathNodes);
+    public void setPathfinderExecutor(PathfinderExecutor executor) {
+        this.pathfinderExecutor = executor;
     }
 
-    public void gotoBlock(List<Vec3i> pos) {
-        if (pos.isEmpty()) {
-            System.out.println("Done pathing!");
-            return;
-        }
-        this.setPos(Vec3d.fromBlock(pos.removeFirst()));
-        List<Vec3i> finalPos = pos;
-        getInstance().getScheduler().schedule(1, Scheduler.Type.ONCE, consumer -> gotoBlock(finalPos));
+    public PathfinderExecutor getPathFinderExecutor() {
+        return pathfinderExecutor;
     }
+
 
     public int getChunkX() {
         return chunkX;
@@ -131,6 +121,7 @@ public class ClientPlayerEntity extends PlayerEntity {
             this.setVelocity(this.getVelocity().getX() * 0.6d, this.getVelocity().getY(), this.getVelocity().getZ() * 0.6d);
         }
         updateVelocity();
+        tickPathfinder();
         updatePosPackets();
     }
 
@@ -259,7 +250,7 @@ public class ClientPlayerEntity extends PlayerEntity {
                 Box playerBox = this.calcBoundingBox(Vec3d.of(blockPos));
                 Box blockBox = block.getBoundingBox().offset(blockPos);
                 if (!playerBox.intersects(blockBox)) continue;
-                if (block == Blocks.AIR) continue;
+                if (block.hasNoCollision()) continue;
                 return new Pair<>(blockPos, block);
             }
         }
@@ -269,6 +260,15 @@ public class ClientPlayerEntity extends PlayerEntity {
     public void jump() {
         if (!this.isOnGround()) return;
         this.setVelocity(this.getVelocity().add(0 , 0.60, 0));
+    }
+
+    public void tickPathfinder() {
+        if (pathfinderExecutor == null) return;
+        if (pathfinderExecutor.isFinished()) {
+            pathfinderExecutor = null;
+            return;
+        }
+        pathfinderExecutor.doNextMovement();
     }
 
 }

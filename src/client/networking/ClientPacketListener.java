@@ -1,6 +1,7 @@
 package client.networking;
 
 import client.game.Entity;
+import client.networking.packets.C2S.play.ChatMessageC2SPacket;
 import client.networking.packets.S2C.configuration.*;
 import client.networking.packets.S2C.play.*;
 
@@ -32,6 +33,7 @@ public interface ClientPacketListener extends PacketListener {
     void onSetCenterChunk(SetCenterChunkS2CPacket packet);
     void onChunkData(ChunkDataS2CPacket packet);
     void onBlockUpdate(BlockUpdateS2CPacket packet);
+    void onChatMessageS2C(PlayerChatMessageS2C packet);
     void onSetContainerContent(SetContainerContentS2CPacket packet);
     void onSetContainerSlot(SetContainerSlotS2CPacket packet);
     void onBlockSectionUpdate(UpdateBlockSectionS2CPacket packet);

@@ -29,4 +29,9 @@ public class UUID {
     public void setLeastSignificant(long leastSignificant) {
         this.leastSignificant = leastSignificant;
     }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof UUID uuid)) return false;
+        return uuid.mostSignificant == mostSignificant && uuid.leastSignificant == leastSignificant;
+    }
 }

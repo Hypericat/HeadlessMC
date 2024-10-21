@@ -7,7 +7,6 @@ import math.Vec3i;
 
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 public class Pathfinder {
     protected PathNode startNode;
@@ -26,15 +25,39 @@ public class Pathfinder {
     private final Vec3i start;
     private final CalculationContext ctx;
 
-    public Pathfinder(final Vec3i start, Goal goal, CalculationContext ctx) {
+    protected Pathfinder(final Vec3i start, Goal goal, CalculationContext ctx) {
         this.start = start;
         this.goal = goal;
         this.ctx = ctx;
         map = new HashMap<>();
     }
 
+    protected IPath calculate() {
+        if (isFinished) throw new UnsupportedOperationException("Pathfinder cannot be reused!");
 
-    public Optional<IPath> getPath(long primaryTimeout, long failureTimeout) {
+        IPath path = getPath(4000L, 5000L).orElse(null);
+        this.isFinished = true;
+        if (path == null) return null;
+        int prevLength = path.length();
+        path = path.cutoffAtLoadedChunks(ctx.getWorldProvider());
+
+        if (path.length() < prevLength) {
+            logDebug("Cutting off path at edge of loaded chunks");
+            logDebug("Length decreased by " + (prevLength - path.length()));
+        } else {
+            logDebug("Path ends within loaded chunks");
+        }
+
+        prevLength = path.length();
+        path = path.staticCutoff(goal);
+        if (path.length() < prevLength) {
+            logDebug("Static cutoff " + prevLength + " to " + path.length());
+        }
+        return path;
+    }
+
+
+    private Optional<IPath> getPath(long primaryTimeout, long failureTimeout) {
         int minY = ctx.getWorld().getDimensionType().getMinY();
         int height = ctx.getWorld().getDimensionType().getHeight();
         this.startNode = getNodeAtPosition(start);
@@ -62,7 +85,7 @@ public class Pathfinder {
             if ((numNodes & (timeCheckInterval - 1)) == 0) { // only call this once every 64 nodes (about half a millisecond)
                 long now = System.currentTimeMillis(); // since nanoTime is slow on windows (takes many microseconds)
                 if (now - failureTimeoutTime >= 0 || (!failing && now - primaryTimeoutTime >= 0)) {
-                    System.out.println("RAN OUT OF TIME!");
+                    logDebug("RAN OUT OF TIME!");
                     break;
                 }
             }
@@ -70,8 +93,7 @@ public class Pathfinder {
             mostRecentConsidered = currentNode;
             numNodes++;
             if (goal.isInGoal(currentNode.x, currentNode.y, currentNode.z)) {
-                System.out.println("TESTY");
-                logDebug("Took " + (System.currentTimeMillis() - startTime) + "ms, " + numMovementsConsidered + " movements considered");
+                logDebug("Found Path Solution! Took " + (System.currentTimeMillis() - startTime) + "ms, " + numMovementsConsidered + " movements considered");
                 return Optional.of(new Path(start, startNode, currentNode, numNodes, goal));
             }
 
@@ -107,6 +129,9 @@ public class Pathfinder {
                 long hashCode = Vec3i.longHash(res.x, res.y, res.z);
                 PathNode neighbor = getNodeAtPosition(res.x, res.y, res.z, hashCode);
                 double tentativeCost = currentNode.cost + actionCost;
+                if (numNodes == 1) {
+                    logDebug("GOT HERE");
+                }
                 if (neighbor.cost - tentativeCost > MIN_IMPROVEMENT) {
                     neighbor.previous = currentNode;
                     neighbor.cost = tentativeCost;
@@ -132,13 +157,16 @@ public class Pathfinder {
         if (cancelRequested) {
             return Optional.empty();
         }
-        System.out.println(numMovementsConsidered + " movements considered");
-        System.out.println("Open set size: " + open.size());
-        System.out.println("PathNode map size: " + getMapSize());
-        System.out.println((int) (numNodes * 1.0 / ((System.currentTimeMillis() - startTime) / 1000F)) + " nodes per second");
+        logDebug(numMovementsConsidered + " movements considered");
+        logDebug("Open set size: " + open.size());
+        logDebug("PathNode map size: " + getMapSize());
+        logDebug("NUM NODES : " + numNodes);
+        logDebug("OPEN REMAINING : " + open.size());
+        logDebug("TIME : " + (System.currentTimeMillis() - startTime) + "ms");
+        logDebug((int) (numNodes * 1.0 / ((System.currentTimeMillis() - startTime) / 1000F)) + " nodes per second");
         Optional<IPath> result = bestSoFar(true, numNodes);
         if (result.isPresent()) {
-            logDebug("Took " + (System.currentTimeMillis() - startTime) + "ms, " + numMovementsConsidered + " movements considered");
+            logDebug("Found Path Guess : Took " + (System.currentTimeMillis() - startTime) + "ms, " + numMovementsConsidered + " movements considered");
         }
         return result;
     }
@@ -189,11 +217,11 @@ public class Pathfinder {
             if (dist > MIN_DIST_PATH * MIN_DIST_PATH) {
                 if (logInfo) {
                     if (COEFFICIENTS[i] >= 3) {
-                        System.out.println("Warning: cost coefficient is greater than three! Probably means that");
-                        System.out.println("the path I found is pretty terrible (like sneak-bridging for dozens of blocks)");
-                        System.out.println("But I'm going to do it anyway, because yolo");
+                        logDebug("Warning: cost coefficient is greater than three! Probably means that");
+                        logDebug("the path I found is pretty terrible (like sneak-bridging for dozens of blocks)");
+                        logDebug("But I'm going to do it anyway, because yolo");
                     }
-                    System.out.println("Path goes for " + Math.sqrt(dist) + " blocks");
+                    logDebug("Path goes for " + Math.sqrt(dist) + " blocks");
                     logDebug("A* cost coefficient " + COEFFICIENTS[i]);
                 }
                 return Optional.of(new Path(start, startNode, bestSoFar[i], numNodes, goal));
@@ -202,12 +230,13 @@ public class Pathfinder {
         if (logInfo) {
             logDebug("Even with a cost coefficient of " + COEFFICIENTS[COEFFICIENTS.length - 1] + ", I couldn't get more than " + Math.sqrt(bestDist) + " blocks");
             logDebug("No path found =(");
+            logDebug("Start POS " + start);
         }
         return Optional.empty();
     }
 
     public void logDebug(Object o) {
-        System.out.println(o);
+        //logDebug(o);
     }
 
     public final boolean isFinished() {
