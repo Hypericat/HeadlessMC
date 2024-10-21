@@ -17,7 +17,7 @@ public class PathfinderExecutor {
     private boolean readyMove = false;
     private Goal goal;
     private final HeadlessInstance instance;
-    private boolean drawing;
+    private final boolean drawing;
 
     public static final int MAX_RETRY = 3;
 
@@ -55,7 +55,7 @@ public class PathfinderExecutor {
             Pathfinder pathfinder = new Pathfinder(instance.getPlayer().getBlockPos(), goal, new CalculationContext(instance.getWorld()));
             currentPath = pathfinder.calculate();
             if (currentPath != null) {
-                System.out.println("Found path!");
+                System.out.println("Found path! Going to " + currentPath.positions().getLast());
                 break;
             }
             System.out.println("Failed to find path!");
