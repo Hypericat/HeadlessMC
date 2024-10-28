@@ -13,7 +13,7 @@ public class BitUtils {
 
     public static long getBitLength(long l) {
         long n = 1;
-        while (n <= l) n <<= 1;
+        while (n <= l) n <<= 1; 
         return (n - 1);
     }
 }

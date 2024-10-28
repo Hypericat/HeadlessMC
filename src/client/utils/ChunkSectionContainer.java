@@ -67,22 +67,22 @@ public class ChunkSectionContainer {
     }
 
     public int getIdAt(int x, int y, int z) {
-        if (simpleID == -1 && data == null) throw new RuntimeException("Simple ID and Data have no data!");
+        if (simpleID == -1 && data == null) throw new RuntimeException("Both Simple ID and Data have no data!");
         if (simpleID != -1) return simpleID;
-        if (x < 0 || y < 0 || z < 0) return Blocks.AIR.getStates().getDefault();
-        int dataIndex = x + z * 16 + y * 256;
-        int dataPerLong = Long.SIZE / bpe;
-        int longIndex = dataIndex / dataPerLong;
-        long l = data[longIndex];
-        int firstBitIndex = dataIndex % dataPerLong * bpe;
-        int bits = BitUtils.getBits(firstBitIndex, bpe, l);
+        if (x < 0 || y < 0 || z < 0) return Blocks.AIR.getStates().getDefault(); // return air if invalid position
+        int dataIndex = x + z * 16 + y * 256; // calculate the index of the block from the coordinates
+        int dataPerLong = Long.SIZE / bpe; // calculate how many blocks we store per long
+        int longIndex = dataIndex / dataPerLong; // calculate the index of the long which contains our data
+        long l = data[longIndex]; // get this long
+        int firstBitIndex = dataIndex % dataPerLong * bpe; // get the index of the first bit from the 64 bit long
+        int bits = BitUtils.getBits(firstBitIndex, bpe, l); // get the bits with the block ID
         if (mappings == null) {
-            return bits;
+            return bits; // return the block ID, if mapping is null we are using direct therefore the bits should be the block ID
         }
-        if (bits < 0 || bits > mappings.length) {
+        if (bits < 0 || bits > mappings.length) { // sanity check
             throw new IllegalArgumentException("Invalid mapping length received");
         }
-        return mappings[bits];
+        return mappings[bits]; // return the block ID from the index of the mappings, this means we are using indirect.
 
     }
     public void setAtID(int x, int y, int z, int blockID) {

@@ -11,13 +11,14 @@ public class Main {
     public static final boolean dev = true;
     private static final List<Pair<HeadlessInstance, Thread>> instances = new ArrayList<>();
     private static TerminalHandler terminal;
+    public static final String version = "1.21.1";
 
     public static void main(String[] args) {
         terminal = new TerminalHandler();
         Thread terminalThread = new Thread(terminal);
 
         //makeInstance(args[0], args[1], Integer.parseInt(args[2]));
-        makeInstances("Winston", "127.0.0.1", 1);
+        makeInstances("Winston", "127.0.0.1", 5);
         //makeInstance("Winston", "192.168.2.226", 1);
 
         //don't remove this

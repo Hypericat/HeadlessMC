@@ -27,7 +27,6 @@ public class ClientPlayerEntity extends PlayerEntity {
     @Override
     public void onTick() {
         super.onTick();
-        List<Entity> players = getInstance().getWorld().getEntitiesByType(EntityTypes.PLAYER);
         doTestMovement();
 
         tickMovement();
