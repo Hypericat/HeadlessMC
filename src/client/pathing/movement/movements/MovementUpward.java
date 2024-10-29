@@ -18,8 +18,28 @@
 package client.pathing.movement.movements;
 
 
+import client.pathing.ActionCosts;
+import client.pathing.CalculationContext;
 import client.pathing.movement.Movement;
+import client.pathing.movement.Moves;
+import client.pathing.openset.MutableMoveResult;
+import math.Vec3i;
+
+import java.util.List;
 
 public class MovementUpward extends Movement {
 
+    public MovementUpward(Vec3i centerPos, Vec3i endPos) {
+        super(centerPos, endPos);
+    }
+
+    @Override
+    public double cost(CalculationContext ctx, MutableMoveResult res, Moves move) {
+        return isValidBlock(ctx, getCenterPos().withY(getCenterPos().getY() + 1)) ? ActionCosts.JUMP_ONE_BLOCK_COST : ActionCosts.COST_INF;
+    }
+
+    @Override
+    public List<Vec3i> getValidCheckOffsets() {
+        return List.of();
+    }
 }

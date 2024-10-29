@@ -1,4 +1,4 @@
-package client.pathing;
+package client.pathing.goals;
 
 import math.Vec3i;
 

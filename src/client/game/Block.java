@@ -35,6 +35,10 @@ public class Block {
         return states;
     }
 
+    public boolean isFluid() {
+        return this == Blocks.WATER || this == Blocks.LAVA;
+    }
+
     public Box getBoundingBox() {
         return new Box(Vec3d.ZERO, new Vec3d(1, 1, 1));
     }

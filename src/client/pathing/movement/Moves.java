@@ -1,79 +1,81 @@
 package client.pathing.movement;
 
+import client.HeadlessInstance;
 import client.game.Blocks;
 import client.pathing.ActionCosts;
 import client.pathing.CalculationContext;
 import client.pathing.movement.movements.*;
 import client.pathing.openset.MutableMoveResult;
+import math.Vec3i;
 
 public enum Moves {
     DOWNWARD(0, -1, 0) {
         @Override
         public double cost(CalculationContext context, int x, int y, int z) {
-            return MovementDownward.costDown(context, x, y, z);
+            return new MovementDownward(new Vec3i(x, y, z), null).cost(context, this);
         }
     },
 
     UPWARD(0, +1, 0) {
         @Override
         public double cost(CalculationContext context, int x, int y, int z) {
-            return MovementUpward.costUp(context, x, y, z);
+            return new MovementUpward(new Vec3i(x, y, z), null).cost(context, this);
         }
     },
 
     TRAVERSE_NORTH(0, 0, -1) {
         @Override
         public double cost(CalculationContext context, int x, int y, int z) {
-            return MovementTraverse.costTraverse(context, x, y, z, x, z - 1);
+            return new MovementTraverse(new Vec3i(x, y, z), new Vec3i(x, -1, z - 1)).cost(context, this);
         }
     },
 
     TRAVERSE_SOUTH(0, 0, +1) {
         @Override
         public double cost(CalculationContext context, int x, int y, int z) {
-            return MovementTraverse.costTraverse(context, x, y, z, x, z + 1);
+            return new MovementTraverse(new Vec3i(x, y, z), new Vec3i(x, -1, z + 1)).cost(context, this);
         }
     },
 
     TRAVERSE_EAST(+1, 0, 0) {
         @Override
         public double cost(CalculationContext context, int x, int y, int z) {
-            return MovementTraverse.costTraverse(context, x, y, z, x + 1, z);
+            return new MovementTraverse(new Vec3i(x, y, z), new Vec3i(x + 1, -1, z)).cost(context, this);
         }
     },
 
     TRAVERSE_WEST(-1, 0, 0) {
         @Override
         public double cost(CalculationContext context, int x, int y, int z) {
-            return MovementTraverse.costTraverse(context, x, y, z, x - 1, z);
+            return new MovementTraverse(new Vec3i(x, y, z), new Vec3i(x - 1, -1, z)).cost(context, this);
         }
     },
 
     DIAGONAL_NORTHEAST(+1, 0, -1, false, true) {
         @Override
         public void apply(CalculationContext context, int x, int y, int z, MutableMoveResult result) {
-            MovementDiagonal.costDiagonal(context, x, y, z, x + 1, z - 1, result, this);
+            new MovementDiagonal(new Vec3i(x, y, z), new Vec3i(x + 1, -1, z - 1)).cost(context, result, this);
         }
     },
 
     DIAGONAL_NORTHWEST(-1, 0, -1, false, true) {
         @Override
         public void apply(CalculationContext context, int x, int y, int z, MutableMoveResult result) {
-            MovementDiagonal.costDiagonal(context, x, y, z, x - 1, z - 1, result, this);
+            new MovementDiagonal(new Vec3i(x, y, z), new Vec3i(x - 1, -1, z - 1)).cost(context, result, this);
         }
     },
 
     DIAGONAL_SOUTHEAST(+1, 0, +1, false, true) {
         @Override
         public void apply(CalculationContext context, int x, int y, int z, MutableMoveResult result) {
-            MovementDiagonal.costDiagonal(context, x, y, z, x + 1, z + 1, result, this);
+            new MovementDiagonal(new Vec3i(x, y, z), new Vec3i(x + 1, -1, z + 1)).cost(context, result, this);
         }
     },
 
     DIAGONAL_SOUTHWEST(-1, 0, +1, false, true) {
         @Override
         public void apply(CalculationContext context, int x, int y, int z, MutableMoveResult result) {
-            MovementDiagonal.costDiagonal(context, x, y, z, x - 1, z + 1, result, this);
+            new MovementDiagonal(new Vec3i(x, y, z), new Vec3i(x - 1, -1, z + 1)).cost(context, result, this);
         }
     };
 

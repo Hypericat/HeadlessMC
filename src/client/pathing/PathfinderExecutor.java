@@ -2,6 +2,7 @@ package client.pathing;
 
 import client.HeadlessInstance;
 import client.game.Blocks;
+import client.pathing.goals.Goal;
 import math.Vec3d;
 import math.Vec3i;
 

@@ -1,17 +1,14 @@
 package client.game;
 
 import client.HeadlessInstance;
-import client.Logger;
 import client.networking.NetworkHandler;
 import client.networking.packets.C2S.play.*;
 import client.pathing.*;
+import client.pathing.goals.GoalXYZ;
+import client.pathing.goals.GoalXZ;
 import client.utils.UUID;
 import math.Vec3d;
 import math.Vec3i;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 public class InteractionManager {
     private ClientPlayerEntity player;
@@ -60,7 +57,7 @@ public class InteractionManager {
     }
 
     public void pathTo(Vec3i vec) {
-        instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalXYZ(vec.getX(), vec.getY(), vec.getZ()), instance));
+        instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalXZ(vec.getX(), vec.getZ()), instance));
     }
 
     public void drawPathTo(Vec3i vec) {

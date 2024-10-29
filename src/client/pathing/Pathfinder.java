@@ -1,5 +1,7 @@
 package client.pathing;
 
+import client.HeadlessInstance;
+import client.pathing.goals.Goal;
 import client.pathing.movement.Moves;
 import client.pathing.openset.BinaryHeapOpenSet;
 import client.pathing.openset.MutableMoveResult;

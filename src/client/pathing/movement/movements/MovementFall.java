@@ -18,8 +18,28 @@
 package client.pathing.movement.movements;
 
 
+import client.HeadlessInstance;
+import client.pathing.CalculationContext;
 import client.pathing.movement.Movement;
+import client.pathing.movement.Moves;
+import client.pathing.openset.MutableMoveResult;
+import math.Vec3i;
+
+import java.util.List;
 
 public class MovementFall extends Movement {
 
+    public MovementFall(Vec3i centerPos, Vec3i endPos) {
+        super(centerPos, endPos);
+    }
+
+    @Override
+    public double cost(CalculationContext ctx, MutableMoveResult res, Moves move) {
+        return 0;
+    }
+
+    @Override
+    public List<Vec3i> getValidCheckOffsets() {
+        return List.of();
+    }
 }

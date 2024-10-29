@@ -1,5 +1,6 @@
-package client.pathing;
+package client.pathing.goals;
 
+import client.pathing.Pathfinder;
 import math.Vec3d;
 import math.Vec3i;
 

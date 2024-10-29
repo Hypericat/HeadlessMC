@@ -1,4 +1,6 @@
-package client.pathing;
+package client.pathing.goals;
+
+import client.pathing.ActionCosts;
 
 public class GoalY implements Goal, ActionCosts {
 

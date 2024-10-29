@@ -36,14 +36,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     protected void messageReceived(ChannelHandlerContext ctx, ByteBuf buf) {
         if (handler.isCompressionEnabled()) {
             usedCompression = true;
-            try {
-                buf = handleCompressedPacket(buf);
-            } catch (IndexOutOfBoundsException exception) {
-                lastBytes = null;
-                lastCompressedBytes = null;
-                exception.printStackTrace();
-                System.out.println("Caught error!");
-            }
+            buf = handleCompressedPacket(buf);
         }
 
         if (lastBytes != null) {
@@ -57,7 +50,15 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
         while (buf.readableBytes() > 0) {
             int readerIndex = buf.readerIndex();
-            int packetSize = PacketUtil.readVarInt(buf);
+            int packetSize;
+            try {
+                packetSize = PacketUtil.readVarInt(buf);
+            } catch (IndexOutOfBoundsException ex) {
+                buf.readerIndex(readerIndex);
+                lastBytes = new byte[buf.readableBytes()];
+                buf.readBytes(lastBytes);
+                return;
+            }
 
             if (!usedCompression && handler.isCompressionEnabled()) {
                 packetSize = packetSize - PacketUtil.getIntVarIntSize(PacketUtil.readVarInt(buf));
@@ -119,7 +120,15 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         while (buf.readableBytes() > 0) {
             int readerIndex = buf.readerIndex();
 
-            int packetLength = PacketUtil.readVarInt(buf);
+            int packetLength;
+            try {
+                packetLength = PacketUtil.readVarInt(buf);
+            } catch (IndexOutOfBoundsException ex) {
+                buf.readerIndex(readerIndex);
+                lastCompressedBytes = new byte[buf.readableBytes()];
+                buf.readBytes(lastCompressedBytes);
+                return decompressedBuf;
+            }
 
             if (packetLength > buf.readableBytes()) {
                 buf.readerIndex(readerIndex);

@@ -1,6 +1,6 @@
 package client.pathing;
 
-import client.pathing.movement.Moves;
+import client.pathing.goals.Goal;
 import math.Vec3i;
 
 import java.util.ArrayList;

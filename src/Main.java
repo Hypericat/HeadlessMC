@@ -75,4 +75,6 @@ public class Main {
     //if not done this could cause chunks to get desynced because we wont receieve block updates ^^
 
     //fix GoalXZ
+
+    //refactor inbound handler, make uncompressed and compressed packet parsers / handlers
 }
