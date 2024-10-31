@@ -1083,4 +1083,11 @@ public final class Blocks {
     public static Block getBlockByID(int id) {
         return blocks.get(id);
     }
+    public static Block getBlockByName(String name) {
+        if (name.startsWith("minecraft:")) name = "minecraft:" + name;
+        for (Block block : blocks.values()) {
+            if (block.getName().equals(name)) return block;
+        }
+        return null;
+    }
 }

@@ -23,8 +23,10 @@ import client.pathing.CalculationContext;
 import client.pathing.movement.Movement;
 import client.pathing.movement.Moves;
 import client.pathing.openset.MutableMoveResult;
+import math.Vec3d;
 import math.Vec3i;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MovementDownward extends Movement {
@@ -35,11 +37,25 @@ public class MovementDownward extends Movement {
 
     @Override
     public double cost(CalculationContext ctx, MutableMoveResult res, Moves move) {
-        return isValidBlock(ctx, getCenterPos().withY(getCenterPos().getY() - 1)) ? ActionCosts.FALL_N_BLOCKS_COST[1] : ActionCosts.COST_INF;
+        List<Vec3i> invalid = findInvalid(ctx);
+        double cost = ActionCosts.FALL_N_BLOCKS_COST[1];
+        if (invalid.isEmpty()) {
+            return cost;
+        }
+        for (Vec3i vec3i : invalid) {
+            double tick = getMiningDurationTicks(ctx, ctx.getWorld().getBlock(vec3i), false);
+            if (tick == ActionCosts.COST_INF) return ActionCosts.COST_INF;
+            cost += tick;
+        }
+        return cost;
     }
 
     @Override
     public List<Vec3i> getValidCheckOffsets() {
-        return List.of();
+        List<Vec3i> offsets = new ArrayList<>();
+        for (Vec3i vec : offsetStanding) {
+            offsets.add(vec.add(getCenterPos()));
+        }
+        return offsets;
     }
 }

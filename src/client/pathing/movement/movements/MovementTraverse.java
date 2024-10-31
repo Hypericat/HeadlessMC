@@ -21,7 +21,6 @@ package client.pathing.movement.movements;
 import client.game.Block;
 import client.pathing.ActionCosts;
 import client.pathing.CalculationContext;
-import client.pathing.movement.BlockBreakTickCache;
 import client.pathing.movement.Movement;
 import client.pathing.movement.Moves;
 import client.pathing.openset.MutableMoveResult;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovementTraverse extends Movement {
-    public static final Vec3i[] validOffsets = new Vec3i[] {Vec3i.ZERO, Vec3i.ZERO.addY(1)};
 
     public MovementTraverse(Vec3i centerPos, Vec3i endPos) {
         super(centerPos, endPos);
@@ -40,23 +38,25 @@ public class MovementTraverse extends Movement {
 
     @Override
     public double cost(CalculationContext ctx, MutableMoveResult res, Moves move) {
-        return isValidBlock(ctx, getEndPos().getX(), getCenterPos().getY(), getEndPos().getZ()) ? ActionCosts.WALK_ONE_BLOCK_COST * Vec3d.of(getCenterPos()).distanceTo(new Vec3d(getEndPos().getX(), getCenterPos().getY(), getEndPos().getZ())) : ActionCosts.COST_INF;
+        List<Vec3i> invalid = findInvalid(ctx);
+        double cost = ActionCosts.WALK_ONE_BLOCK_COST * Vec3d.of(getCenterPos()).distanceTo(new Vec3d(getEndPos().getX(), getCenterPos().getY(), getEndPos().getZ()));
+        if (invalid.isEmpty()) {
+            return cost;
+        }
+        for (Vec3i vec3i : invalid) {
+            double tick = getMiningDurationTicks(ctx, ctx.getWorld().getBlock(vec3i), false);
+            if (tick == ActionCosts.COST_INF) return ActionCosts.COST_INF;
+            cost += tick;
+        }
+        return cost;
     }
 
     @Override
     public List<Vec3i> getValidCheckOffsets() {
         List<Vec3i> offsets = new ArrayList<>();
-        for (Vec3i vec : validOffsets) {
+        for (Vec3i vec : offsetStanding) {
             offsets.add(vec.add(getCenterPos()));
         }
         return offsets;
-    }
-
-    static double getMiningDurationTicks(CalculationContext ctx, Vec3i blockPos, Block block, boolean includeFalling) {
-        if (block.hasNoCollision()) return 0;
-        if (block.isFluid()) return ActionCosts.COST_INF;
-        int tickDuration = BlockBreakTickCache.getMiningTickCount(ctx, blockPos, block, includeFalling);
-        if (tickDuration <= 0) return ActionCosts.COST_INF;
-        return tickDuration;
     }
 }

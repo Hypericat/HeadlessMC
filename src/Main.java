@@ -18,7 +18,7 @@ public class Main {
         Thread terminalThread = new Thread(terminal);
 
         //makeInstance(args[0], args[1], Integer.parseInt(args[2]));
-        makeInstances("Winston", "127.0.0.1", 5);
+        makeInstances("Winston", "127.0.0.1", 1);
         //makeInstance("Winston", "192.168.2.226", 1);
 
         //don't remove this

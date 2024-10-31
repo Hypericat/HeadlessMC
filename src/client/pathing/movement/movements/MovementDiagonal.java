@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovementDiagonal extends Movement {
-    public static final Vec3i[] validOffsets = new Vec3i[] {Vec3i.ZERO, Vec3i.ZERO.addY(1)};
 
     public MovementDiagonal(Vec3i centerPos, Vec3i endPos) {
         super(centerPos, endPos);
@@ -41,8 +40,18 @@ public class MovementDiagonal extends Movement {
         res.x = getEndPos().getX();
         res.y = getCenterPos().getY();
         res.z = getEndPos().getZ();
-        boolean isValid = isValidBlock(ctx, getEndPos().getX(), getCenterPos().getY(), getEndPos().getZ()) && isValidBlock(ctx, getCenterPos().withZ(getEndPos().getZ())) && isValidBlock(ctx, getCenterPos().withX(getEndPos().getX()));
-        res.cost = isValid ? ActionCosts.WALK_ONE_BLOCK_COST * Vec3d.of(getCenterPos()).distanceTo(new Vec3d(getEndPos().getX(), getCenterPos().getY(), getEndPos().getZ())) : ActionCosts.COST_INF;
+
+        List<Vec3i> invalid = findInvalid(ctx);
+        double cost =ActionCosts.WALK_ONE_BLOCK_COST * Vec3d.of(getCenterPos()).distanceTo(new Vec3d(getEndPos().getX(), getCenterPos().getY(), getEndPos().getZ()));
+        if (invalid.isEmpty()) {
+            return cost;
+        }
+        for (Vec3i vec3i : invalid) {
+            double tick = getMiningDurationTicks(ctx, ctx.getWorld().getBlock(vec3i), false);
+            if (tick == ActionCosts.COST_INF) return ActionCosts.COST_INF;
+            cost += tick;
+        }
+        res.cost = cost;
         Moves.applyFloatingPenalty(ctx, res, move);
         return res.cost;
     }
@@ -50,6 +59,11 @@ public class MovementDiagonal extends Movement {
     @Override
     public List<Vec3i> getValidCheckOffsets() {
         List<Vec3i> offsets = new ArrayList<>();
+        for (Vec3i posOffset : offsetStanding) {
+            offsets.add(new Vec3i(getEndPos().withY(getCenterPos().getY() + posOffset.getY())));
+            offsets.add(new Vec3i(getCenterPos().getX(), getCenterPos().getY() + posOffset.getY(), getEndPos().getZ()));
+            offsets.add(new Vec3i(getEndPos().getX(), getCenterPos().getY() + posOffset.getY(), getCenterPos().getZ()));
+        }
         return offsets;
     }
 

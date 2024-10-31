@@ -1,5 +1,6 @@
 package client.pathing.goals;
 
+import client.pathing.CalculationContext;
 import math.Vec3i;
 
 public interface Goal {

@@ -16,6 +16,7 @@ public interface ActionCosts {
     double[] FALL_N_BLOCKS_COST = generateFallNBlocksCost();
     double FALL_1_25_BLOCKS_COST = distanceToTicks(1.25);
     double FALL_0_25_BLOCKS_COST = distanceToTicks(0.25);
+    double MINE_PENALTY = 5;
     double JUMP_ONE_BLOCK_COST = FALL_1_25_BLOCKS_COST - FALL_0_25_BLOCKS_COST;
 
 

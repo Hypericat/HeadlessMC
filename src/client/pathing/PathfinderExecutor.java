@@ -3,6 +3,7 @@ package client.pathing;
 import client.HeadlessInstance;
 import client.game.Blocks;
 import client.pathing.goals.Goal;
+import client.pathing.movement.BlockBreakTickCache;
 import math.Vec3d;
 import math.Vec3i;
 
@@ -53,7 +54,7 @@ public class PathfinderExecutor {
     private void findNextPath() {
         for (int i = 0; i < MAX_RETRY; i++) {
             System.out.println("Trying to find path!");
-            Pathfinder pathfinder = new Pathfinder(instance.getPlayer().getBlockPos(), goal, new CalculationContext(instance.getWorld()));
+            Pathfinder pathfinder = new Pathfinder(instance.getPlayer().getBlockPos(), goal, new CalculationContext(instance.getWorld(), new BlockBreakTickCache(instance.getPlayer().getInventory())));
             currentPath = pathfinder.calculate();
             if (currentPath != null) {
                 System.out.println("Found path! Going to " + currentPath.positions().getLast());
@@ -70,15 +71,36 @@ public class PathfinderExecutor {
 
     public void doNextMovement() {
         if (!readyMove) return;
-        if (!drawing) {
-            instance.getPlayer().setPos(Vec3d.fromBlock(positions.get(positionIndex)));
-        } else {
-            positions.get(positionIndex).setBlock(this.instance.getInteractionManager(), Blocks.GLASS);
-            isLast = true;
+        if (drawing) {
+            tickDraw();
+            return;
         }
+        Vec3i feetBlock = positions.get(positionIndex);
+        Vec3i headBlock = feetBlock.addY(1);
+        if (instance.getWorld().getBlock(feetBlock).hasCollision()) {
+            instance.getInteractionManager().playerMineBlock(feetBlock);
+            return;
+        }
+        if (instance.getWorld().getBlock(headBlock).hasCollision()) {
+            instance.getInteractionManager().playerMineBlock(headBlock);
+            return;
+        }
+        instance.getPlayer().setPos(Vec3d.fromBlock(positions.get(positionIndex)));
+
+
         positionIndex++;
         nextPath();
         if (isLast && positionIndex >= positions.size()) {
+            isFinished = true;
+        }
+    }
+
+    private void tickDraw() {
+        positions.get(positionIndex).setBlock(this.instance.getInteractionManager(), Blocks.GLASS);
+        isLast = true;
+        positionIndex++;
+        nextPath();
+            if (isLast && positionIndex >= positions.size()) {
             isFinished = true;
         }
     }

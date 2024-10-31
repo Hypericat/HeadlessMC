@@ -3,6 +3,9 @@ package client.pathing.movement;
 import client.game.Block;
 import client.game.inventory.Inventory;
 import client.game.inventory.LivingInventory;
+import client.game.items.ItemStack;
+import client.game.items.ItemType;
+import client.game.items.Items;
 import client.pathing.CalculationContext;
 import math.Vec3i;
 
@@ -16,10 +19,18 @@ public class BlockBreakTickCache {
         this.cache = new HashMap<>();
     }
 
-    public int getMiningTickCount(CalculationContext ctx, Vec3i blockPos, Block block, boolean includeFalling) {
+    public int getMiningTickCount(CalculationContext ctx, Block block, boolean includeFalling) {
         if (cache.containsKey(block)) return cache.get(block);
-        double result = 1 / strVsBlock;
+        int tickCount = getMiningTickCount0(ctx, block, includeFalling);
+        cache.put(block, tickCount);
+        return tickCount;
+    }
 
-        return result;
+    private int getMiningTickCount0(CalculationContext ctx, Block block, boolean includeFalling) {
+        for (ItemStack stack : playerInventory.getHotbar()) {
+            if (stack == null) continue;
+            if (stack.getType() == Items.DIAMOND_PICKAXE) return 10;
+        }
+        return -1;
     }
 }

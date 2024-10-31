@@ -4,6 +4,7 @@ import client.HeadlessInstance;
 import client.networking.NetworkHandler;
 import client.networking.packets.C2S.play.*;
 import client.pathing.*;
+import client.pathing.goals.GoalMineBlock;
 import client.pathing.goals.GoalXYZ;
 import client.pathing.goals.GoalXZ;
 import client.utils.UUID;
@@ -57,7 +58,7 @@ public class InteractionManager {
     }
 
     public void pathTo(Vec3i vec) {
-        instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalXZ(vec.getX(), vec.getZ()), instance));
+        instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalXYZ(vec), instance));
     }
 
     public void drawPathTo(Vec3i vec) {
@@ -106,6 +107,14 @@ public class InteractionManager {
             pathTo(new Vec3i(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2])));
             return;
         }
+
+        if (chatMessage.startsWith("mine ")) {
+            chatMessage = chatMessage.replace("mine ", "");
+            System.out.println(chatMessage);
+            instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalMineBlock(Blocks.WATER, instance.getWorld()), instance));
+            return;
+        }
+
 
         if (chatMessage.startsWith("drawTo ")) {
             chatMessage = chatMessage.replace("drawTo ", "");
