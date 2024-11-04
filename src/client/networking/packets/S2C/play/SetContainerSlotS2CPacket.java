@@ -52,7 +52,7 @@ public class SetContainerSlotS2CPacket extends S2CPacket {
         ItemType type = ItemIDs.fromID(itemID).getType();
         int add = PacketUtil.readVarInt(buf);
         int remove = PacketUtil.readVarInt(buf);
-        if (add != 0 || remove != 0) System.err.println("ReadSlot was given item with add/remove components which is not supported at the moment.");
+        if (add != 0 || remove != 0) System.err.println("ReadSlot was given item with add/remove components which is not supported at the moment. The item was : " + type.getIdentifier());
 
         return new ItemStack(type, itemCount);
     }

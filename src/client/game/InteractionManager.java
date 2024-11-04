@@ -11,6 +11,8 @@ import client.utils.UUID;
 import math.Vec3d;
 import math.Vec3i;
 
+import java.util.List;
+
 public class InteractionManager {
     private ClientPlayerEntity player;
     private World world;
@@ -101,6 +103,12 @@ public class InteractionManager {
 
     public void onReceiveChatMessage(UUID senderUUID, String chatMessage) {
         instance.getLogger().logUser("Receieved chat message : " + chatMessage);
+
+        if (chatMessage.startsWith("stop")) {
+            instance.getPlayer().setPathfinderExecutor(null);
+        }
+
+
         if (chatMessage.startsWith("goto ")) {
             chatMessage = chatMessage.replace("goto ", "");
             String[] pos = chatMessage.split(" ");
@@ -110,8 +118,15 @@ public class InteractionManager {
 
         if (chatMessage.startsWith("mine ")) {
             chatMessage = chatMessage.replace("mine ", "");
-            System.out.println(chatMessage);
-            instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalMineBlock(Blocks.WATER, instance.getWorld()), instance));
+            Block block = Blocks.getBlockByName(chatMessage);
+            if (block == null) return;
+            //cache the blocks right now
+            instance.getWorld().cacheIfNotPresent(block);
+
+            List<Vec3i> blocks = instance.getWorld().findCachedBlock(block);
+            instance.getLogger().logUser("Found " + blocks.size() + " " + block.getNameNoPrefix() + " blocks!");
+
+            instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalMineBlock(block, instance.getWorld()), instance));
             return;
         }
 

@@ -1,7 +1,6 @@
 package client.game;
 
 import client.HeadlessInstance;
-import client.pathing.PathNode;
 import client.pathing.IWorldProvider;
 import client.utils.UUID;
 import math.Pair;
@@ -11,12 +10,14 @@ import math.Vec3i;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class World implements IWorldProvider {
-    private int maxHeight;
+    private final int maxHeight;
     HashMap<Long, Chunk> chunks = new HashMap<>();
-    private volatile HashMap<Integer, Entity> entities = new HashMap<>();
-    private HeadlessInstance instance;
+    private final HashMap<Block, List<Vec3i>> cached = new HashMap<>();
+    private final HashMap<Integer, Entity> entities = new HashMap<>();
+    private final HeadlessInstance instance;
 
     public World(int maxHeight, HeadlessInstance instance) {
         this.maxHeight = maxHeight;
@@ -129,6 +130,23 @@ public class World implements IWorldProvider {
             if (entity.getEntityType().getEntityClass() == type.getEntityClass()) entities.add((T) entity);
         }
         return entities;
+    }
+
+    public void cacheIfNotPresent(Block block) {
+        if (cached.containsKey(block)) return;
+        List<Vec3i> blocks = getAllBlocksSatisfy(blockVec3iPair -> blockVec3iPair.getLeft() == block);
+        cached.put(block, blocks);
+    }
+
+    public List<Vec3i> findCachedBlock(Block block) {
+        cacheIfNotPresent(block);
+        return cached.get(block);
+    }
+
+    public List<Vec3i> getAllBlocksSatisfy(Predicate<Pair<Block, Vec3i>> predicate) {
+        List<Vec3i> blocks = new ArrayList<>();
+        chunks.values().forEach(chunk -> blocks.addAll(chunk.getAllBlocksSatisfy(predicate)));
+        return blocks;
     }
 
     @Override

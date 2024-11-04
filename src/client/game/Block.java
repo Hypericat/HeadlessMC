@@ -207,6 +207,10 @@ public class Block {
         noCollision.put(Blocks.FROGSPAWN, (byte) 1);
     }
 
+    public String getNameNoPrefix() {
+        return this.getName().substring(10);
+    }
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         boolean wasLastSpace = true;

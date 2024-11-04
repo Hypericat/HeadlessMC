@@ -3,8 +3,13 @@ package client.utils;
 import client.game.Block;
 import client.game.Blocks;
 import io.netty.buffer.ByteBuf;
+import math.MutableVec3i;
 import math.Pair;
 import math.Vec3i;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 public class ChunkSectionContainer {
 
@@ -162,6 +167,22 @@ public class ChunkSectionContainer {
         }
         simpleID = -1;
     }
+
+    public List<MutableVec3i> getAllLocalBlocksSatisfy(Predicate<Pair<Block, Vec3i>> predicate) {
+        List<MutableVec3i> blocks =  new ArrayList<>();
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                for (int y = 0; y < 16; y++) {
+                    MutableVec3i pos = new MutableVec3i(x, y, z);
+                    if (predicate.test(new Pair<>(Blocks.getBlockByID(getIdAt(x, y, z)), pos))) {
+                        blocks.add(pos);
+                    }
+                }
+            }
+        }
+        return blocks;
+    }
+
 
     public int getY() {
         return y;

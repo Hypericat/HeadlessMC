@@ -1084,9 +1084,9 @@ public final class Blocks {
         return blocks.get(id);
     }
     public static Block getBlockByName(String name) {
-        if (name.startsWith("minecraft:")) name = "minecraft:" + name;
+        if (!name.startsWith("minecraft:")) name = "minecraft:" + name;
         for (Block block : blocks.values()) {
-            if (block.getName().equals(name)) return block;
+            if (block.getName().equalsIgnoreCase(name)) return block;
         }
         return null;
     }

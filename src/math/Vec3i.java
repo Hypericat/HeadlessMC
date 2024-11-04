@@ -7,9 +7,9 @@ import client.game.InteractionManager;
 public class Vec3i implements Comparable<Vec3i> {
 
     public static final Vec3i ZERO = new Vec3i(0, 0, 0);
-    private int x;
-    private int y;
-    private int z;
+    protected int x;
+    protected int y;
+    protected int z;
 
     public Vec3i(int x, int y, int z) {
         this.x = x;

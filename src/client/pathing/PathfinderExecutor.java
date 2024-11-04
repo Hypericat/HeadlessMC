@@ -63,6 +63,10 @@ public class PathfinderExecutor {
             System.out.println("Failed to find path!");
         }
         //handle no path found
+        if (currentPath == null) {
+            isFinished = true;
+            return;
+        }
         positions = currentPath.positions();
         positionIndex = 0;
         if (currentPath instanceof Path) isLast = goal.isInGoal(currentPath.getDest());
