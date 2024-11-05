@@ -33,11 +33,11 @@ public class Chunk {
     }
 
     public Block getBlockAt(int chunkPosX, int chunkPosY, int chunkPosZ) {
-        return Blocks.getBlockByID(chunkSections.get((chunkPosY + 64) >> 4).getIdAt(chunkPosX, (chunkPosY + 64) % 16, chunkPosZ));
+        return Blocks.getBlockByID(chunkSections.get((chunkPosY + 64) / 16).getIdAt(chunkPosX, (chunkPosY + 64) % 16, chunkPosZ));
     }
 
     public void setBlockAt(int chunkPosX, int chunkPosY, int chunkPosZ, Block block) {
-        chunkSections.get((chunkPosY + 64) >> 4).setAtID(chunkPosX, (chunkPosY + 64) % 16, chunkPosZ, block.getStates().getDefault());
+        chunkSections.get((chunkPosY + 64) / 16).setAtID(chunkPosX, (chunkPosY + 64) % 16, chunkPosZ, block.getStates().getDefault());
     }
 
     public void setBlocksAt(int sectionY, Pair<Block, Vec3i>[] blocks) {

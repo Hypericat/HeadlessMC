@@ -28,6 +28,7 @@ public class ClientPlayerEntity extends PlayerEntity {
     public void onTick() {
         super.onTick();
         doTestMovement();
+        doKillAura();
 
         tickMovement();
         decrementAttackCooldown();
@@ -47,7 +48,7 @@ public class ClientPlayerEntity extends PlayerEntity {
     }
 
     public void resetAttackTicks() {
-        attackCooldown = 18;
+        attackCooldown = 6;
     }
 
     public void setChunkX(int chunkX) {
@@ -59,8 +60,10 @@ public class ClientPlayerEntity extends PlayerEntity {
     }
 
     public void doKillAura() {
+        boolean attackPlayers = false;
+
         for (Entity e : getInstance().getWorld().getEntitiesWithin(getBoundingBox().getCenter().add(getHeadPos()), 4d)) {
-            if ((e instanceof LivingEntity) && attackCooldown <= 0) {
+            if ((e instanceof LivingEntity living) && (living.getEntityType().getEntityClass() != EntityTypes.PLAYER.getEntityClass() | attackPlayers) && attackCooldown <= 0) {
                 getInstance().getInteractionManager().attackEntity(e);
                 getInstance().getInteractionManager().lookAt(e);
                 return;
@@ -119,8 +122,8 @@ public class ClientPlayerEntity extends PlayerEntity {
         if (this.isOnGround()) {
             this.setVelocity(this.getVelocity().getX() * 0.6d, this.getVelocity().getY(), this.getVelocity().getZ() * 0.6d);
         }
-        updateVelocity();
         tickPathfinder();
+        updateVelocity();
         updatePosPackets();
     }
 

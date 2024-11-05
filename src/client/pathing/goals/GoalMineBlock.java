@@ -26,7 +26,9 @@ public class GoalMineBlock implements Goal {
             //fromBlock may not be the best
             Vec3d delta = new Vec3d(x, y, z).subtract(Vec3d.fromBlock(vec3i));
             double current = GoalXYZ.calculate(delta.getX(), (int) delta.getY(), delta.getZ());
-            if (current < best) best = current;
+            if (current < best) {
+                best = current;
+            }
         }
         return best;
     }

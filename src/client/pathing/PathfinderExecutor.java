@@ -74,7 +74,10 @@ public class PathfinderExecutor {
     }
 
     public void doNextMovement() {
-        if (!readyMove) return;
+        if (!readyMove) {
+            instance.getPlayer().setVelocity(Vec3d.ZERO.setY(-0.03));
+            return;
+        }
         if (drawing) {
             tickDraw();
             return;
@@ -90,6 +93,7 @@ public class PathfinderExecutor {
             return;
         }
         instance.getPlayer().setPos(Vec3d.fromBlock(positions.get(positionIndex)));
+        instance.getPlayer().setVelocity(Vec3d.ZERO);
 
 
         positionIndex++;

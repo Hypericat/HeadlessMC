@@ -51,6 +51,8 @@ public class Block {
     }
 
     public static void initCollisions() {
+        noCollision.put(Blocks.WATER, (byte) 1); // For now put water
+
         noCollision.put(Blocks.AIR, (byte) 1);
         noCollision.put(Blocks.OAK_SAPLING, (byte) 1);
         noCollision.put(Blocks.SPRUCE_SAPLING, (byte) 1);
