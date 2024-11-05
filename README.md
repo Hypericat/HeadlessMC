@@ -1,5 +1,9 @@
 # Minecraft Headless Client
 
+[![Short Video](http://img.youtube.com/vi/I71i-_ZlKeU/0.jpg)](http://www.youtube.com/watch?v=I71i-_ZlKeU "Video Title")
+
+
+Short Pathfinding Demonstration
  
 ## Introduction 
 
