@@ -7,6 +7,10 @@ public interface Goal {
     boolean isInGoal(int x, int y, int z);
     double heuristic(int x, int y, int z);
 
+    default boolean next() {
+        return false;
+    }
+
     default boolean isInGoal(Vec3i pos) {
         return isInGoal(pos.getX(), pos.getY(), pos.getZ());
     }

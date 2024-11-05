@@ -99,7 +99,8 @@ public class PathfinderExecutor {
         positionIndex++;
         nextPath();
         if (isLast && positionIndex >= positions.size()) {
-            isFinished = true;
+            this.isFinished = !goal.next();
+            if (!this.isFinished) findNextPath();
         }
     }
 
@@ -108,7 +109,7 @@ public class PathfinderExecutor {
         isLast = true;
         positionIndex++;
         nextPath();
-            if (isLast && positionIndex >= positions.size()) {
+        if (isLast && positionIndex >= positions.size()) {
             isFinished = true;
         }
     }

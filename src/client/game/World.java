@@ -8,6 +8,7 @@ import math.Vec3d;
 import math.Vec3i;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
@@ -76,7 +77,23 @@ public class World implements IWorldProvider {
     private void setBlock(int x, int y, int z, Block block) {
         Chunk chunk = getChunkAtCord(x, z);
         if (chunk == null) return;
+        Vec3i currentBlock = new Vec3i(x, y, z);
+        //update cache for current block
+        if (cached.containsKey(block)) {
+            cached.get(block).add(currentBlock);
+        }
 
+        //update cache for replaced block
+        Block replaceBlock = getBlock(currentBlock);
+        if (cached.containsKey(replaceBlock)) {
+            List<Vec3i> cache = cached.get(replaceBlock);
+            for (int i = 0; i < cache.size(); i++) {
+                if (cache.get(i).equals(currentBlock)) {
+                    cache.remove(i);
+                    i--;
+                }
+            }
+        }
 
         chunk.setBlockAt(Math.floorMod(x, 16), y, (Math.floorMod(z, 16)), block);
     }
@@ -111,8 +128,14 @@ public class World implements IWorldProvider {
 
     public List<Entity> getEntitiesWithin(Vec3d origin, double radius) {
         List<Entity> entities = new ArrayList<>();
-        for (Entity entity : this.entities.values()) {
-            if (entity.getBoundingBox().getCenter().add(entity.getPos()).isInRange(origin, radius)) entities.add(entity);
+        try {
+            for (Entity entity : this.entities.values()) {
+                if (entity.getBoundingBox().getCenter().add(entity.getPos()).isInRange(origin, radius))
+                    entities.add(entity);
+            }
+        } catch (ConcurrentModificationException ex) {
+            //return either a half full list or an empty list, realistically we would want to try again because this is a threading error but for now it doesn't matter
+            return entities;
         }
         return entities;
     }

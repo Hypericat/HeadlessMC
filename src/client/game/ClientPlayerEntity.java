@@ -20,6 +20,8 @@ public class ClientPlayerEntity extends PlayerEntity {
     private int attackCooldown = 0;
     private PathfinderExecutor pathfinderExecutor;
 
+    public static final float GRAVITY = 0.08f;
+
     public ClientPlayerEntity(int entityID, HeadlessInstance instance) {
         super(entityID, instance.getUuid(), instance);
     }
@@ -63,7 +65,7 @@ public class ClientPlayerEntity extends PlayerEntity {
         boolean attackPlayers = false;
 
         for (Entity e : getInstance().getWorld().getEntitiesWithin(getBoundingBox().getCenter().add(getHeadPos()), 4d)) {
-            if ((e instanceof LivingEntity living) && (living.getEntityType().getEntityClass() != EntityTypes.PLAYER.getEntityClass() | attackPlayers) && attackCooldown <= 0) {
+            if ((e instanceof LivingEntity living) && (living.getEntityType().getEntityClass() != EntityTypes.PLAYER.getEntityClass() || attackPlayers) && attackCooldown <= 0) {
                 getInstance().getInteractionManager().attackEntity(e);
                 getInstance().getInteractionManager().lookAt(e);
                 return;
@@ -138,9 +140,8 @@ public class ClientPlayerEntity extends PlayerEntity {
     }
 
     public void tickFalling(Vec3d velocity) {
-        double gravity = 0.08;
         double yVel = velocity.y;
-        yVel -= gravity;
+        yVel -= GRAVITY;
         this.setVelocity(velocity.x, yVel, velocity.z);
     }
 
@@ -237,7 +238,8 @@ public class ClientPlayerEntity extends PlayerEntity {
         Vec3i blockPos = intersectingYBlock.getLeft();
         Block block = intersectingYBlock.getRight();
         Box blockBox = block.getBoundingBox().offset(blockPos);
-        this.setPos(this.getPos().setY(blockBox.getRelativeCenter().y + delta > 0 ? blockBox.getMaxPos().y : blockBox.getMinPos().y));
+        this.setPos(this.getPos().setY(delta > 0 ? blockBox.getMaxPos().y : blockBox.getMinPos().y));
+
         this.setVelocity(this.getVelocity().setY(0));
         this.setOnGround(true);
     }
