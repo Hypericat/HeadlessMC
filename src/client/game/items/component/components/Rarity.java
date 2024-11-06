@@ -20,6 +20,11 @@ public enum Rarity implements IComponent {
     }
 
     @Override
+    public IComponent copy() {
+        return this;
+    }
+
+    @Override
     public int getTypeID() {
         return 8;
     }

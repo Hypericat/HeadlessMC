@@ -9,6 +9,11 @@ public class FireResistant implements IComponent {
     }
 
     @Override
+    public IComponent copy() {
+        return new FireResistant();
+    }
+
+    @Override
     public int getTypeID() {
         return 21;
     }

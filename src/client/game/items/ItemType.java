@@ -18,4 +18,8 @@ public class ItemType {
     public Component getComponent() {
         return component;
     }
+
+    public static ItemType copy(ItemType type) {
+        return new ItemType(type.getIdentifier(), new Component(type.getComponent()));
+    }
 }

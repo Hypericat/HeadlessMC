@@ -1350,4 +1350,9 @@ public class ItemIDs {
     public static ItemID fromID(int id) {
         return map.get(id);
     }
+
+    public static ItemID getCopyFromID(int id) {
+        ItemID item = map.get(id);
+        return new ItemID(ItemType.copy(item.getType()), item.getId());
+    }
 }

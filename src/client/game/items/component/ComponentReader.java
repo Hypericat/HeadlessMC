@@ -15,23 +15,33 @@ public class ComponentReader {
         }
 
         int itemID = PacketUtil.readVarInt(buf);
-        ItemType type = ItemIDs.fromID(itemID).getType();
+        ItemType type = ItemIDs.getCopyFromID(itemID).getType();
         int add = PacketUtil.readVarInt(buf);
         int remove = PacketUtil.readVarInt(buf);
-        addValues(type, add, buf);
-        removeValues(type, remove, buf);
+        try {
+            addValues(type, add, buf);
+            removeValues(type, remove, buf);
+        } catch (IllegalStateException ex) {
+            System.err.println("ReadSlot was given item with add/remove components which is not supported at the moment. The item was : " + type.getIdentifier());
+            return new ItemStack(type, itemCount);
+        }
 
-        if (add != 0 || remove != 0) System.err.println("ReadSlot was given item with add/remove components which is not supported at the moment. The item was : " + type.getIdentifier());
 
 
         return new ItemStack(type, itemCount);
     }
 
     public static void addValues(ItemType baseType, int amountToAdd, ByteBuf buf) {
-
+        for (int i = 0; i < amountToAdd; i++) {
+            int componentID = PacketUtil.readVarInt(buf);
+            baseType.getComponent().getComponentByID(componentID).read(buf);
+        }dgerfewfewed
     }
 
     public static void removeValues(ItemType baseType, int amountToRemove, ByteBuf buf) {
-
+        for (int i = 0; i < amountToRemove; i++) {
+            int componentID = PacketUtil.readVarInt(buf);
+            baseType.getComponent().getComponentByID(componentID).remove();
+        }
     }
 }

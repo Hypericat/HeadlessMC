@@ -41,6 +41,40 @@ public class Component {
 
     private HashMap<Integer, IComponent> components;
 
+    public Component(Component component) {
+        this.modifiers = (AttributeModifiers) component.modifiers.copy();
+        this.enchantments = (Enchantments) component.enchantments.copy();
+        this.lore = (Lore) component.lore.copy();
+        this.maxStackSize = (MaxStackSize) component.maxStackSize.copy();
+        this.rarity = (Rarity) component.rarity.copy();
+        this.repairCost = (RepairCost) component.repairCost.copy();
+        this.fireResistant = (FireResistant) component.fireResistant.copy();
+        this.food = (Food) component.food.copy();
+        this.bucketEntityData = (BucketEntityData) component.bucketEntityData.copy();
+        this.container = (Container) component.container.copy();
+        this.bees = (Bees) component.bees.copy();
+        this.bannerPatterns = (BannerPatterns) component.bannerPatterns.copy();
+        this.damage = (Damage) component.damage.copy();
+        this.maxDamage = (MaxDamage) component.maxDamage.copy();
+        this.contents = (BundleContents) component.contents.copy();
+        this.projectiles = (ChargedProjectiles) component.projectiles.copy();
+        this.debugStickState = (DebugStickState) component.debugStickState.copy();
+        this.enchantmentGlintOverride = (EnchantmentGlintOverride) component.enchantmentGlintOverride.copy();
+        this.potDecorations = (PotDecorations) component.potDecorations.copy();
+        this.tool = (Tool) component.tool.copy();
+        this.storedEnchantments = (StoredEnchantments) component.storedEnchantments.copy();
+        this.mapColor = (MapColor) component.mapColor.copy();
+        this.decorations = (MapDecorations) component.decorations.copy();
+        this.fireworks = (Fireworks) component.fireworks.copy();
+        this.recipes = (Recipes) component.recipes.copy();
+        this.potionContents = (PotionContents) component.potionContents.copy();
+        this.jukeboxPlayable = (JukeboxPlayable) component.jukeboxPlayable.copy();
+        this.ominousBottleAmplifier = (OminousBottleAmplifier) component.ominousBottleAmplifier.copy();
+        this.effects = (SuspiciousStewEffects) component.effects.copy();
+        this.writableBookContent = (WritableBookContent) component.writableBookContent.copy();
+        component.initComponents();
+    }
+
     public Component(builder builder) {
         this.modifiers = builder.modifiers;
         this.enchantments = builder.enchantments;

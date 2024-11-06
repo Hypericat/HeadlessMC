@@ -16,6 +16,10 @@ public class Tool implements IComponent {
 
     }
 
+    public Tool(List<ToolRule> rules) {
+        this.rules = rules;
+    }
+
     public int getDamagePerBlock() {
         return damagePerBlock;
     }
@@ -31,6 +35,12 @@ public class Tool implements IComponent {
 
     public void addRule() {
 
+    }
+
+    @Override
+    public IComponent copy() {
+        List<ToolRule>
+        return new Tool(rules);
     }
 
     @Override

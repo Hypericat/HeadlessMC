@@ -5,6 +5,11 @@ import io.netty.buffer.ByteBuf;
 
 public class Bees implements IComponent {
     @Override
+    public IComponent copy() {
+        return null;
+    }
+
+    @Override
     public int getTypeID() {
         return 54;
     }

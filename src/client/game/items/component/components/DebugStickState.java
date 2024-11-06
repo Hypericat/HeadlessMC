@@ -5,6 +5,11 @@ import client.game.items.component.IComponent;
 public class DebugStickState implements IComponent {
 
     @Override
+    public IComponent copy() {
+        return null;
+    }
+
+    @Override
     public int getTypeID() {
         return 36;
     }
