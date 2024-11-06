@@ -1,36 +1,45 @@
 package client.game.items.component;
 
+import client.game.items.component.components.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class Component {
     private AttributeModifiers modifiers;
     private Enchantments enchantments;
     private Lore lore;
-    private int maxStackSize;
+    private MaxStackSize maxStackSize;
     private Rarity rarity;
-    private int repairCost;
-    private boolean fireResistant;
+    private RepairCost repairCost;
+    private FireResistant fireResistant;
     private Food food;
-    private boolean bucketEntityData;
+    private BucketEntityData bucketEntityData;
     private Container container;
     private Bees bees;
     private BannerPatterns bannerPatterns;
-    private int damage;
-    private int maxDamage;
+    private Damage damage;
+    private MaxDamage maxDamage;
     private BundleContents contents;
     private ChargedProjectiles projectiles;
     private DebugStickState debugStickState;
-    private boolean enchantmentGlintOverride;
+    private EnchantmentGlintOverride enchantmentGlintOverride;
     private PotDecorations potDecorations;
     private Tool tool;
     private StoredEnchantments storedEnchantments;
-    private int mapColor;
+    private MapColor mapColor;
     private MapDecorations decorations;
     private Fireworks fireworks;
     private Recipes recipes;
     private PotionContents potionContents;
     private JukeboxPlayable jukeboxPlayable;
-    private int ominousBottleAmplifier;
+    private OminousBottleAmplifier ominousBottleAmplifier;
     private SuspiciousStewEffects effects;
     private WritableBookContent writableBookContent;
+
+    private HashMap<Integer, IComponent> components;
 
     public Component(builder builder) {
         this.modifiers = builder.modifiers;
@@ -63,6 +72,54 @@ public class Component {
         this.ominousBottleAmplifier = builder.ominousBottleAmplifier;
         this.effects = builder.effects;
         this.writableBookContent = builder.writableBookContent;
+        initComponents();
+    }
+
+    public void initComponents() {
+        components = new HashMap<>();
+        addToComponents(modifiers);
+        addToComponents(enchantments);
+        addToComponents(lore);
+        addToComponents(maxStackSize);
+        addToComponents(rarity);
+        addToComponents(repairCost);
+        addToComponents(fireResistant);
+        addToComponents(food);
+        addToComponents(bucketEntityData);
+        addToComponents(container);
+        addToComponents(bees);
+        addToComponents(bannerPatterns);
+        addToComponents(damage);
+        addToComponents(maxDamage);
+        addToComponents(contents);
+        addToComponents(projectiles);
+        addToComponents(debugStickState);
+        addToComponents(enchantmentGlintOverride);
+        addToComponents(potDecorations);
+        addToComponents(tool);
+        addToComponents(storedEnchantments);
+        addToComponents(mapColor);
+        addToComponents(decorations);
+        addToComponents(fireworks);
+        addToComponents(recipes);
+        addToComponents(potionContents);
+        addToComponents(jukeboxPlayable);
+        addToComponents(ominousBottleAmplifier);
+        addToComponents(effects);
+        addToComponents(writableBookContent);
+    }
+
+    private void addToComponents(IComponent component) {
+        if (components.containsKey(component.getTypeID())) throw new RuntimeException();
+        if (component.getTypeID() == 0) throw new RuntimeException();
+        components.put(component.getTypeID(), component);
+    }
+
+    public List<IComponent> getAllComponents() {
+        return components.values().stream().toList();
+    }
+    public IComponent getComponentByID(int id) {
+        return components.get(id);
     }
 
     public static builder getBuilder() {
@@ -93,12 +150,12 @@ public class Component {
         this.lore = lore;
     }
 
-    public int getMaxStackSize() {
+    public MaxStackSize getMaxStackSize() {
         return maxStackSize;
     }
 
     public void setMaxStackSize(int maxStackSize) {
-        this.maxStackSize = maxStackSize;
+        this.maxStackSize.setValue(maxStackSize);
     }
 
     public Rarity getRarity() {
@@ -109,20 +166,21 @@ public class Component {
         this.rarity = rarity;
     }
 
-    public int getRepairCost() {
+    public RepairCost getRepairCost() {
         return repairCost;
     }
 
     public void setRepairCost(int repairCost) {
-        this.repairCost = repairCost;
+        this.repairCost.setValue(repairCost);
     }
 
     public boolean isFireResistant() {
-        return fireResistant;
+        return fireResistant != null;
     }
 
     public void setFireResistant(boolean fireResistant) {
-        this.fireResistant = fireResistant;
+        if (isFireResistant() == fireResistant) return;
+        this.fireResistant = (fireResistant ? new FireResistant() : null);
     }
 
     public Food getFood() {
@@ -133,12 +191,12 @@ public class Component {
         this.food = food;
     }
 
-    public boolean isBucketEntityData() {
+    public BucketEntityData isBucketEntityData() {
         return bucketEntityData;
     }
 
     public void setBucketEntityData(boolean bucketEntityData) {
-        this.bucketEntityData = bucketEntityData;
+        throw new IllegalStateException();
     }
 
     public Container getContainer() {
@@ -165,20 +223,20 @@ public class Component {
         this.bannerPatterns = bannerPatterns;
     }
 
-    public int getDamage() {
+    public Damage getDamage() {
         return damage;
     }
 
     public void setDamage(int damage) {
-        this.damage = damage;
+        this.damage.setValue(damage);
     }
 
-    public int getMaxDamage() {
+    public MaxDamage getMaxDamage() {
         return maxDamage;
     }
 
     public void setMaxDamage(int maxDamage) {
-        this.maxDamage = maxDamage;
+        this.maxDamage.setValue(maxDamage);
     }
 
     public BundleContents getContents() {
@@ -205,12 +263,15 @@ public class Component {
         this.debugStickState = debugStickState;
     }
 
-    public boolean isEnchantmentGlintOverride() {
+    public EnchantmentGlintOverride getEnchantmentGlintOverride() {
         return enchantmentGlintOverride;
     }
 
     public void setEnchantmentGlintOverride(boolean enchantmentGlintOverride) {
-        this.enchantmentGlintOverride = enchantmentGlintOverride;
+        if (enchantmentGlintOverride)
+            this.enchantmentGlintOverride.setValue(1);
+        else
+            this.enchantmentGlintOverride.setValue(0);
     }
 
     public PotDecorations getPotDecorations() {
@@ -237,12 +298,12 @@ public class Component {
         this.storedEnchantments = storedEnchantments;
     }
 
-    public int getMapColor() {
+    public MapColor getMapColor() {
         return mapColor;
     }
 
     public void setMapColor(int mapColor) {
-        this.mapColor = mapColor;
+        this.mapColor.setValue(mapColor);
     }
 
     public MapDecorations getDecorations() {
@@ -285,12 +346,12 @@ public class Component {
         this.jukeboxPlayable = jukeboxPlayable;
     }
 
-    public int getOminousBottleAmplifier() {
+    public OminousBottleAmplifier getOminousBottleAmplifier() {
         return ominousBottleAmplifier;
     }
 
     public void setOminousBottleAmplifier(int ominousBottleAmplifier) {
-        this.ominousBottleAmplifier = ominousBottleAmplifier;
+        this.ominousBottleAmplifier.setValue(ominousBottleAmplifier);
     }
 
     public SuspiciousStewEffects getEffects() {
@@ -313,31 +374,31 @@ public class Component {
         private AttributeModifiers modifiers;
         private Enchantments enchantments;
         private Lore lore;
-        private int maxStackSize;
+        private MaxStackSize maxStackSize;
         private Rarity rarity;
-        private int repairCost;
-        private boolean fireResistant;
+        private RepairCost repairCost;
+        private FireResistant fireResistant;
         private Food food;
-        private boolean bucketEntityData;
+        private BucketEntityData bucketEntityData;
         private Container container;
         private Bees bees;
         private BannerPatterns bannerPatterns;
-        private int damage;
-        private int maxDamage;
+        private Damage damage;
+        private MaxDamage maxDamage;
         private BundleContents contents;
         private ChargedProjectiles projectiles;
         private DebugStickState debugStickState;
-        private boolean enchantmentGlintOverride;
+        private EnchantmentGlintOverride enchantmentGlintOverride;
         private PotDecorations potDecorations;
         private Tool tool;
         private StoredEnchantments storedEnchantments;
-        private int mapColor;
+        private MapColor mapColor;
         private MapDecorations decorations;
         private Fireworks fireworks;
         private Recipes recipes;
         private PotionContents potionContents;
         private JukeboxPlayable jukeboxPlayable;
-        private int ominousBottleAmplifier;
+        private OminousBottleAmplifier ominousBottleAmplifier;
         private SuspiciousStewEffects effects;
         private WritableBookContent writableBookContent;
 
@@ -345,31 +406,31 @@ public class Component {
             this.modifiers = null;
             this.enchantments = null;
             this.lore = null;
-            this.maxStackSize = 64;
+            this.maxStackSize = new MaxStackSize(64);
             this.rarity = Rarity.COMMON;
-            this.repairCost = 0;
-            this.fireResistant = false;
+            this.repairCost = new RepairCost(0);
+            this.fireResistant = null;
             this.food = null;
-            this.bucketEntityData = false;
+            this.bucketEntityData = null;
             this.container = null;
             this.bees = null;
             this.bannerPatterns = null;
-            this.damage = 0;
-            this.maxDamage = -1;
+            this.damage = new Damage(0);
+            this.maxDamage = new MaxDamage(-1);
             this.contents = null;
             this.projectiles = null;
             this.debugStickState = null;
-            this.enchantmentGlintOverride = false;
+            this.enchantmentGlintOverride = new EnchantmentGlintOverride(0);
             this.potDecorations = null;
             this.tool = null;
             this.storedEnchantments = null;
-            this.mapColor = -1;
+            this.mapColor = new MapColor(-1);
             this.decorations = null;
             this.fireworks = null;
             this.recipes = null;
             this.potionContents = null;
             this.jukeboxPlayable = null;
-            this.ominousBottleAmplifier = -1;
+            this.ominousBottleAmplifier = new OminousBottleAmplifier(-1);
             this.effects = null;
             this.writableBookContent = null;
         }
@@ -386,7 +447,7 @@ public class Component {
             return lore;
         }
 
-        public int getMaxStackSize() {
+        public MaxStackSize getMaxStackSize() {
             return maxStackSize;
         }
 
@@ -394,11 +455,11 @@ public class Component {
             return rarity;
         }
 
-        public int getRepairCost() {
+        public RepairCost getRepairCost() {
             return repairCost;
         }
 
-        public boolean isFireResistant() {
+        public FireResistant isFireResistant() {
             return fireResistant;
         }
 
@@ -406,7 +467,7 @@ public class Component {
             return food;
         }
 
-        public boolean isBucketEntityData() {
+        public BucketEntityData isBucketEntityData() {
             return bucketEntityData;
         }
 
@@ -422,11 +483,11 @@ public class Component {
             return bannerPatterns;
         }
 
-        public int getDamage() {
+        public Damage getDamage() {
             return damage;
         }
 
-        public int getMaxDamage() {
+        public MaxDamage getMaxDamage() {
             return maxDamage;
         }
 
@@ -442,7 +503,7 @@ public class Component {
             return debugStickState;
         }
 
-        public boolean isEnchantmentGlintOverride() {
+        public EnchantmentGlintOverride isEnchantmentGlintOverride() {
             return enchantmentGlintOverride;
         }
 
@@ -458,7 +519,7 @@ public class Component {
             return storedEnchantments;
         }
 
-        public int getMapColor() {
+        public MapColor getMapColor() {
             return mapColor;
         }
 
@@ -482,7 +543,7 @@ public class Component {
             return jukeboxPlayable;
         }
 
-        public int getOminousBottleAmplifier() {
+        public OminousBottleAmplifier getOminousBottleAmplifier() {
             return ominousBottleAmplifier;
         }
 
@@ -510,7 +571,7 @@ public class Component {
         }
 
         public builder setMaxStackSize(int maxStackSize) {
-            this.maxStackSize = maxStackSize;
+            this.maxStackSize.setValue(maxStackSize);
             return this;
         }
 
@@ -520,12 +581,13 @@ public class Component {
         }
 
         public builder setRepairCost(int repairCost) {
-            this.repairCost = repairCost;
+            this.repairCost.setValue(repairCost);
             return this;
         }
 
         public builder setFireResistant(boolean fireResistant) {
-            this.fireResistant = fireResistant;
+            if (fireResistant)
+                this.fireResistant = new FireResistant();
             return this;
         }
 
@@ -535,7 +597,8 @@ public class Component {
         }
 
         public builder setBucketEntityData(boolean bucketEntityData) {
-            this.bucketEntityData = bucketEntityData;
+            if (bucketEntityData)
+                this.bucketEntityData = new BucketEntityData();
             return this;
         }
 
@@ -555,12 +618,12 @@ public class Component {
         }
 
         public builder setDamage(int damage) {
-            this.damage = damage;
+            this.damage.setValue(damage);
             return this;
         }
 
         public builder setMaxDamage(int maxDamage) {
-            this.maxDamage = maxDamage;
+            this.maxDamage.setValue(maxDamage);
             return this;
         }
 
@@ -580,7 +643,8 @@ public class Component {
         }
 
         public builder setEnchantmentGlintOverride(boolean enchantmentGlintOverride) {
-            this.enchantmentGlintOverride = enchantmentGlintOverride;
+            if (enchantmentGlintOverride)
+                this.enchantmentGlintOverride.setValue(1);
             return this;
         }
 
@@ -600,7 +664,7 @@ public class Component {
         }
 
         public builder setMapColor(int mapColor) {
-            this.mapColor = mapColor;
+            this.mapColor.setValue(mapColor);
             return this;
         }
 
@@ -630,7 +694,7 @@ public class Component {
         }
 
         public builder setOminousBottleAmplifier(int ominousBottleAmplifier) {
-            this.ominousBottleAmplifier = ominousBottleAmplifier;
+            this.ominousBottleAmplifier.setValue(ominousBottleAmplifier);
             return this;
         }
 

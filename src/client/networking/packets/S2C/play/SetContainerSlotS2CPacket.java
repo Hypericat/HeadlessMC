@@ -2,6 +2,7 @@ package client.networking.packets.S2C.play;
 
 import client.game.items.ItemStack;
 import client.game.items.ItemType;
+import client.game.items.component.ComponentReader;
 import client.networking.ClientPacketListener;
 import client.networking.ItemIDs;
 import client.networking.packets.PacketID;
@@ -39,22 +40,7 @@ public class SetContainerSlotS2CPacket extends S2CPacket {
         windowID = buf.readByte();
         stateID = PacketUtil.readVarInt(buf);
         this.slot = buf.readShort();
-        itemStack = readSlot(buf);
-    }
-
-    public ItemStack readSlot(ByteBuf buf) {
-        int itemCount = PacketUtil.readVarInt(buf);
-        if (itemCount < 1) {
-            return null;
-        }
-
-        int itemID = PacketUtil.readVarInt(buf);
-        ItemType type = ItemIDs.fromID(itemID).getType();
-        int add = PacketUtil.readVarInt(buf);
-        int remove = PacketUtil.readVarInt(buf);
-        if (add != 0 || remove != 0) System.err.println("ReadSlot was given item with add/remove components which is not supported at the moment. The item was : " + type.getIdentifier());
-
-        return new ItemStack(type, itemCount);
+        itemStack = ComponentReader.readSlot(buf);
     }
 
     public boolean isClientInventory() {

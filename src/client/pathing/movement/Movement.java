@@ -49,6 +49,7 @@ public abstract class Movement {
     protected static double getMiningDurationTicks(CalculationContext ctx, Block block, boolean includeFalling) {
         if (block.hasNoCollision()) return 0;
         if (block.isFluid()) return ActionCosts.COST_INF;
+        if (block.isUnbreakable()) return ActionCosts.COST_INF;
         int tickDuration = ctx.getBlockBreakTickCache().getMiningTickCount(ctx, block, includeFalling);
         if (tickDuration <= 0) return ActionCosts.COST_INF;
         return tickDuration + ActionCosts.MINE_PENALTY;

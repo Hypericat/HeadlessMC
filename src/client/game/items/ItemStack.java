@@ -14,12 +14,12 @@ public class ItemStack {
 
     public ItemStack(ItemType itemType, int stackSize) {
         this.type = itemType;
-        this.stackSize = Math.clamp(stackSize, 1, itemType.getComponent().getMaxStackSize());
+        this.stackSize = Math.clamp(stackSize, 1, itemType.getComponent().getMaxStackSize().getValue());
     }
 
     private ItemStack(ItemType itemType, int stackSize, boolean IknowThisIsBadCodeButIDC) {
         this.type = itemType;
-        this.stackSize = Math.clamp(stackSize, 1, itemType.getComponent().getMaxStackSize());
+        this.stackSize = Math.clamp(stackSize, 1, itemType.getComponent().getMaxStackSize().getValue());
     }
 
     public static ItemStack empty() {

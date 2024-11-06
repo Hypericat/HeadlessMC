@@ -1,9 +1,12 @@
-package client.game.items.component;
+package client.game.items.component.components;
+
+import client.game.items.component.IComponent;
+import client.game.items.component.ToolRule;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class Tool {
+public class Tool implements IComponent {
     private final List<ToolRule> rules;
     private int damagePerBlock = 2;
 
@@ -28,5 +31,10 @@ public class Tool {
 
     public void addRule() {
 
+    }
+
+    @Override
+    public int getTypeID() {
+        return 22;
     }
 }

@@ -210,6 +210,10 @@ public class Block {
         noCollision.add(Blocks.FROGSPAWN);
     }
 
+    public boolean isUnbreakable() {
+        return this == Blocks.BEDROCK || this == Blocks.COMMAND_BLOCK || this == Blocks.STRUCTURE_BLOCK;
+    }
+
     public String getNameNoPrefix() {
         return this.getName().substring(10);
     }

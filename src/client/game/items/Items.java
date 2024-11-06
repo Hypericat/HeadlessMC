@@ -1,6 +1,9 @@
 package client.game.items;
 
 import client.game.items.component.*;
+import client.game.items.component.components.Rarity;
+import client.game.items.component.components.Tool;
+import client.game.items.component.ToolRule;
 
 import java.util.HashMap;
 import java.util.List;
