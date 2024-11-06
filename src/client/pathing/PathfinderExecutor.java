@@ -21,6 +21,8 @@ public class PathfinderExecutor {
     private final HeadlessInstance instance;
     private final boolean drawing;
 
+    public static final float IDLE_DOWN_VELOCITY = 0.01f;
+
     public static final int MAX_RETRY = 3;
 
 
@@ -53,14 +55,14 @@ public class PathfinderExecutor {
 
     private void findNextPath() {
         for (int i = 0; i < MAX_RETRY; i++) {
-            System.out.println("Trying to find path!");
+            instance.getLogger().logUser("Trying to find path!");
             Pathfinder pathfinder = new Pathfinder(instance.getPlayer().getBlockPos(), goal, new CalculationContext(instance.getWorld(), new BlockBreakTickCache(instance.getPlayer().getInventory())));
             currentPath = pathfinder.calculate();
             if (currentPath != null) {
-                System.out.println("Found path! Going to " + currentPath.positions().getLast());
+                instance.getLogger().logUser("Found path! Going to " + currentPath.positions().getLast());
                 break;
             }
-            System.out.println("Failed to find path!");
+            instance.getLogger().logUser("Failed to find path!");
         }
         //handle no path found
         if (currentPath == null) {
@@ -75,7 +77,7 @@ public class PathfinderExecutor {
 
     public void doNextMovement() {
         if (!readyMove) {
-            instance.getPlayer().setVelocity(Vec3d.ZERO.setY(-0.03));
+            instance.getPlayer().setVelocity(Vec3d.ZERO.setY(-IDLE_DOWN_VELOCITY));
             return;
         }
         if (drawing) {
@@ -90,6 +92,7 @@ public class PathfinderExecutor {
         }
         if (instance.getWorld().getBlock(headBlock).hasCollision()) {
             instance.getInteractionManager().playerMineBlock(headBlock);
+            instance.getPlayer().setVelocity(Vec3d.ZERO.setY(-IDLE_DOWN_VELOCITY));
             return;
         }
         instance.getPlayer().setPos(Vec3d.fromBlock(positions.get(positionIndex)));

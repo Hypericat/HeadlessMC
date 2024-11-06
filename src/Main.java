@@ -18,7 +18,7 @@ public class Main {
         Thread terminalThread = new Thread(terminal);
 
         //makeInstance(args[0], args[1], Integer.parseInt(args[2]));
-        makeInstances("Winston", "127.0.0.1", 15);
+        makeInstances("Winston", "127.0.0.1", 1);
         //makeInstance("Winston", "192.168.2.226", 1);
 
         //don't remove this
@@ -59,7 +59,7 @@ public class Main {
     public static void makeInstance(String name, String ip, int id) {
         if (ip.equalsIgnoreCase("localhost")) ip = "127.0.0.1";
 
-        HeadlessInstance headless = new HeadlessInstance(name, ip, id, 5, isDev());
+        HeadlessInstance headless = new HeadlessInstance(name, ip, id, 5, isDev(), terminal);
         Thread thread = new Thread(headless);
         instances.add(new Pair<>(headless, thread));
         thread.start();

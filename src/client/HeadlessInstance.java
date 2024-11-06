@@ -8,6 +8,7 @@ import client.networking.NetworkState;
 import client.networking.packets.C2S.configuration.HandShakeC2SPacket;
 import client.networking.packets.C2S.configuration.LoginStartC2SPacket;
 import client.utils.UUID;
+import commands.TerminalHandler;
 
 public class HeadlessInstance implements Runnable {
 
@@ -26,17 +27,22 @@ public class HeadlessInstance implements Runnable {
     private UUID uuid;
     private final Scheduler scheduler;
     private final Logger logger;
-    private boolean autoJump = true;
+    private final TerminalHandler terminal;
 
 
-    public HeadlessInstance(String userName, String ip, int id, int viewDistance, boolean dev) {
+    public HeadlessInstance(String userName, String ip, int id, int viewDistance, boolean dev, TerminalHandler terminalHandler) {
         this.userName = userName + id;
         this.logger = new Logger(userName, id, dev);
         this.viewDistance = (byte) viewDistance;
         this.ip = ip;
         this.lastTickTime = System.currentTimeMillis();
         this.scheduler = new Scheduler();
-        network = new NetworkHandler(this);
+        this.network = new NetworkHandler(this);
+        this.terminal = terminalHandler;
+    }
+
+    public TerminalHandler getTerminal() {
+        return this.terminal;
     }
 
     public boolean connect(String address) {
@@ -130,10 +136,6 @@ public class HeadlessInstance implements Runnable {
 
     public InteractionManager getInteractionManager() {
         return interactionManager;
-    }
-
-    public boolean getAutoJump() {
-        return this.autoJump;
     }
 
     public byte getViewDistance() {

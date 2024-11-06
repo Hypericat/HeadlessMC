@@ -1,6 +1,7 @@
 package client.pathing.movement;
 
 import client.HeadlessInstance;
+import client.game.Block;
 import client.game.Blocks;
 import client.pathing.ActionCosts;
 import client.pathing.CalculationContext;
@@ -107,6 +108,7 @@ public enum Moves {
         result.z = z + zOffset;
         result.cost = cost(context, x, y, z);
         applyFloatingPenalty(context, result, this);
+        applyInWaterPenalty(context, result, this);
     }
 
     public static void applyFloatingPenalty(CalculationContext context, MutableMoveResult result, Moves move) {
@@ -121,8 +123,19 @@ public enum Moves {
         }
     }
 
+    public static void applyInWaterPenalty(CalculationContext context, MutableMoveResult result, Moves move) {
+        if (isHeadInWater(context, result.x, result.y, result.z)) {
+            float waterPenaltyMultiplier = 7;
+            result.cost = result.cost * waterPenaltyMultiplier;
+        }
+    }
+
     public static boolean isFloating(CalculationContext context, int x, int y, int z) {
-        return context.getWorld().getBlock(x, y - 1, z).hasNoCollision();
+        Block underBlock = context.getWorld().getBlock(x, y - 1, z);
+        return underBlock.hasNoCollision() && underBlock != Blocks.WATER;
+    }
+    public static boolean isHeadInWater(CalculationContext context, int x, int y, int z) {
+        return context.getWorld().getBlock(x, y + 1, z) == Blocks.WATER;
     }
 
     public double cost(CalculationContext context, int x, int y, int z) {

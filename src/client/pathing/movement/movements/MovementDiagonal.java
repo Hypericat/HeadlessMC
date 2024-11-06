@@ -53,6 +53,7 @@ public class MovementDiagonal extends Movement {
         }
         res.cost = cost;
         Moves.applyFloatingPenalty(ctx, res, move);
+        Moves.applyInWaterPenalty(ctx, res, move);
         return res.cost;
     }
 

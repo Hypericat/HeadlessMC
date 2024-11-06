@@ -71,6 +71,10 @@ public class ChunkSectionContainer {
         }
     }
 
+
+    // I want to kill myself he ehe he fucking hell
+    // WHY WHAT
+    // WHY IS THIS HAAFSFDSAF
     public int getIdAt(int x, int y, int z) {
         if (simpleID == -1 && data == null) throw new RuntimeException("Both Simple ID and Data have no data!");
         if (simpleID != -1) return simpleID;

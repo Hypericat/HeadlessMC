@@ -3,14 +3,19 @@ package client.game;
 import client.HeadlessInstance;
 import client.networking.NetworkHandler;
 import client.networking.packets.C2S.play.*;
+import client.networking.packets.S2C.play.PlayerChatMessageS2C;
+import client.networking.packets.S2C.play.SynchronizePlayerPositionS2CPacket;
 import client.pathing.*;
 import client.pathing.goals.GoalMineBlock;
 import client.pathing.goals.GoalXYZ;
-import client.pathing.goals.GoalXZ;
+import client.utils.Flag;
 import client.utils.UUID;
+import math.MathHelper;
 import math.Vec3d;
 import math.Vec3i;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class InteractionManager {
@@ -20,6 +25,10 @@ public class InteractionManager {
     private HeadlessInstance instance;
     private Vec3i currentBlockBreaking;
     private int blockBreakingProgress;
+
+    private static final double PATHFINDING_MAX_RESET_POSITION_DELTA = 8d;
+    private static final double PATHFINDING_MAX_RESET_POSITION_DELTA_SQUARED = PATHFINDING_MAX_RESET_POSITION_DELTA * PATHFINDING_MAX_RESET_POSITION_DELTA;
+
 
     public InteractionManager(ClientPlayerEntity player, World world, NetworkHandler networkHandler, HeadlessInstance instance) {
         this.player = player;
@@ -40,23 +49,44 @@ public class InteractionManager {
         sendCommand("/setblock " + pos.getX() + " " + pos.getY() + " " + pos.getZ() + " " + block.getName());
     }
 
+    public void onSynchronizePlayerPositions(SynchronizePlayerPositionS2CPacket packet) {
+        Flag flags = packet.getFlags();
+        ClientPlayerEntity player = instance.getPlayer();
+        Vec3d oldPos = player.getPos();
+        //instance.getInteractionManager().sendChatMessage("Server resetting client position!");
+
+        player.setX(flags.contains(0x01) ? player.getX() + packet.getX() : packet.getX());
+        player.setY(flags.contains(0x02) ? player.getY() + packet.getY() : packet.getY());
+        player.setZ(flags.contains(0x04) ? player.getZ() + packet.getZ() : packet.getZ());
+        player.setYaw(flags.contains(0x08) ? player.getYaw() + packet.getYaw() : packet.getYaw());
+        player.setPitch(flags.contains(0x10) ? player.getPitch() + packet.getPitch() : packet.getPitch());
+
+        instance.getNetworkHandler().sendPacket(new ConfirmTeleportationC2SPacket(packet.getTeleportID()));
+
+
+        if (instance.getPlayer().getPathFinderExecutor() != null && oldPos.squaredDistanceTo(player.getPos()) > PATHFINDING_MAX_RESET_POSITION_DELTA_SQUARED) {
+            instance.getLogger().logUser("Cancelling Pathfinding because the server reset client position!");
+            instance.getPlayer().setPathfinderExecutor(null);
+        }
+    }
+
     public void lookAt(Entity entity) {
         lookAt(entity.getBoundingBox().getCenter().add(entity.getPos()));
     }
 
-    public void lookAt(Vec3i pos) {
-        lookAt(Vec3d.of(pos));
+    public void lookAt(Vec3i target) {
+        lookAt(Vec3d.fromBlock(target));
     }
 
-    public void lookAt(Vec3d pos) {
-        Vec3d delta = this.player.getHeadPos().subtract(pos);
-        double radius = Math.sqrt(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
-        float yaw = (float) Math.floorMod((int) (-Math.atan2(delta.x, delta.z) / Math.PI * 180) + 180, 360);
+    public void lookAt(Vec3d target) {
+        Vec3d vec3d = this.player.getHeadPos();
+        double d = target.x - vec3d.x;
+        double e = target.y - vec3d.y;
+        double f = target.z - vec3d.z;
+        double g = Math.sqrt(d * d + f * f);
 
-        float pitch = (float) (-Math.asin(delta.y / radius) / Math.PI * 180);
-
-        this.player.setYaw(yaw);
-        this.player.setPitch(-pitch);
+        this.player.setPitch(MathHelper.wrapDegrees((float)(-(MathHelper.atan2(e, g) * 180.0F / (float)Math.PI))));
+        this.player.setYaw(MathHelper.wrapDegrees((float)(MathHelper.atan2(f, d) * 180.0F / (float)Math.PI) - 90.0F));
     }
 
     public void pathTo(Vec3i vec) {
@@ -92,6 +122,7 @@ public class InteractionManager {
         networkHandler.sendPacket(PlayerActionC2SPacket.finishDigging(blockPos, BlockFace.UP, 0));
         currentBlockBreaking = null;
     }
+
     public boolean playerSilentlyMineBlock(Vec3i blockPos) {
         if (isBreakingBlock()) return false;
         startDestroyBlock(blockPos);
@@ -101,44 +132,42 @@ public class InteractionManager {
         return true;
     }
 
-    public void onReceiveChatMessage(UUID senderUUID, String chatMessage) {
-        instance.getLogger().logUser("Receieved chat message : " + chatMessage);
-
-        if (chatMessage.startsWith("stop")) {
-            instance.getPlayer().setPathfinderExecutor(null);
-        }
-
-
-        if (chatMessage.startsWith("goto ")) {
-            chatMessage = chatMessage.replace("goto ", "");
-            String[] pos = chatMessage.split(" ");
-            pathTo(new Vec3i(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2])));
-            return;
-        }
-
-        if (chatMessage.startsWith("mine ")) {
-            chatMessage = chatMessage.replace("mine ", "");
-            Block block = Blocks.getBlockByName(chatMessage);
-            if (block == null) return;
-            //cache the blocks right now
+    public void pathfindMineForBlocks(List<Block> blockTypes) {
+        if (blockTypes.isEmpty()) throw new IllegalArgumentException("Gave invalid blocks list");
+        List<Vec3i> positions = new ArrayList<>();
+        StringBuilder blockNames = new StringBuilder();
+        for (Block block : blockTypes) {
             instance.getWorld().cacheIfNotPresent(block);
+            positions.addAll(instance.getWorld().findCachedBlock(block));
+            blockNames.append(block.getNameNoPrefix()).append(", ");
+        }
+        instance.getLogger().logUser("Found " + blockTypes.size() + " " + blockNames.substring(0, blockNames.length() - 2) + " blocks!");
 
-            List<Vec3i> blocks = instance.getWorld().findCachedBlock(block);
-            instance.getLogger().logUser("Found " + blocks.size() + " " + block.getNameNoPrefix() + " blocks!");
-
-            instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalMineBlock(block, instance.getWorld()), instance));
+        if (positions.isEmpty()) {
+            instance.getLogger().logUser("No blocks found, canceling pathing!");
             return;
         }
 
+        instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalMineBlock(blockTypes, instance.getWorld()), instance));
+    }
 
-        if (chatMessage.startsWith("drawTo ")) {
-            chatMessage = chatMessage.replace("drawTo ", "");
-            String[] pos = chatMessage.split(" ");
-            drawPathTo(new Vec3i(Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2])));
+    public void pathfindMineForBlocks(Block ... blocks) {
+        pathfindMineForBlocks(List.of(blocks));
+    }
+
+    public void onReceiveChatMessage(PlayerChatMessageS2C packet) {
+        String chatMessage = packet.getMessage();
+        instance.getLogger().logUser("Received chat message : " + chatMessage);
+
+        //this will fuck up if more than one instance but idc
+
+        if (chatMessage.startsWith("#")) {
+            instance.getTerminal().parseCommand(chatMessage.substring(1));
             return;
         }
 
-        Entity sender = world.getEntityByUUID(senderUUID);
+        //REMOVE THIS FOR RELEASE THIS IS BAD THIS SHOULD NOT BE HERE
+        Entity sender = world.getEntityByUUID(packet.getSenderUUID());
         if (sender == null) return;
         if (chatMessage.equalsIgnoreCase("here")) {
             pathTo(Vec3i.ofFloored(sender.getPos()));

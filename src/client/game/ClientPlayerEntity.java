@@ -1,12 +1,8 @@
 package client.game;
 
 import client.HeadlessInstance;
-import client.Scheduler;
 import client.networking.packets.C2S.play.ClientStatusC2SPacket;
 import client.networking.packets.C2S.play.PlayerMoveFullC2SPacket;
-import client.pathing.CutoffPath;
-import client.pathing.IPath;
-import client.pathing.Path;
 import client.pathing.PathfinderExecutor;
 import math.*;
 
@@ -29,7 +25,6 @@ public class ClientPlayerEntity extends PlayerEntity {
     @Override
     public void onTick() {
         super.onTick();
-        doTestMovement();
         doKillAura();
 
         tickMovement();
@@ -140,6 +135,7 @@ public class ClientPlayerEntity extends PlayerEntity {
     }
 
     public void tickFalling(Vec3d velocity) {
+        if (this.isPathfinding()) return;
         double yVel = velocity.y;
         yVel -= GRAVITY;
         this.setVelocity(velocity.x, yVel, velocity.z);
@@ -259,6 +255,10 @@ public class ClientPlayerEntity extends PlayerEntity {
             }
         }
         return null;
+    }
+
+    public boolean isPathfinding() {
+        return this.getPathFinderExecutor() != null;
     }
 
     public void jump() {

@@ -3,6 +3,8 @@ package commands;
 import client.HeadlessInstance;
 import commands.command.GotoCommand;
 import commands.command.MineBlockCommand;
+import commands.command.SayCommand;
+import commands.command.StopCommand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,8 @@ public class TerminalHandler implements Runnable {
     private void initCommands() {
         commands.add(new MineBlockCommand());
         commands.add(new GotoCommand());
+        commands.add(new StopCommand());
+        commands.add(new SayCommand());
     }
 
     private Command getCommand(String in) {
@@ -44,15 +48,20 @@ public class TerminalHandler implements Runnable {
 
     private void pollInput(List<HeadlessInstance> instances) {
         String in = systemIn.nextLine();
+        parseCommand(in);
+    }
+
+    public void parseCommand(String in) {
         for (Command command : commands) {
             List<CommandSyntax> commandSyntaxes = command.getSyntaxes(in);
             if (commandSyntaxes.isEmpty()) continue;
-            System.out.println(commandSyntaxes.get(0).getName());
+            System.out.println("Executing command : " + in);
             command.execute(commandSyntaxes, in, instances);
             return;
         }
         System.err.println("Error invalid command name : " + in);
     }
+
 
     @Override
     public void run() {

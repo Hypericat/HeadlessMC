@@ -59,6 +59,11 @@ public class Vec3d implements Position {
         return d < 1.0E-4 ? ZERO : new Vec3d(this.x / d, this.y / d, this.z / d);
     }
 
+    public Vec3d fastNormalize() {
+        double d = MathHelper.Qrsqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        return d < 1.0E-4 ? ZERO : new Vec3d(this.x * d, this.y * d, this.z * d);
+    }
+
     public double dotProduct(Vec3d vec) {
         return this.x * vec.x + this.y * vec.y + this.z * vec.z;
     }

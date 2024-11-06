@@ -6,11 +6,9 @@ import client.networking.packets.C2S.configuration.ClientInformationC2SPacket;
 import client.networking.packets.C2S.configuration.LoginAcknowledgedC2SPacket;
 import client.networking.packets.C2S.configuration.ServerBoundKnownPacksC2SPacket;
 import client.HeadlessInstance;
-import client.networking.packets.C2S.play.ConfirmTeleportationC2SPacket;
 import client.networking.packets.C2S.play.KeepAliveC2SPacket;
 import client.networking.packets.S2C.configuration.*;
 import client.networking.packets.S2C.play.*;
-import client.utils.Flag;
 import math.Pair;
 import math.Vec3d;
 import math.Vec3i;
@@ -166,17 +164,7 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onSynchronizePlayerPosition(SynchronizePlayerPositionS2CPacket packet) {
-        Flag flags = packet.getFlags();
-        ClientPlayerEntity player = instance.getPlayer();
-        //instance.getInteractionManager().sendChatMessage("Server resetting client position!");
-
-        player.setX(flags.contains(0x01) ? player.getX() + packet.getX() : packet.getX());
-        player.setY(flags.contains(0x02) ? player.getY() + packet.getY() : packet.getY());
-        player.setZ(flags.contains(0x04) ? player.getZ() + packet.getZ() : packet.getZ());
-        player.setYaw(flags.contains(0x08) ? player.getYaw() + packet.getYaw() : packet.getYaw());
-        player.setPitch(flags.contains(0x10) ? player.getPitch() + packet.getPitch() : packet.getPitch());
-
-        instance.getNetworkHandler().sendPacket(new ConfirmTeleportationC2SPacket(packet.getTeleportID()));
+        instance.getInteractionManager().onSynchronizePlayerPositions(packet);
     }
 
     @Override
@@ -199,7 +187,7 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onChatMessageS2C(PlayerChatMessageS2C packet) {
-        instance.getInteractionManager().onReceiveChatMessage(packet.getSenderUUID(), packet.getMessage());
+        instance.getInteractionManager().onReceiveChatMessage(packet);
     }
 
     @Override

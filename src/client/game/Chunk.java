@@ -33,7 +33,9 @@ public class Chunk {
     }
 
     public Block getBlockAt(int chunkPosX, int chunkPosY, int chunkPosZ) {
-        return Blocks.getBlockByID(chunkSections.get((chunkPosY + 64) / 16).getIdAt(chunkPosX, (chunkPosY + 64) % 16, chunkPosZ));
+        int index = (chunkPosY + 64) / 16;
+        if (index < 0 || index > chunkSections.size()) return Blocks.AIR;
+        return Blocks.getBlockByID(chunkSections.get(index).getIdAt(chunkPosX, (chunkPosY + 64) % 16, chunkPosZ));
     }
 
     public void setBlockAt(int chunkPosX, int chunkPosY, int chunkPosZ, Block block) {
