@@ -41,6 +41,7 @@ public class SetContainerSlotS2CPacket extends S2CPacket {
         stateID = PacketUtil.readVarInt(buf);
         this.slot = buf.readShort();
         itemStack = ComponentReader.readSlot(buf);
+        System.out.println("Updated item : " + itemStack);
     }
 
     public boolean isClientInventory() {

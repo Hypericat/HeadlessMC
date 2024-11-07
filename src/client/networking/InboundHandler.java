@@ -103,7 +103,8 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
             //e.printStackTrace();
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             System.err.println("Failed to decode packet");
-            //e.printStackTrace();
+            if (handler.getInstance().isDev())
+                e.printStackTrace();
         }
     }
 

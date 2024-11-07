@@ -28,17 +28,23 @@ public class HeadlessInstance implements Runnable {
     private final Scheduler scheduler;
     private final Logger logger;
     private final TerminalHandler terminal;
+    private boolean dev;
 
 
     public HeadlessInstance(String userName, String ip, int id, int viewDistance, boolean dev, TerminalHandler terminalHandler) {
         this.userName = userName + id;
         this.logger = new Logger(userName, id, dev);
+        this.dev = dev;
         this.viewDistance = (byte) viewDistance;
         this.ip = ip;
         this.lastTickTime = System.currentTimeMillis();
         this.scheduler = new Scheduler();
         this.network = new NetworkHandler(this);
         this.terminal = terminalHandler;
+    }
+
+    public boolean isDev() {
+        return this.dev;
     }
 
     public TerminalHandler getTerminal() {

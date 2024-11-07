@@ -38,7 +38,6 @@ public class Component {
     private OminousBottleAmplifier ominousBottleAmplifier;
     private SuspiciousStewEffects effects;
     private WritableBookContent writableBookContent;
-
     private CustomName customName;
     private ItemName itemName;
     private Unbreakable unbreakable;
@@ -78,7 +77,12 @@ public class Component {
         this.ominousBottleAmplifier = (OminousBottleAmplifier) component.ominousBottleAmplifier.copy();
         this.effects = (SuspiciousStewEffects) component.effects.copy();
         this.writableBookContent = (WritableBookContent) component.writableBookContent.copy();
-        component.initComponents();
+        this.customName = (CustomName) component.customName.copy();
+        this.itemName = (ItemName) component.customName.copy();
+        this.unbreakable = (Unbreakable) component.customName.copy();
+        this.dyedColor = (DyedColor) component.customName.copy();
+        this.mapID = (MapID) component.customName.copy();
+        initComponents();
     }
 
     public Component(builder builder) {
@@ -150,6 +154,7 @@ public class Component {
     }
 
     private void addToComponents(IComponent component) {
+        if (component == null) return;
         if (components.containsKey(component.getTypeID())) throw new RuntimeException();
         if (component.getTypeID() == 0) throw new RuntimeException();
         components.put(component.getTypeID(), component);
@@ -158,8 +163,49 @@ public class Component {
     public List<IComponent> getAllComponents() {
         return components.values().stream().toList();
     }
+
     public IComponent getComponentByID(int id) {
         return components.get(id);
+    }
+
+    public MapID getMapID() {
+        return mapID;
+    }
+
+    public void setMapID(MapID mapID) {
+        this.mapID = mapID;
+    }
+
+    public DyedColor getDyedColor() {
+        return dyedColor;
+    }
+
+    public void setDyedColor(DyedColor dyedColor) {
+        this.dyedColor = dyedColor;
+    }
+
+    public Unbreakable getUnbreakable() {
+        return unbreakable;
+    }
+
+    public void setUnbreakable(Unbreakable unbreakable) {
+        this.unbreakable = unbreakable;
+    }
+
+    public ItemName getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(ItemName itemName) {
+        this.itemName = itemName;
+    }
+
+    public CustomName getCustomName() {
+        return customName;
+    }
+
+    public void setCustomName(CustomName customName) {
+        this.customName = customName;
     }
 
     public static builder getBuilder() {
@@ -448,40 +494,41 @@ public class Component {
         private MapID mapID;
 
         public builder() {
-            this.modifiers = null;
-            this.enchantments = null;
-            this.lore = null;
+            this.modifiers = new AttributeModifiers();
+            this.enchantments = new Enchantments();
+            this.lore = new Lore();
             this.maxStackSize = new MaxStackSize(64);
             this.rarity = Rarity.COMMON;
             this.repairCost = new RepairCost(0);
-            this.fireResistant = null;
-            this.food = null;
-            this.bucketEntityData = null;
-            this.container = null;
-            this.bees = null;
-            this.bannerPatterns = null;
+            this.fireResistant = new FireResistant();
+            this.food = new Food();
+            this.bucketEntityData = new BucketEntityData();
+            this.container = new Container(null);
+            this.bees = new Bees();
+            this.bannerPatterns = new BannerPatterns();
             this.damage = new Damage(0);
             this.maxDamage = new MaxDamage(-1);
-            this.contents = null;
-            this.projectiles = null;
-            this.debugStickState = null;
-            this.enchantmentGlintOverride = null;
-            this.potDecorations = null;
-            this.tool = null;
-            this.storedEnchantments = null;
-            this.mapColor = null;
-            this.decorations = null;
-            this.fireworks = null;
-            this.recipes = null;
-            this.potionContents = null;
-            this.jukeboxPlayable = null;
-            this.ominousBottleAmplifier = null;
-            this.effects = null;
-            this.writableBookContent = null;
-            this.itemName = null;
-            this.unbreakable = null;
-            this.dyedColor = null;
-            this.mapID = null;
+            this.contents = new BundleContents();
+            this.projectiles = new ChargedProjectiles();
+            this.debugStickState = new DebugStickState();
+            this.enchantmentGlintOverride = new EnchantmentGlintOverride(-1);
+            this.potDecorations = new PotDecorations();
+            this.tool = new Tool();
+            this.storedEnchantments = new StoredEnchantments();
+            this.mapColor = new MapColor(-1);
+            this.decorations = new MapDecorations();
+            this.fireworks = new Fireworks();
+            this.recipes = new Recipes();
+            this.potionContents = new PotionContents();
+            this.jukeboxPlayable = new JukeboxPlayable();
+            this.ominousBottleAmplifier = new OminousBottleAmplifier(-1);
+            this.effects = new SuspiciousStewEffects();
+            this.writableBookContent = new WritableBookContent();
+            this.itemName = new ItemName("");
+            this.unbreakable = new Unbreakable();
+            this.dyedColor = new DyedColor(-1);
+            this.mapID = new MapID(-1);
+            this.customName = new CustomName("");
         }
 
         public MapID getMapID() {
@@ -737,7 +784,7 @@ public class Component {
 
         public builder setEnchantmentGlintOverride(boolean enchantmentGlintOverride) {
             if (enchantmentGlintOverride)
-                this.enchantmentGlintOverride.setValue(1);
+                this.enchantmentGlintOverride = new EnchantmentGlintOverride(1);
             return this;
         }
 
@@ -757,7 +804,7 @@ public class Component {
         }
 
         public builder setMapColor(int mapColor) {
-            this.mapColor.setValue(mapColor);
+            this.mapColor = new MapColor(mapColor);
             return this;
         }
 
@@ -787,7 +834,7 @@ public class Component {
         }
 
         public builder setOminousBottleAmplifier(int ominousBottleAmplifier) {
-            this.ominousBottleAmplifier.setValue(ominousBottleAmplifier);
+            this.ominousBottleAmplifier = new OminousBottleAmplifier(ominousBottleAmplifier);
             return this;
         }
 

@@ -52,9 +52,4 @@ public class Tool implements IComponent {
     public int getTypeID() {
         return 22;
     }
-
-    @Override
-    public void read(ByteBuf buf) {
-
-    }
 }
