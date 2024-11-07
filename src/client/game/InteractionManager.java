@@ -80,9 +80,11 @@ public class InteractionManager {
 
     public void lookAt(Vec3d target) {
         Vec3d vec3d = this.player.getHeadPos();
+        //deltas
         double d = target.x - vec3d.x;
         double e = target.y - vec3d.y;
         double f = target.z - vec3d.z;
+        //area distance
         double g = Math.sqrt(d * d + f * f);
 
         this.player.setPitch(MathHelper.wrapDegrees((float)(-(MathHelper.atan2(e, g) * 180.0F / (float)Math.PI))));

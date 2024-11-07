@@ -10,6 +10,7 @@ public class Logger {
     private final boolean isDev;
     private final List<String> logBuffer;
     private final File logFile;
+    private final int flushMinCount;
 
     public Logger(String baseName, int id, boolean dev) {
        this.baseName = baseName;
@@ -18,6 +19,7 @@ public class Logger {
        this.logBuffer = new ArrayList<>();
        this.id = id;
        this.isDev = dev;
+       this.flushMinCount = isDev ? 1 : 10;
     }
 
     public static void sysLog(Object object) {
@@ -31,6 +33,8 @@ public class Logger {
             writer.write(str + '\n');
         }
         logBuffer.clear();
+        writer.flush();
+        writer.close();
     }
 
     public void flush() {
@@ -72,7 +76,7 @@ public class Logger {
     }
 
     public void checkLogBuffer() {
-        if (logBuffer.size() >= 10) flush();
+        if (logBuffer.size() >= flushMinCount) flush();
     }
 
     public String getName() {

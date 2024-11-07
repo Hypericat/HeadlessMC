@@ -7,7 +7,7 @@ public class BundleContents implements IComponent {
 
     @Override
     public IComponent copy() {
-        return null;
+        return new BundleContents();
     }
 
     @Override

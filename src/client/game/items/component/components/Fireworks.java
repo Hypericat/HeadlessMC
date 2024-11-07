@@ -5,7 +5,7 @@ import client.game.items.component.IComponent;
 public class Fireworks implements IComponent {
     @Override
     public IComponent copy() {
-        return null;
+        return new Fireworks();
     }
 
     @Override

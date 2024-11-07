@@ -5,7 +5,7 @@ import client.game.items.component.IComponent;
 public class Recipes implements IComponent {
     @Override
     public IComponent copy() {
-        return null;
+        return new Recipes();
     }
 
     @Override

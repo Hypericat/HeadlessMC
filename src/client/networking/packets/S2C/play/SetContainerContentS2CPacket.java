@@ -49,7 +49,6 @@ public class SetContainerContentS2CPacket extends S2CPacket {
             items.add(ComponentReader.readSlot(buf));
         }
         carriedStack = ComponentReader.readSlot(buf);
-        System.out.println("Updated item : " + items);
     }
 
     public boolean isClientInventory() {

@@ -6,6 +6,8 @@ import client.game.items.component.IComponent;
 import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
 
+import java.util.Arrays;
+
 public class Container implements IComponent {
     private ItemStack[] slots;
     public Container(ItemStack[] slots) {
@@ -13,7 +15,7 @@ public class Container implements IComponent {
     }
     @Override
     public IComponent copy() {
-        return null;
+        return new Container(slots == null ? null : Arrays.copyOf(slots, slots.length));
     }
 
     @Override

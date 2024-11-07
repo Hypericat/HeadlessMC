@@ -7,7 +7,7 @@ public class BannerPatterns implements IComponent {
 
     @Override
     public IComponent copy() {
-        return null;
+        return new BannerPatterns();
     }
 
     @Override

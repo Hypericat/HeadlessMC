@@ -5,7 +5,7 @@ import client.game.items.component.IComponent;
 public class WritableBookContent implements IComponent {
     @Override
     public IComponent copy() {
-        return null;
+        return new WritableBookContent();
     }
 
     @Override

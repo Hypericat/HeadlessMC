@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
 public class Bees implements IComponent {
     @Override
     public IComponent copy() {
-        return null;
+        return new Bees();
     }
 
     @Override

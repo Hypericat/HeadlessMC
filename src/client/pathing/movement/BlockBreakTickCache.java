@@ -30,7 +30,12 @@ public class BlockBreakTickCache {
         for (ItemStack stack : playerInventory.getHotbar()) {
             if (stack == null) continue;
             if (stack.getType() == Items.DIAMOND_PICKAXE) return 10;
+            return getMiningSpeedWithItem(stack.getType(), block);
         }
         return -1;
+    }
+
+    private int getMiningSpeedWithItem(ItemType itemType, Block block) {
+        return Integer.MAX_VALUE;
     }
 }

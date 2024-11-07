@@ -32,7 +32,7 @@ public class MathHelper {
     }
 
     public static double Qrsqrt(double d) {
-        return Qrsqrt(d, 2);
+        return Qrsqrt(d, 1);
     }
 
     public static float Qrsqrt(float f, int accuracy) {

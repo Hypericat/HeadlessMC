@@ -6,7 +6,7 @@ public class DebugStickState implements IComponent {
 
     @Override
     public IComponent copy() {
-        return null;
+        return new DebugStickState();
     }
 
     @Override

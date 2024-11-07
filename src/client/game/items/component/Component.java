@@ -2,14 +2,12 @@ package client.game.items.component;
 
 import client.game.items.component.components.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Component {
     private AttributeModifiers modifiers;
-    private Enchantments enchantments;
+    private EnchantmentsComponent enchantments;
     private Lore lore;
     private MaxStackSize maxStackSize;
     private Rarity rarity;
@@ -48,7 +46,7 @@ public class Component {
 
     public Component(Component component) {
         this.modifiers = (AttributeModifiers) component.modifiers.copy();
-        this.enchantments = (Enchantments) component.enchantments.copy();
+        this.enchantments = (EnchantmentsComponent) component.enchantments.copy();
         this.lore = (Lore) component.lore.copy();
         this.maxStackSize = (MaxStackSize) component.maxStackSize.copy();
         this.rarity = (Rarity) component.rarity.copy();
@@ -78,16 +76,16 @@ public class Component {
         this.effects = (SuspiciousStewEffects) component.effects.copy();
         this.writableBookContent = (WritableBookContent) component.writableBookContent.copy();
         this.customName = (CustomName) component.customName.copy();
-        this.itemName = (ItemName) component.customName.copy();
-        this.unbreakable = (Unbreakable) component.customName.copy();
-        this.dyedColor = (DyedColor) component.customName.copy();
-        this.mapID = (MapID) component.customName.copy();
+        this.itemName = (ItemName) component.itemName.copy();
+        this.unbreakable = (Unbreakable) component.unbreakable.copy();
+        this.dyedColor = (DyedColor) component.dyedColor.copy();
+        this.mapID = (MapID) component.mapID.copy();
         initComponents();
     }
 
     public Component(builder builder) {
         this.modifiers = builder.modifiers;
-        this.enchantments = builder.enchantments;
+        this.enchantments = builder.enchantmentsComponent;
         this.lore = builder.lore;
         this.maxStackSize = builder.maxStackSize;
         this.rarity = builder.rarity;
@@ -116,45 +114,50 @@ public class Component {
         this.ominousBottleAmplifier = builder.ominousBottleAmplifier;
         this.effects = builder.effects;
         this.writableBookContent = builder.writableBookContent;
+        this.customName = builder.customName;
+        this.itemName = builder.itemName;
+        this.unbreakable = builder.unbreakable;
+        this.dyedColor = builder.dyedColor;
+        this.mapID = builder.mapID;
         initComponents();
     }
 
     public void initComponents() {
         components = new HashMap<>();
-        addToComponents(modifiers);
-        addToComponents(enchantments);
-        addToComponents(lore);
-        addToComponents(maxStackSize);
-        addToComponents(rarity);
-        addToComponents(repairCost);
-        addToComponents(fireResistant);
-        addToComponents(food);
-        addToComponents(bucketEntityData);
-        addToComponents(container);
-        addToComponents(bees);
-        addToComponents(bannerPatterns);
-        addToComponents(damage);
-        addToComponents(maxDamage);
-        addToComponents(contents);
-        addToComponents(projectiles);
-        addToComponents(debugStickState);
-        addToComponents(enchantmentGlintOverride);
-        addToComponents(potDecorations);
-        addToComponents(tool);
-        addToComponents(storedEnchantments);
-        addToComponents(mapColor);
-        addToComponents(decorations);
-        addToComponents(fireworks);
-        addToComponents(recipes);
-        addToComponents(potionContents);
-        addToComponents(jukeboxPlayable);
-        addToComponents(ominousBottleAmplifier);
-        addToComponents(effects);
-        addToComponents(writableBookContent);
+        addToComponents(modifiers, "modifiers");
+        addToComponents(enchantments, "enchantments");
+        addToComponents(lore, "lore");
+        addToComponents(maxStackSize, "maxStackSize");
+        addToComponents(rarity, "rarity");
+        addToComponents(repairCost, "repairCost");
+        addToComponents(fireResistant, "fireResistant");
+        addToComponents(food, "food");
+        addToComponents(bucketEntityData, "bucketEntityData");
+        addToComponents(container, "container");
+        addToComponents(bees, "bees");
+        addToComponents(bannerPatterns, "bannerPatterns");
+        addToComponents(damage, "damage");
+        addToComponents(maxDamage, "maxDamage");
+        addToComponents(contents, "contents");
+        addToComponents(projectiles, "projectiles");
+        addToComponents(debugStickState, "debugStickState");
+        addToComponents(enchantmentGlintOverride, "enchantmentGlintOverride");
+        addToComponents(potDecorations, "potDecorations");
+        addToComponents(tool, "tool");
+        addToComponents(storedEnchantments, "storedEnchantments");
+        addToComponents(mapColor, "mapColor");
+        addToComponents(decorations, "decorations");
+        addToComponents(fireworks, "fireworks");
+        addToComponents(recipes, "recipes");
+        addToComponents(potionContents, "potionContents");
+        addToComponents(jukeboxPlayable, "jukeboxPlayable");
+        addToComponents(ominousBottleAmplifier, "ominousBottleAmplifier");
+        addToComponents(effects, "effects");
+        addToComponents(writableBookContent, "writableBookContent");
     }
 
-    private void addToComponents(IComponent component) {
-        if (component == null) return;
+    private void addToComponents(IComponent component, String name) {
+        if (component == null) System.out.println("Component null : " + name);
         if (components.containsKey(component.getTypeID())) throw new RuntimeException();
         if (component.getTypeID() == 0) throw new RuntimeException();
         components.put(component.getTypeID(), component);
@@ -220,12 +223,12 @@ public class Component {
         this.modifiers = modifiers;
     }
 
-    public Enchantments getEnchantments() {
+    public EnchantmentsComponent getEnchantments() {
         return enchantments;
     }
 
-    public void setEnchantments(Enchantments enchantments) {
-        this.enchantments = enchantments;
+    public void setEnchantments(EnchantmentsComponent enchantmentsComponent) {
+        this.enchantments = enchantmentsComponent;
     }
 
     public Lore getLore() {
@@ -458,7 +461,7 @@ public class Component {
 
     public static class builder {
         private AttributeModifiers modifiers;
-        private Enchantments enchantments;
+        private EnchantmentsComponent enchantmentsComponent;
         private Lore lore;
         private MaxStackSize maxStackSize;
         private Rarity rarity;
@@ -495,7 +498,7 @@ public class Component {
 
         public builder() {
             this.modifiers = new AttributeModifiers();
-            this.enchantments = new Enchantments();
+            this.enchantmentsComponent = new EnchantmentsComponent();
             this.lore = new Lore();
             this.maxStackSize = new MaxStackSize(64);
             this.rarity = Rarity.COMMON;
@@ -579,8 +582,8 @@ public class Component {
             return modifiers;
         }
 
-        public Enchantments getEnchantments() {
-            return enchantments;
+        public EnchantmentsComponent getEnchantments() {
+            return enchantmentsComponent;
         }
 
         public Lore getLore() {
@@ -700,8 +703,8 @@ public class Component {
             return this;
         }
 
-        public builder setEnchantments(Enchantments enchantments) {
-            this.enchantments = enchantments;
+        public builder setEnchantments(EnchantmentsComponent enchantmentsComponent) {
+            this.enchantmentsComponent = enchantmentsComponent;
             return this;
         }
 
