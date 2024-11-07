@@ -2,7 +2,9 @@ package client.game.items.component.components;
 
 import client.game.items.component.IComponent;
 import client.game.items.component.ToolRule;
+import io.netty.buffer.ByteBuf;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,18 +35,26 @@ public class Tool implements IComponent {
         return rules;
     }
 
-    public void addRule() {
-
+    public void addRule(ToolRule rule) {
+        this.rules.add(rule);
     }
 
     @Override
     public IComponent copy() {
-        List<ToolRule>
-        return new Tool(rules);
+        List<ToolRule> newRules = new ArrayList<>();
+        for (ToolRule rule : rules) {
+            newRules.add(new ToolRule(rule));
+        }
+        return new Tool(newRules);
     }
 
     @Override
     public int getTypeID() {
         return 22;
+    }
+
+    @Override
+    public void read(ByteBuf buf) {
+
     }
 }

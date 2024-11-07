@@ -39,6 +39,12 @@ public class Component {
     private SuspiciousStewEffects effects;
     private WritableBookContent writableBookContent;
 
+    private CustomName customName;
+    private ItemName itemName;
+    private Unbreakable unbreakable;
+    private DyedColor dyedColor;
+    private MapID mapID;
+
     private HashMap<Integer, IComponent> components;
 
     public Component(Component component) {
@@ -435,6 +441,11 @@ public class Component {
         private OminousBottleAmplifier ominousBottleAmplifier;
         private SuspiciousStewEffects effects;
         private WritableBookContent writableBookContent;
+        private CustomName customName;
+        private ItemName itemName;
+        private Unbreakable unbreakable;
+        private DyedColor dyedColor;
+        private MapID mapID;
 
         public builder() {
             this.modifiers = null;
@@ -454,19 +465,67 @@ public class Component {
             this.contents = null;
             this.projectiles = null;
             this.debugStickState = null;
-            this.enchantmentGlintOverride = new EnchantmentGlintOverride(0);
+            this.enchantmentGlintOverride = null;
             this.potDecorations = null;
             this.tool = null;
             this.storedEnchantments = null;
-            this.mapColor = new MapColor(-1);
+            this.mapColor = null;
             this.decorations = null;
             this.fireworks = null;
             this.recipes = null;
             this.potionContents = null;
             this.jukeboxPlayable = null;
-            this.ominousBottleAmplifier = new OminousBottleAmplifier(-1);
+            this.ominousBottleAmplifier = null;
             this.effects = null;
             this.writableBookContent = null;
+            this.itemName = null;
+            this.unbreakable = null;
+            this.dyedColor = null;
+            this.mapID = null;
+        }
+
+        public MapID getMapID() {
+            return mapID;
+        }
+
+        public void setMapID(int mapID) {
+            this.mapID = new MapID(mapID);
+        }
+
+        public DyedColor getDyedColor() {
+            return dyedColor;
+        }
+
+        public void setDyedColor(DyedColor dyedColor) {
+            this.dyedColor = dyedColor;
+        }
+
+        public Unbreakable getUnbreakable() {
+            return unbreakable;
+        }
+
+        public void setUnbreakable(boolean unbreakable) {
+            if (this.unbreakable == null == !unbreakable) return;
+            if (unbreakable)
+                this.unbreakable = new Unbreakable();
+            else
+                this.unbreakable = null;
+        }
+
+        public ItemName getItemName() {
+            return itemName;
+        }
+
+        public void setItemName(String name) {
+            this.itemName = new ItemName(name);
+        }
+
+        public CustomName getCustomName() {
+            return customName;
+        }
+
+        public void setCustomName(String name) {
+            this.customName = new CustomName(name);
         }
 
         public AttributeModifiers getModifiers() {

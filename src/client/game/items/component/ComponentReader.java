@@ -23,11 +23,11 @@ public class ComponentReader {
             removeValues(type, remove, buf);
         } catch (IllegalStateException ex) {
             System.err.println("ReadSlot was given item with add/remove components which is not supported at the moment. The item was : " + type.getIdentifier());
+
+            ex.printStackTrace();
+
             return new ItemStack(type, itemCount);
         }
-
-
-
         return new ItemStack(type, itemCount);
     }
 
@@ -35,7 +35,7 @@ public class ComponentReader {
         for (int i = 0; i < amountToAdd; i++) {
             int componentID = PacketUtil.readVarInt(buf);
             baseType.getComponent().getComponentByID(componentID).read(buf);
-        }dgerfewfewed
+        }
     }
 
     public static void removeValues(ItemType baseType, int amountToRemove, ByteBuf buf) {

@@ -20,6 +20,12 @@ public class ToolRule {
         this.speed = speed;
     }
 
+    public ToolRule(ToolRule rule) {
+        this.affectedBlocks = new ArrayList<>(rule.affectedBlocks);
+        this.correctForDrops = rule.correctForDrops;
+        this.speed = rule.speed;
+    }
+
     public List<String> getAffectedBlocks() {
         return affectedBlocks;
     }
