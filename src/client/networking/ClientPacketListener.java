@@ -38,6 +38,7 @@ public interface ClientPacketListener extends PacketListener {
     void onSetContainerSlot(SetContainerSlotS2CPacket packet);
     void onBlockSectionUpdate(UpdateBlockSectionS2CPacket packet);
     void onSetEntityVelocity(SetEntityVelocityS2CPacket packet);
+    void onUnloadChunk(UnloadChunkS2CPacket packet);
 
 
 }

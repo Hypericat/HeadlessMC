@@ -1,10 +1,10 @@
-package commands.command;
+package client.commands.command;
 
 import client.HeadlessInstance;
-import commands.Command;
-import commands.CommandSyntax;
-import commands.MultipleArgument;
-import commands.StringArgument;
+import client.commands.Command;
+import client.commands.CommandSyntax;
+import client.commands.MultipleArgument;
+import client.commands.StringArgument;
 
 import java.util.List;
 

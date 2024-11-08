@@ -211,7 +211,13 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onSetEntityVelocity(SetEntityVelocityS2CPacket packet) {
+        if (instance.getPlayer().isPathfinding()) return;
         if (packet.getEntityID() != instance.getPlayer().getEntityID()) return;
         instance.getPlayer().setVelocity(packet.getX(), packet.getY(), packet.getZ());
+    }
+
+    @Override
+    public void onUnloadChunk(UnloadChunkS2CPacket packet) {
+        instance.getWorld().unloadChunkAt(packet.getChunkX(), packet.getChunkZ());
     }
 }

@@ -1,4 +1,4 @@
-package commands;
+package client.commands;
 
 import client.game.Block;
 import client.game.Blocks;

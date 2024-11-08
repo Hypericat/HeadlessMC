@@ -29,13 +29,15 @@ public class BlockBreakTickCache {
     private int getMiningTickCount0(CalculationContext ctx, Block block, boolean includeFalling) {
         for (ItemStack stack : playerInventory.getHotbar()) {
             if (stack == null) continue;
-            if (stack.getType() == Items.DIAMOND_PICKAXE) return 10;
             return getMiningSpeedWithItem(stack.getType(), block);
         }
-        return -1;
+        return Integer.MAX_VALUE;
     }
 
     private int getMiningSpeedWithItem(ItemType itemType, Block block) {
+        if (itemType.getIdentifier().hashCode() == Items.DIAMOND_PICKAXE.getIdentifier().hashCode()) {
+            return 5;
+        }
         return Integer.MAX_VALUE;
     }
 }

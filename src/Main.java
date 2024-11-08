@@ -1,6 +1,6 @@
 import client.HeadlessInstance;
 import client.game.Block;
-import commands.TerminalHandler;
+import client.commands.TerminalHandler;
 import math.Pair;
 
 import java.util.ArrayList;

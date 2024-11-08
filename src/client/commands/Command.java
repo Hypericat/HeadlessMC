@@ -1,4 +1,4 @@
-package commands;
+package client.commands;
 
 import client.HeadlessInstance;
 import client.Logger;

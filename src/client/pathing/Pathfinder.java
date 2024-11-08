@@ -37,7 +37,7 @@ public class Pathfinder {
     protected IPath calculate() {
         if (isFinished) throw new UnsupportedOperationException("Pathfinder cannot be reused!");
 
-        IPath path = getPath(4000L, 5000L).orElse(null);
+        IPath path = getPath(4000L, 20000L).orElse(null);
         this.isFinished = true;
         if (path == null) return null;
         int prevLength = path.length();

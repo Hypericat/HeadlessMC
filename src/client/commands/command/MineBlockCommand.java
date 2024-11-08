@@ -1,9 +1,8 @@
-package commands.command;
+package client.commands.command;
 
 import client.HeadlessInstance;
 import client.game.Block;
-import commands.*;
-import math.Vec3i;
+import client.commands.*;
 
 import java.util.List;
 

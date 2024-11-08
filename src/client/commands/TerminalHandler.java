@@ -1,10 +1,10 @@
-package commands;
+package client.commands;
 
 import client.HeadlessInstance;
-import commands.command.GotoCommand;
-import commands.command.MineBlockCommand;
-import commands.command.SayCommand;
-import commands.command.StopCommand;
+import client.commands.command.GotoCommand;
+import client.commands.command.MineBlockCommand;
+import client.commands.command.SayCommand;
+import client.commands.command.StopCommand;
 
 import java.util.ArrayList;
 import java.util.List;

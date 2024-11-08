@@ -8,7 +8,7 @@ import client.networking.NetworkState;
 import client.networking.packets.C2S.configuration.HandShakeC2SPacket;
 import client.networking.packets.C2S.configuration.LoginStartC2SPacket;
 import client.utils.UUID;
-import commands.TerminalHandler;
+import client.commands.TerminalHandler;
 
 public class HeadlessInstance implements Runnable {
 

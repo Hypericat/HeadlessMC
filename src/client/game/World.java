@@ -118,6 +118,18 @@ public class World implements IWorldProvider {
         entities.put(id, entity);
     }
 
+    public void unloadChunkAt(int chunkX, int chunkZ) {
+        long hash = getHash(chunkX, chunkZ);
+        if (!chunks.containsKey(hash)) return;
+        Chunk chunk = chunks.get(hash);
+        // I know this is slow, I don't care
+        for (Vec3i blockPos : chunk.getAllBlocksSatisfy(pair -> cached.keySet().stream().toList().contains(pair.getLeft()))) {
+            cached.get(getBlock(blockPos)).remove(blockPos);
+        }
+        chunks.remove(hash);
+        instance.getLogger().logToFile("Unloaded chunk at : " + chunkX  + ", " + chunkZ);
+    }
+
     public void removeEntity(Entity entity) {
         removeEntity(entity.getEntityID());
     }

@@ -62,8 +62,6 @@ public class Chunk {
             });
             blocks.addAll(containerBlocks);
         }
-
-
         return blocks;
     }
 

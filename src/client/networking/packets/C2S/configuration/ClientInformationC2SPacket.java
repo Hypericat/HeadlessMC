@@ -12,7 +12,7 @@ public class ClientInformationC2SPacket extends C2SPacket {
 
     private String locale;
     byte viewDistance;
-    int chatMode; //0 for enabled, 1 for commands only, 2 for hidden
+    int chatMode; //0 for enabled, 1 for client.commands only, 2 for hidden
     boolean chatColors;
     byte skinParts;
     int mainHand;

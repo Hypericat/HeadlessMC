@@ -60,7 +60,7 @@ public class ClientPlayerEntity extends PlayerEntity {
         boolean attackPlayers = false;
 
         for (Entity e : getInstance().getWorld().getEntitiesWithin(getBoundingBox().getCenter().add(getHeadPos()), 4d)) {
-            if ((e instanceof LivingEntity living) && (living.getEntityType().getEntityClass() != EntityTypes.PLAYER.getEntityClass() || attackPlayers) && attackCooldown <= 0) {
+            if ((e instanceof LivingEntity living) && (living.getEntityType().getType() != EntityTypes.PLAYER.getType() || attackPlayers) && attackCooldown <= 0) {
                 getInstance().getInteractionManager().attackEntity(e);
                 getInstance().getInteractionManager().lookAt(e);
                 return;

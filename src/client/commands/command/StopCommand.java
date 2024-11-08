@@ -1,11 +1,8 @@
-package commands.command;
+package client.commands.command;
 
 import client.HeadlessInstance;
-import client.game.Block;
-import commands.BlockArgument;
-import commands.Command;
-import commands.CommandSyntax;
-import commands.MultipleArgument;
+import client.commands.Command;
+import client.commands.CommandSyntax;
 
 import java.util.List;
 
