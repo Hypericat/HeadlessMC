@@ -48,14 +48,15 @@ public class Chunk {
         chunkSections.get(index).fillAtIDs(blocks);
     }
 
-    public List<MutableVec3i> getAllBlocksSatisfy(Predicate<Pair<Block, Vec3i>> predicate) {
-        List<MutableVec3i> blocks = new ArrayList<>();
+    public List<Pair<Block, MutableVec3i>> getAllBlocksSatisfy(Predicate<Pair<Block, Vec3i>> predicate) {
+        List<Pair<Block, MutableVec3i>> blocks = new ArrayList<>();
         int chunkXOffset = chunkX << 4;
         int chunkZOffset = chunkZ << 4;
 
         for (ChunkSectionContainer container : chunkSections) {
-            List<MutableVec3i> containerBlocks = container.getAllLocalBlocksSatisfy(predicate);
-            containerBlocks.forEach(vec3i -> {
+            List<Pair<Block, MutableVec3i>> containerBlocks = container.getAllLocalBlocksSatisfy(predicate);
+            containerBlocks.forEach(pair -> {
+                MutableVec3i vec3i = pair.getRight();
                 vec3i.addY(container.getY() - 64 - 16);
                 vec3i.addX(chunkXOffset);
                 vec3i.addZ(chunkZOffset);

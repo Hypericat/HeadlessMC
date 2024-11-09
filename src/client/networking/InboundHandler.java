@@ -2,6 +2,7 @@ package client.networking;
 
 import client.HeadlessInstance;
 import client.Logger;
+import client.networking.packets.PacketID;
 import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.*;
 import client.networking.packets.S2C.configuration.*;
@@ -166,8 +167,9 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     private void initPacketMap() {
-        //login / configuration
         packetMap = new HashMap<>();
+
+        //login / configuration
         packetMap.put(StatusResponseS2CPacket.packetID.getOffset(), StatusResponseS2CPacket.class);
         packetMap.put(CompressionRequestS2CPacket.packetID.getOffset(), CompressionRequestS2CPacket.class);
         packetMap.put(LoginSuccessS2CPacket.packetID.getOffset(), LoginSuccessS2CPacket.class);
@@ -198,5 +200,6 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         packetMap.put(SetContainerContentS2CPacket.packetID.getOffset(), SetContainerContentS2CPacket.class);
         packetMap.put(SetContainerSlotS2CPacket.packetID.getOffset(), SetContainerSlotS2CPacket.class);
         packetMap.put(PlayerChatMessageS2C.packetID.getOffset(), PlayerChatMessageS2C.class);
+        packetMap.put(UnloadChunkS2CPacket.packetID.getOffset(), UnloadChunkS2CPacket.class);
     }
 }

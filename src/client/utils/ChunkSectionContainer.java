@@ -72,9 +72,6 @@ public class ChunkSectionContainer {
     }
 
 
-    // I want to kill myself he ehe he fucking hell
-    // WHY WHAT
-    // WHY IS THIS HAAFSFDSAF
     public int getIdAt(int x, int y, int z) {
         if (simpleID == -1 && data == null) throw new RuntimeException("Both Simple ID and Data have no data!");
         if (simpleID != -1) return simpleID;
@@ -172,14 +169,15 @@ public class ChunkSectionContainer {
         simpleID = -1;
     }
 
-    public List<MutableVec3i> getAllLocalBlocksSatisfy(Predicate<Pair<Block, Vec3i>> predicate) {
-        List<MutableVec3i> blocks =  new ArrayList<>();
+    public List<Pair<Block, MutableVec3i>> getAllLocalBlocksSatisfy(Predicate<Pair<Block, Vec3i>> predicate) {
+        List<Pair<Block, MutableVec3i>> blocks = new ArrayList<>();
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 for (int y = 0; y < 16; y++) {
                     MutableVec3i pos = new MutableVec3i(x, y, z);
-                    if (predicate.test(new Pair<>(Blocks.getBlockByID(getIdAt(x, y, z)), pos))) {
-                        blocks.add(pos);
+                    Block block = Blocks.getBlockByID(getIdAt(x, y, z));
+                    if (predicate.test(new Pair<>(block, pos))) {
+                        blocks.add(new Pair<>(block, pos));
                     }
                 }
             }

@@ -35,6 +35,7 @@ public class BlockBreakTickCache {
     }
 
     private int getMiningSpeedWithItem(ItemType itemType, Block block) {
+
         if (itemType.getIdentifier().hashCode() == Items.DIAMOND_PICKAXE.getIdentifier().hashCode()) {
             return 5;
         }

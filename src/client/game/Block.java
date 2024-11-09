@@ -211,7 +211,7 @@ public class Block {
     }
 
     public boolean isUnbreakable() {
-        return this == Blocks.BEDROCK || this == Blocks.COMMAND_BLOCK || this == Blocks.STRUCTURE_BLOCK;
+        return this == Blocks.BEDROCK || this == Blocks.COMMAND_BLOCK || this == Blocks.STRUCTURE_BLOCK || this == Blocks.WATER || this == Blocks.LAVA;
     }
 
     public String getNameNoPrefix() {

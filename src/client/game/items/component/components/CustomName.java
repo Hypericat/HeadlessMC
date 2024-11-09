@@ -17,7 +17,7 @@ public class CustomName implements IComponent {
 
     @Override
     public int getTypeID() {
-        return 4;
+        return 5;
     }
 
     @Override

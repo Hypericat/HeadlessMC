@@ -139,18 +139,17 @@ public class InteractionManager {
         List<Vec3i> positions = new ArrayList<>();
         StringBuilder blockNames = new StringBuilder();
         for (Block block : blockTypes) {
-            instance.getWorld().cacheIfNotPresent(block);
             positions.addAll(instance.getWorld().findCachedBlock(block));
             blockNames.append(block.getNameNoPrefix()).append(", ");
         }
-        instance.getLogger().logUser("Found " + blockTypes.size() + " " + blockNames.substring(0, blockNames.length() - 2) + " blocks!");
+        instance.getLogger().logUser("Found " + positions.size() + " " + blockNames.substring(0, blockNames.length() - 2) + " blocks!");
 
         if (positions.isEmpty()) {
             instance.getLogger().logUser("No blocks found, canceling pathing!");
             return;
         }
 
-        instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalMineBlock(blockTypes, instance.getWorld()), instance));
+        instance.getPlayer().setPathfinderExecutor(new PathfinderExecutor(new GoalMineBlock(blockTypes, instance.getWorld(), instance.getPlayer().getBlockPos()), instance));
     }
 
     public void pathfindMineForBlocks(Block ... blocks) {

@@ -17,7 +17,7 @@ public class Lore implements IComponent {
 
     @Override
     public int getTypeID() {
-        return 6;
+        return 7;
     }
 
     @Override

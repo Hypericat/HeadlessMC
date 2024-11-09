@@ -154,11 +154,15 @@ public class Component {
         addToComponents(ominousBottleAmplifier, "ominousBottleAmplifier");
         addToComponents(effects, "effects");
         addToComponents(writableBookContent, "writableBookContent");
+        addToComponents(customName, "customName");
+        addToComponents(itemName, "itemName");
+        addToComponents(unbreakable, "unbreakable");
+        addToComponents(dyedColor, "dyedColor");
+        addToComponents(mapID, "mapID");
     }
 
     private void addToComponents(IComponent component, String name) {
-        if (component == null) System.out.println("Component null : " + name);
-        if (components.containsKey(component.getTypeID())) throw new RuntimeException();
+        if (components.containsKey(component.getTypeID())) throw new RuntimeException("Duplicated component id : " + component.getTypeID() + " name : " + name);
         if (component.getTypeID() == 0) throw new RuntimeException();
         components.put(component.getTypeID(), component);
     }

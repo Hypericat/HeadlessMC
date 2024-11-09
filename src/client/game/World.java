@@ -2,21 +2,21 @@ package client.game;
 
 import client.HeadlessInstance;
 import client.pathing.IWorldProvider;
+import client.utils.Timer;
 import client.utils.UUID;
+import math.MutableVec3i;
 import math.Pair;
 import math.Vec3d;
 import math.Vec3i;
 
-import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 
 public class World implements IWorldProvider {
     private final int maxHeight;
     HashMap<Long, Chunk> chunks = new HashMap<>();
-    private final HashMap<Block, List<Vec3i>> cached = new HashMap<>();
+    private final HashMap<Block, HashMap<Long, Vec3i>> cached = new HashMap<>();
     private final HashMap<Integer, Entity> entities = new HashMap<>();
     private final HeadlessInstance instance;
 
@@ -41,9 +41,21 @@ public class World implements IWorldProvider {
     }
 
     public void addChunk(Chunk chunk) {
+        int timer = Timer.start();
+
         long hash = getHash(chunk);
-        chunks.remove(hash);
+        if (chunks.containsKey(hash))
+            unloadChunk(chunks.get(hash), hash);
+
+        HashSet<Block> cachedKeys = new HashSet<>(cached.keySet());
+        // Holy O(n)
+        for (Pair<Block, MutableVec3i> pair : chunk.getAllBlocksSatisfy(pair -> cachedKeys.contains(pair.getLeft()))) {
+            Vec3i blockPos = pair.getRight();
+            cached.get(pair.getLeft()).put(blockPos.longHash(), blockPos);
+        }
         chunks.put(hash, chunk);
+
+        Timer.end(timer);
     }
 
     public Chunk getChunkAtCord(int x, int z) {
@@ -78,22 +90,19 @@ public class World implements IWorldProvider {
         Chunk chunk = getChunkAtCord(x, z);
         if (chunk == null) return;
         Vec3i currentBlock = new Vec3i(x, y, z);
-        //update cache for current block
-        if (cached.containsKey(block)) {
-            cached.get(block).add(currentBlock);
-        }
 
         //update cache for replaced block
         Block replaceBlock = getBlock(currentBlock);
         if (cached.containsKey(replaceBlock)) {
-            List<Vec3i> cache = cached.get(replaceBlock);
-            for (int i = 0; i < cache.size(); i++) {
-                if (cache.get(i).equals(currentBlock)) {
-                    cache.remove(i);
-                    i--;
-                }
-            }
+            cached.get(replaceBlock).remove(currentBlock.longHash());
         }
+
+        //update cache for current block
+        if (cached.containsKey(block)) {
+            cached.get(block).put(currentBlock.longHash(), currentBlock);
+        }
+
+
 
         chunk.setBlockAt(Math.floorMod(x, 16), y, (Math.floorMod(z, 16)), block);
     }
@@ -120,14 +129,24 @@ public class World implements IWorldProvider {
 
     public void unloadChunkAt(int chunkX, int chunkZ) {
         long hash = getHash(chunkX, chunkZ);
-        if (!chunks.containsKey(hash)) return;
-        Chunk chunk = chunks.get(hash);
-        // I know this is slow, I don't care
-        for (Vec3i blockPos : chunk.getAllBlocksSatisfy(pair -> cached.keySet().stream().toList().contains(pair.getLeft()))) {
-            cached.get(getBlock(blockPos)).remove(blockPos);
+        if (!chunks.containsKey(getHash(chunkX, chunkZ))) return;
+        unloadChunk(chunks.get(hash), hash);
+    }
+
+    public void unloadChunk(Chunk chunk, long hash) {
+        HashSet<Block> cachedKeys = new HashSet<>(cached.keySet());
+        // Holy O(n)
+        for (Pair<Block, MutableVec3i> pair : chunk.getAllBlocksSatisfy(pair -> cachedKeys.contains(pair.getLeft()))) {
+            cached.get(pair.getLeft()).remove(pair.getRight().longHash());
         }
         chunks.remove(hash);
-        instance.getLogger().logToFile("Unloaded chunk at : " + chunkX  + ", " + chunkZ);
+        System.out.println("Cached count : " + countCached());
+    }
+
+    public long countCached() {
+        AtomicLong count = new AtomicLong(0);
+        cached.values().forEach(longVec3iHashMap -> count.addAndGet(longVec3iHashMap.size()));
+        return count.get();
     }
 
     public void removeEntity(Entity entity) {
@@ -169,18 +188,19 @@ public class World implements IWorldProvider {
 
     public void cacheIfNotPresent(Block block) {
         if (cached.containsKey(block)) return;
-        List<Vec3i> blocks = getAllBlocksSatisfy(blockVec3iPair -> blockVec3iPair.getLeft() == block);
+        HashMap<Long, Vec3i> blocks = getAllBlocksSatisfy(blockVec3iPair -> blockVec3iPair.getLeft() == block);
         cached.put(block, blocks);
     }
 
     public List<Vec3i> findCachedBlock(Block block) {
         cacheIfNotPresent(block);
-        return cached.get(block);
+        System.out.println("There are : " +  cached.get(block).values().size() + " " + block.getName());
+        return cached.get(block).values().stream().toList();
     }
 
-    public List<Vec3i> getAllBlocksSatisfy(Predicate<Pair<Block, Vec3i>> predicate) {
-        List<Vec3i> blocks = new ArrayList<>();
-        chunks.values().forEach(chunk -> blocks.addAll(chunk.getAllBlocksSatisfy(predicate)));
+    public HashMap<Long, Vec3i> getAllBlocksSatisfy(Predicate<Pair<Block, Vec3i>> predicate) {
+        HashMap<Long, Vec3i> blocks = new HashMap<>();
+        chunks.values().forEach(chunk -> chunk.getAllBlocksSatisfy(predicate).forEach(pair -> blocks.put(pair.getRight().longHash(), pair.getRight().toVec3i())));
         return blocks;
     }
 

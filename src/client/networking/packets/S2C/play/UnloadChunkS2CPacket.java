@@ -2,6 +2,7 @@ package client.networking.packets.S2C.play;
 
 import client.game.Chunk;
 import client.networking.ClientPacketListener;
+import client.networking.InboundHandler;
 import client.networking.packets.PacketID;
 import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
@@ -44,4 +45,5 @@ public class UnloadChunkS2CPacket extends S2CPacket {
     public int getChunkZ() {
         return chunkZ;
     }
+
 }
