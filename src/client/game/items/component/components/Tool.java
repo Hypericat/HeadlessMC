@@ -1,15 +1,12 @@
 package client.game.items.component.components;
 
 import client.game.Block;
-import client.game.items.BlockSet;
 import client.game.items.component.IComponent;
 import client.game.items.component.ToolRule;
-import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 public class Tool implements IComponent {
     private final List<ToolRule> rules;

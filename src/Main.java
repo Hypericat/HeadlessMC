@@ -25,17 +25,6 @@ public class Main {
         makeInstances("Winston", "127.0.0.1", 1);
         //makeInstance("Winston", "192.168.2.226", 1);
 
-        float axe = Items.DIAMOND_AXE.getComponent().getTool().getSpeedAgainstBlock(Blocks.OAK_LOG);
-        float pickaxe = Items.DIAMOND_PICKAXE.getComponent().getTool().getSpeedAgainstBlock(Blocks.OAK_LOG);
-
-        //int axe = BlockBreakTickCache.getMiningTickCount(Items.DIAMOND_AXE, Blocks.OAK_LOG);
-        //int pickaxe = BlockBreakTickCache.getMiningTickCount(Items.DIAMOND_PICKAXE, Blocks.OAK_LOG);
-        System.out.println("AXE : " + axe + " ticks!");
-        System.out.println("PICKAXE : " + pickaxe + " ticks!");
-
-
-
-
         //don't remove this
         Block.initCollisions();
 

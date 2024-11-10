@@ -1,6 +1,8 @@
 package client.pathing.movement;
 
 import client.game.Block;
+import client.game.BlockSet;
+import client.game.BlockSets;
 import client.game.Blocks;
 import client.game.inventory.Inventory;
 import client.game.inventory.LivingInventory;
@@ -11,6 +13,7 @@ import math.Pair;
 import math.Vec3i;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 public class BlockBreakTickCache {
     private final LivingInventory playerInventory;
@@ -41,12 +44,13 @@ public class BlockBreakTickCache {
             ItemStack stack = playerInventory.getHotbar().get(i);
             if (stack == null) continue;
             int speed = getMiningTickCount(stack.getType(), block);
+            System.out.println("speed to mine " + block + " with " + stack + " is " + speed);
+            if (speed < 0) continue;
             if (speed < bestSpeed) {
                 bestSpeed = speed;
                 bestSlot = i;
             }
         }
-        System.out.println("Found best item : " + playerInventory.getHotbar().get(bestSlot) + " for block : " + block + " speed : " + bestSpeed + " ticks");
         return new Pair<>(bestSlot, bestSpeed);
     }
 
@@ -55,7 +59,9 @@ public class BlockBreakTickCache {
     }
 
     public static int getMiningTickCount(ItemType itemType, Block  block) {
-        return (int) Math.ceil(1f / getStrengthVsBlock(itemType, block));
+        float strength = getStrengthVsBlock(itemType, block);
+        if (strength < 0) return -1;
+        return (int) Math.max(Math.round(1f / strength), 0);
     }
 
     public static float getStrengthVsBlock(ItemType itemType, Block block) {
@@ -70,6 +76,16 @@ public class BlockBreakTickCache {
         }
         speed /= hardness;
         return speed / 30;
+    }
+
+    public static float getSpeed(ItemType itemType, Block block) {
+        float speed = itemType.getComponent().getTool().getSpeedAgainstBlock(block);
+        if (speed > 1f && itemType.getComponent().getEnchantments().hasEnchantment(EnchantmentTypes.EFFICIENCY)) {
+            int level = itemType.getComponent().getEnchantments().getByType(EnchantmentTypes.EFFICIENCY).getLevel();
+            if (level > 0)
+                speed += level * level + 1;
+        }
+        return speed;
     }
 
 }

@@ -6,7 +6,7 @@ import math.Vec3d;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class Block {
+public class Block implements BlockTypeList {
     private final String name;
     private final String type;
     private final BlockProperties properties;
@@ -58,7 +58,7 @@ public class Block {
     }
 
     public static void initCollisions() {
-        noCollision.add(Blocks.WATER); // For now put water
+        //noCollision.add(Blocks.WATER); // For now put water
 
         noCollision.add(Blocks.AIR);
         noCollision.add(Blocks.OAK_SAPLING);
@@ -224,6 +224,7 @@ public class Block {
         return this.getName().substring(10);
     }
 
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         boolean wasLastSpace = true;
@@ -236,5 +237,10 @@ public class Block {
             builder.append(c);
         }
         return builder.toString();
+    }
+
+    @Override
+    public Block[] getBlocks() {
+        return new Block[] {this};
     }
 }

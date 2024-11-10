@@ -136,7 +136,6 @@ public class World implements IWorldProvider {
             cached.get(pair.getLeft()).remove(pair.getRight().longHash());
         }
         chunks.remove(hash);
-        System.out.println("Cached count : " + countCached());
     }
 
     public long countCached() {

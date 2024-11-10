@@ -67,9 +67,14 @@ public class InteractionManager {
         instance.getNetworkHandler().sendPacket(new ConfirmTeleportationC2SPacket(packet.getTeleportID()));
 
 
-        if (instance.getPlayer().getPathFinderExecutor() != null && oldPos.squaredDistanceTo(player.getPos()) > PATHFINDING_MAX_RESET_POSITION_DELTA_SQUARED) {
-            instance.getLogger().logUser("Cancelling Pathfinding because the server reset client position!");
-            instance.getPlayer().setPathfinderExecutor(null);
+        if (instance.getPlayer().getPathFinderExecutor() != null) {
+            /*
+            if (oldPos.squaredDistanceTo(player.getPos()) > PATHFINDING_MAX_RESET_POSITION_DELTA_SQUARED) {
+                instance.getLogger().logUser("Cancelling Pathfinding because the server reset client position!");
+                instance.getPlayer().setPathfinderExecutor(null);
+            }
+             */
+            instance.getPlayer().getPathFinderExecutor().resetPathfind();
         }
     }
 

@@ -1,18 +1,18 @@
-package client.game.items;
-
-import client.game.Block;
+package client.game;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class BlockSet {
+public class BlockSet implements BlockTypeList {
     private final String tag;
     private final HashSet<Block> blocks;
 
-    public BlockSet(String tag, Block ... blocks) {
+    public BlockSet(String tag, BlockTypeList ... blocks) {
         this.tag = tag;
         this.blocks = new HashSet<>();
-        this.blocks.addAll(Arrays.asList(blocks));
+        for (BlockTypeList block : blocks) {
+            this.blocks.addAll(Arrays.asList(block.getBlocks()));
+        }
     }
 
     public BlockSet(String tag) {
@@ -38,4 +38,8 @@ public class BlockSet {
         return s.toString();
     }
 
+    @Override
+    public Block[] getBlocks() {
+        return blocks.toArray(new Block[blocks.size()]);
+    }
 }

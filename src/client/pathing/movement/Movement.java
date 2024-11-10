@@ -51,7 +51,7 @@ public abstract class Movement {
         if (block.isFluid()) return ActionCosts.COST_INF;
         if (block.isUnbreakable()) return ActionCosts.COST_INF;
         int tickDuration = ctx.getBlockBreakTickCache().getMiningSpeedWithBestItem(ctx, block, includeFalling);
-        if (tickDuration <= 0) return ActionCosts.COST_INF;
+        if (tickDuration < 0) return ActionCosts.COST_INF;
         return tickDuration + ActionCosts.MINE_PENALTY;
     }
 

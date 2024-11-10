@@ -2,8 +2,8 @@ package client.game.items.component;
 
 import client.game.Block;
 import client.game.Blocks;
-import client.game.items.BlockSet;
-import client.game.items.BlockSets;
+import client.game.BlockSet;
+import client.game.BlockSets;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -21,9 +21,9 @@ public class PathfinderExecutor {
     private final HeadlessInstance instance;
     private final boolean drawing;
 
-    public static final float IDLE_DOWN_VELOCITY = 0.01f;
+    public static final float IDLE_DOWN_VELOCITY = 0.03f;
 
-    public static final int MAX_RETRY = 3;
+    public static final int MAX_RETRY = 1;
 
 
     public PathfinderExecutor(Goal goal, HeadlessInstance instance) {
@@ -40,6 +40,11 @@ public class PathfinderExecutor {
 
     public static PathfinderExecutor draw(Goal goal, HeadlessInstance instance) {
         return new PathfinderExecutor(goal, instance, true);
+    }
+
+    public void resetPathfind() {
+        readyMove = false;
+        runPathFinderThread();
     }
 
     private void nextPath() {
@@ -88,13 +93,13 @@ public class PathfinderExecutor {
         Vec3i headBlock = feetBlock.addY(1);
         if (instance.getWorld().getBlock(feetBlock).hasCollision()) {
             instance.getInteractionManager().mineWithBestSlot(feetBlock);
-            System.out.println("Block is full : " + feetBlock + " block is : " + instance.getWorld().getBlock(feetBlock));
+            //System.out.println("Block is full : " + feetBlock + " block is : " + instance.getWorld().getBlock(feetBlock));
             return;
         }
         if (instance.getWorld().getBlock(headBlock).hasCollision()) {
             instance.getInteractionManager().mineWithBestSlot(headBlock);
             instance.getPlayer().setVelocity(Vec3d.ZERO.setY(-IDLE_DOWN_VELOCITY));
-            System.out.println("Block is full : " + headBlock + " block is : " + instance.getWorld().getBlock(headBlock));
+            //System.out.println("Block is full : " + headBlock + " block is : " + instance.getWorld().getBlock(headBlock));
             return;
         }
         instance.getPlayer().setPos(Vec3d.fromBlock(positions.get(positionIndex)));
@@ -105,6 +110,7 @@ public class PathfinderExecutor {
         nextPath();
         if (isLast && positionIndex >= positions.size()) {
             this.isFinished = !goal.next();
+            //this should be nextPath()
             if (!this.isFinished) findNextPath();
         }
     }

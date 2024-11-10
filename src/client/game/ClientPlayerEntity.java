@@ -32,6 +32,7 @@ public class ClientPlayerEntity extends PlayerEntity {
 
     public void setPathfinderExecutor(PathfinderExecutor executor) {
         this.pathfinderExecutor = executor;
+        if (executor != null) this.setOnGround(true);
     }
 
     public PathfinderExecutor getPathFinderExecutor() {
@@ -219,7 +220,8 @@ public class ClientPlayerEntity extends PlayerEntity {
         //do this for every block in the hit box X/Z plane
         Pair<Vec3i, Block> intersectingYBlock = getFirstBlock(playerBlockPos.getY(), endBlockPos.getY(), delta, sideBlocks, BlockFace.DOWN);
         if (intersectingYBlock == null) {
-            this.setOnGround(false);
+            if (!this.isPathfinding())
+                this.setOnGround(false);
             return;
         }
         Vec3i blockPos = intersectingYBlock.getLeft();
