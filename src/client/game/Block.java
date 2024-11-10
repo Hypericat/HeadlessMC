@@ -11,13 +11,19 @@ public class Block {
     private final String type;
     private final BlockProperties properties;
     private final BlockStates states;
+    private final float hardness;
     private final static HashSet<Block> noCollision = new HashSet<>();
 
-    public Block(String name, String type, BlockProperties properties, BlockStates states) {
+    public Block(String name, String type, BlockProperties properties, BlockStates states, float hardness) {
         this.name = name;
         this.type = type;
         this.properties = properties;
         this.states = states;
+        this.hardness = hardness;
+    }
+
+    public float getHardness() {
+        return hardness;
     }
 
     public String getName() {
@@ -211,7 +217,7 @@ public class Block {
     }
 
     public boolean isUnbreakable() {
-        return this == Blocks.BEDROCK || this == Blocks.COMMAND_BLOCK || this == Blocks.STRUCTURE_BLOCK || this == Blocks.WATER || this == Blocks.LAVA;
+        return this.hardness < 0;
     }
 
     public String getNameNoPrefix() {

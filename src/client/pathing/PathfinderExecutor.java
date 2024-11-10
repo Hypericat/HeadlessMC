@@ -87,12 +87,12 @@ public class PathfinderExecutor {
         Vec3i feetBlock = positions.get(positionIndex);
         Vec3i headBlock = feetBlock.addY(1);
         if (instance.getWorld().getBlock(feetBlock).hasCollision()) {
-            instance.getInteractionManager().playerMineBlock(feetBlock);
+            instance.getInteractionManager().mineWithBestSlot(feetBlock);
             System.out.println("Block is full : " + feetBlock + " block is : " + instance.getWorld().getBlock(feetBlock));
             return;
         }
         if (instance.getWorld().getBlock(headBlock).hasCollision()) {
-            instance.getInteractionManager().playerMineBlock(headBlock);
+            instance.getInteractionManager().mineWithBestSlot(headBlock);
             instance.getPlayer().setVelocity(Vec3d.ZERO.setY(-IDLE_DOWN_VELOCITY));
             System.out.println("Block is full : " + headBlock + " block is : " + instance.getWorld().getBlock(headBlock));
             return;

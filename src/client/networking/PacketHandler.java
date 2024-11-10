@@ -159,7 +159,7 @@ public class PacketHandler implements ClientPacketListener {
 
     @Override
     public void onSetHeldItem(SetHeldItemS2CPacket packet) {
-        instance.getPlayer().setSelectedSlot(packet.getSlot());
+        instance.getInteractionManager().setSelectedSlot(packet.getSlot());
     }
 
     @Override

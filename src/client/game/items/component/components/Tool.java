@@ -1,5 +1,7 @@
 package client.game.items.component.components;
 
+import client.game.Block;
+import client.game.items.BlockSet;
 import client.game.items.component.IComponent;
 import client.game.items.component.ToolRule;
 import io.netty.buffer.ByteBuf;
@@ -7,6 +9,7 @@ import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class Tool implements IComponent {
     private final List<ToolRule> rules;
@@ -15,7 +18,6 @@ public class Tool implements IComponent {
 
     public Tool(ToolRule... rules) {
         this.rules = Arrays.stream(rules).toList();
-
     }
 
     public Tool(List<ToolRule> rules) {
@@ -46,6 +48,20 @@ public class Tool implements IComponent {
             newRules.add(new ToolRule(rule));
         }
         return new Tool(newRules);
+    }
+
+    public boolean isTool() {
+        return !rules.isEmpty();
+    }
+
+    public float getSpeedAgainstBlock(Block block) {
+        for (ToolRule rule : rules) {
+            if (rule.blockContains(block)) return (float) rule.getSpeed();
+            if (rule.getBlockSets().stream().anyMatch(blockset -> blockset.contains(block))) {
+                return (float) rule.getSpeed();
+            }
+        }
+        return 1.0F;
     }
 
     @Override

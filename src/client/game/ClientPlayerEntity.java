@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientPlayerEntity extends PlayerEntity {
-    private int selectedSlot;
     private int chunkX;
     private int chunkZ;
     private int attackCooldown = 0;
@@ -97,14 +96,6 @@ public class ClientPlayerEntity extends PlayerEntity {
         if (this.getHealth() <= 0) {
             respawn();
         }
-    }
-
-    public int getSelectedSlot() {
-        return selectedSlot;
-    }
-
-    public void setSelectedSlot(int selectedSlot) {
-        this.selectedSlot = selectedSlot;
     }
 
     public void respawn() {

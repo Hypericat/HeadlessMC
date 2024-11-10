@@ -8,9 +8,11 @@ import client.networking.packets.S2C.play.SynchronizePlayerPositionS2CPacket;
 import client.pathing.*;
 import client.pathing.goals.GoalMineBlock;
 import client.pathing.goals.GoalXYZ;
+import client.pathing.movement.BlockBreakTickCache;
 import client.utils.Flag;
 import client.utils.UUID;
 import math.MathHelper;
+import math.Pair;
 import math.Vec3d;
 import math.Vec3i;
 
@@ -25,6 +27,7 @@ public class InteractionManager {
     private HeadlessInstance instance;
     private Vec3i currentBlockBreaking;
     private int blockBreakingProgress;
+    private int selectedSlot;
 
     private static final double PATHFINDING_MAX_RESET_POSITION_DELTA = 8d;
     private static final double PATHFINDING_MAX_RESET_POSITION_DELTA_SQUARED = PATHFINDING_MAX_RESET_POSITION_DELTA * PATHFINDING_MAX_RESET_POSITION_DELTA;
@@ -125,10 +128,10 @@ public class InteractionManager {
         currentBlockBreaking = null;
     }
 
-    public boolean playerSilentlyMineBlock(Vec3i blockPos) {
+    public boolean playerSilentlyMineBlock(Vec3i blockPos, int tickTime) {
         if (isBreakingBlock()) return false;
         startDestroyBlock(blockPos);
-        instance.getScheduler().schedule(6, o -> {
+        instance.getScheduler().schedule(tickTime, o -> {
             finishDestroyBlock(blockPos);
         });
         return true;
@@ -180,19 +183,47 @@ public class InteractionManager {
         }
     }
 
+    public void cancelBlockBreaking() {
+        this.currentBlockBreaking = null;
+    }
+
+    public boolean mineWithBestSlot(Vec3i pos) {
+        if (this.isBreakingBlock()) return false;
+        Pair<Integer, Integer> pair = BlockBreakTickCache.getBestSlotAndTickTimeUncached(this.player.getInventory(), this.world.getBlock(pos), false);
+        this.setSelectedSlot(pair.getLeft());
+        this.syncSelectedSlots();
+        return this.playerMineBlock(pos, pair.getRight());
+    }
+
+    public int getSelectedSlot() {
+        return selectedSlot;
+    }
+
+    public void setSelectedSlot(int selectedSlot) {
+        this.selectedSlot = selectedSlot;
+    }
+
+    public void syncSelectedSlots() {
+        networkHandler.sendPacket(new SyncSelectedSlotC2SPacket(this.selectedSlot));
+    }
+
 
     public boolean playerMineBlock(int x, int y, int z) {
         return playerMineBlock(new Vec3i(x, y, z));
     }
 
-    public boolean playerMineBlock(Vec3i blockPos) {
-        boolean result = playerSilentlyMineBlock(blockPos);
+    public boolean playerMineBlock(Vec3i blockPos, int tickTime) {
+        boolean result = playerSilentlyMineBlock(blockPos, tickTime);
         if (result) {
             startDestroyBlock(blockPos);
             swingHand(Hand.MAIN);
             lookAt(blockPos);
         }
         return result;
+    }
+
+    public boolean playerMineBlock(Vec3i blockPos) {
+        return playerMineBlock(blockPos, 6);
     }
 
     public void sendChatMessage(String message) {

@@ -41,8 +41,6 @@ public class World implements IWorldProvider {
     }
 
     public void addChunk(Chunk chunk) {
-        int timer = Timer.start();
-
         long hash = getHash(chunk);
         if (chunks.containsKey(hash))
             unloadChunk(chunks.get(hash), hash);
@@ -54,8 +52,6 @@ public class World implements IWorldProvider {
             cached.get(pair.getLeft()).put(blockPos.longHash(), blockPos);
         }
         chunks.put(hash, chunk);
-
-        Timer.end(timer);
     }
 
     public Chunk getChunkAtCord(int x, int z) {

@@ -1,19 +1,23 @@
 package client.game.items;
 
 public class Enchantment {
-    private final int typeID;
-    private final String name;
+    private final EnchantmentType type;
+    private final int level;
 
-    protected Enchantment(int id, String name) {
-        this.typeID = id;
-        this.name = name;
+    public Enchantment(EnchantmentType type, int level) {
+        this.type = type;
+        this.level = level;
     }
 
-    public int getTypeID() {
-        return typeID;
+    public int hash() {
+        return this.getType().getTypeID() << 16 | (level << 16 >> 16);
     }
 
-    public String getName() {
-        return name;
+    public EnchantmentType getType() {
+        return type;
+    }
+
+    public int getLevel() {
+        return level;
     }
 }

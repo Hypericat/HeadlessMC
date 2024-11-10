@@ -1,33 +1,45 @@
 package client.game.items.component;
 
+import client.game.Block;
+import client.game.Blocks;
+import client.game.items.BlockSet;
+import client.game.items.BlockSets;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class ToolRule {
-    private final List<String> affectedBlocks;
+    private final List<BlockSet> set;
+    private final HashSet<Block> blocks;
     private final boolean correctForDrops;
     private final double speed;
 
-    public ToolRule(List<String> affectedBlocks, boolean correctForDrops, double speed) {
-        this.affectedBlocks = affectedBlocks;
+    public ToolRule(List<String> blocks, boolean correctForDrops, double speed) {
+        this.set = new ArrayList<>(0);
+        this.blocks = new HashSet<>(0);
         this.correctForDrops = correctForDrops;
         this.speed = speed;
-    }
-    public ToolRule(String affectedBlocks, boolean correctForDrops, double speed) {
-        this.affectedBlocks = new ArrayList<>();
-        this.affectedBlocks.add(affectedBlocks);
-        this.correctForDrops = correctForDrops;
-        this.speed = speed;
+
+        for (String s : blocks) {
+            if (s.startsWith("#")) {
+                this.set.add(BlockSets.getByTag(s));
+                continue;
+            }
+            //could be better optimized by storing the string or a hash
+            this.blocks.add(Blocks.getBlockByName(s));
+        }
     }
 
     public ToolRule(ToolRule rule) {
-        this.affectedBlocks = new ArrayList<>(rule.affectedBlocks);
+        this.set = rule.set;
+        this.blocks = rule.blocks;
         this.correctForDrops = rule.correctForDrops;
         this.speed = rule.speed;
     }
 
-    public List<String> getAffectedBlocks() {
-        return affectedBlocks;
+    public List<BlockSet> getBlockSets() {
+        return set;
     }
 
     public boolean isCorrectForDrops() {
@@ -36,5 +48,9 @@ public class ToolRule {
 
     public double getSpeed() {
         return speed;
+    }
+
+    public boolean blockContains(Block block) {
+        return this.blocks.contains(block);
     }
 }
