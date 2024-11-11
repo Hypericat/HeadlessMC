@@ -1,3 +1,4 @@
+import auth.AuthUtil;
 import client.HeadlessInstance;
 import client.game.Block;
 import client.commands.TerminalHandler;
@@ -18,6 +19,11 @@ public class Main {
     public static final String version = "1.21.1";
 
     public static void main(String[] args) {
+        System.out.println(AuthUtil.hashString("jeb_"));
+
+
+
+        if (true) return;
         terminal = new TerminalHandler();
         Thread terminalThread = new Thread(terminal);
 

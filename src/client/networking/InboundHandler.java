@@ -177,7 +177,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         packetMap.put(CookieRequestS2CPacket.packetID.getOffset(), CookieRequestS2CPacket.class);
         packetMap.put(ClientBoundPluginMessageS2CPacket.packetID.getOffset(), ClientBoundPluginMessageS2CPacket.class);
         packetMap.put(FinishConfigurationS2CPacket.packetID.getOffset(), FinishConfigurationS2CPacket.class);
-        //packetMap.put(EncryptionRequestS2CPacket.getTypeIdOffset(), EncryptionRequestS2CPacket.class);
+        packetMap.put(EncryptionRequestS2CPacket.packetID.getOffset(), EncryptionRequestS2CPacket.class);
 
 
         //play
