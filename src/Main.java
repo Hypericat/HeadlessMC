@@ -1,4 +1,6 @@
+import auth.Account;
 import auth.AuthUtil;
+import auth.SessionHandler;
 import client.HeadlessInstance;
 import client.game.Block;
 import client.commands.TerminalHandler;
@@ -8,7 +10,9 @@ import client.game.items.Items;
 import client.pathing.movement.BlockBreakTickCache;
 import math.Pair;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -17,13 +21,12 @@ public class Main {
     private static final List<Pair<HeadlessInstance, Thread>> instances = new ArrayList<>();
     private static TerminalHandler terminal;
     public static final String version = "1.21.1";
+    private static Account[] accounts;
 
     public static void main(String[] args) {
-        System.out.println(AuthUtil.hashString("jeb_"));
+        HeadlessInstance.initDir();
+        accounts = SessionHandler.readAccounts();
 
-
-
-        if (true) return;
         terminal = new TerminalHandler();
         Thread terminalThread = new Thread(terminal);
 
@@ -69,7 +72,7 @@ public class Main {
     public static void makeInstance(String name, String ip, int id) {
         if (ip.equalsIgnoreCase("localhost")) ip = "127.0.0.1";
 
-        HeadlessInstance headless = new HeadlessInstance(name, ip, id, 5, isDev(), terminal);
+        HeadlessInstance headless = new HeadlessInstance(new Account(name), ip, id, 5, isDev(), terminal);
         Thread thread = new Thread(headless);
         instances.add(new Pair<>(headless, thread));
         thread.start();

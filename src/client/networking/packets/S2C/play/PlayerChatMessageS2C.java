@@ -5,7 +5,7 @@ import client.networking.packets.PacketID;
 import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
 import client.utils.PacketUtil;
-import client.utils.UUID;
+import java.util.UUID;
 import io.netty.buffer.ByteBuf;
 import math.Vec3i;
 
@@ -33,7 +33,7 @@ public class PlayerChatMessageS2C extends S2CPacket {
 
     @Override
     public void decode(ByteBuf buf) {
-        this.senderUUID = UUID.fromBuf(buf);
+        this.senderUUID = PacketUtil.readUUID(buf);
         this.index = PacketUtil.readVarInt(buf);
         boolean messageSignature = buf.readBoolean();
         if (messageSignature) {

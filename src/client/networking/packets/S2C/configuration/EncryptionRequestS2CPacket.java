@@ -34,7 +34,8 @@ public class EncryptionRequestS2CPacket extends S2CPacket {
 
     @Override
     public void decode(ByteBuf buf) {
-        //serverID = PacketUtil.readString(buf, 20); //string is empty?
+        int serverIDLength = PacketUtil.readVarInt(buf);
+        serverID = PacketUtil.readString(buf, serverIDLength); //string is always empty?
 
         publicKeyLength = PacketUtil.readVarInt(buf);
         publicKey = new byte[publicKeyLength];
@@ -43,6 +44,7 @@ public class EncryptionRequestS2CPacket extends S2CPacket {
         verifyTokenLength = PacketUtil.readVarInt(buf);
         verifyToken = new byte[verifyTokenLength];
         buf.readBytes(verifyToken);
+
         shouldAuthenticate = buf.readBoolean();
     }
 

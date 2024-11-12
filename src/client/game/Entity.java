@@ -1,7 +1,7 @@
 package client.game;
 
 import client.HeadlessInstance;
-import client.utils.UUID;
+import java.util.UUID;
 import math.Box;
 import math.Vec3d;
 

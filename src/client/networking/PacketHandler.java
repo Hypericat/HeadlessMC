@@ -1,10 +1,9 @@
 package client.networking;
 
+import auth.AuthUtil;
+import auth.EncryptionHandler;
 import client.game.*;
-import client.networking.packets.C2S.configuration.AcknowledgedFinishedConfigurationC2SPacket;
-import client.networking.packets.C2S.configuration.ClientInformationC2SPacket;
-import client.networking.packets.C2S.configuration.LoginAcknowledgedC2SPacket;
-import client.networking.packets.C2S.configuration.ServerBoundKnownPacksC2SPacket;
+import client.networking.packets.C2S.configuration.*;
 import client.HeadlessInstance;
 import client.networking.packets.C2S.play.KeepAliveC2SPacket;
 import client.networking.packets.S2C.configuration.*;
@@ -13,6 +12,9 @@ import math.Pair;
 import math.Vec3d;
 import math.Vec3i;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import java.security.PublicKey;
 import java.util.Arrays;
 
 public class PacketHandler implements ClientPacketListener {
@@ -37,12 +39,37 @@ public class PacketHandler implements ClientPacketListener {
     @Override
     public void onEncryption(EncryptionRequestS2CPacket packet) {
         instance.getLogger().debug("Received encryption packet from server");
-        instance.getLogger().debug("Server id " + packet.getServerID());
+        instance.getLogger().debug("Server id : " + packet.getServerID());
         instance.getLogger().debug("Public Key Length " + packet.getPublicKeyLength());
         instance.getLogger().debug("Public Key " + Arrays.toString(packet.getPublicKey()));
         instance.getLogger().debug("Token Length " + packet.getVerifyTokenLength());
         instance.getLogger().debug("Token " + Arrays.toString(packet.getVerifyToken()));
         instance.getLogger().debug("Should Authenticate " + packet.isShouldAuthenticate());
+
+        Cipher cipher;
+        Cipher cipher2;
+        String hash;
+
+        EncryptionResponseC2SPacket encryptionResponseC2SPacket;
+        try {
+            SecretKey secretKey = AuthUtil.generateSecretKey();
+
+            PublicKey publicKey = AuthUtil.decodeEncodedRsaPublicKey(packet.getPublicKey());
+            hash = AuthUtil.getStringFromHash(AuthUtil.computeServerId(packet.getServerID(), publicKey, secretKey));
+            cipher = AuthUtil.cipherFromKey(2, secretKey);
+            cipher2 = AuthUtil.cipherFromKey(1, secretKey);
+            byte[] bs = packet.getVerifyToken();
+            encryptionResponseC2SPacket = new EncryptionResponseC2SPacket(secretKey, publicKey, bs);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Protocol error", ex);
+        }
+
+        instance.getNetworkHandler().sendPacket(encryptionResponseC2SPacket);
+
+
+        //this.setupEncryption(encryptionResponseC2SPacket, cipher, cipher2);
+
+
     }
 
     @Override

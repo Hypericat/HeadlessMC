@@ -8,6 +8,7 @@ import math.Vec3i;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.UUID;
 
 
 public class PacketUtil {
@@ -104,6 +105,10 @@ public class PacketUtil {
         }
 
         return value;
+    }
+
+    public static UUID readUUID(ByteBuf buf) {
+        return new UUID(buf.readLong(), buf.readLong());
     }
 
     public static void writeVarLong(ByteBuf buf, long value) {

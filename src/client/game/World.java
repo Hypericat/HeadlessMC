@@ -2,8 +2,7 @@ package client.game;
 
 import client.HeadlessInstance;
 import client.pathing.IWorldProvider;
-import client.utils.Timer;
-import client.utils.UUID;
+import java.util.UUID;
 import math.MutableVec3i;
 import math.Pair;
 import math.Vec3d;

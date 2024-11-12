@@ -3,14 +3,19 @@ package auth;
 import client.networking.packets.S2C.configuration.EncryptionRequestS2CPacket;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
+import java.security.*;
+import java.security.spec.EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 public class AuthUtil {
+    private AuthUtil() {
+
+    }
 
 
     public static byte[] hash(byte[]... bytes) {
@@ -44,43 +49,54 @@ public class AuthUtil {
         return new BigInteger(hash).toString(16);
     }
 
-    public void onEncrypt(EncryptionRequestS2CPacket packet) {
-        /*
-        this.switchTo(ClientLoginNetworkHandler.State.AUTHORIZING);
-
-        Cipher cipher;
-        Cipher cipher2;
-        String string;
-        LoginKeyC2SPacket loginKeyC2SPacket;
+    public static SecretKey generateSecretKey()  {
         try {
-            SecretKey secretKey = NetworkEncryptionUtils.generateSecretKey();
-            PublicKey publicKey = packet.getPublicKey();
-            string = new BigInteger(NetworkEncryptionUtils.computeServerId(packet.getServerId(), publicKey, secretKey)).toString(16);
-            cipher = NetworkEncryptionUtils.cipherFromKey(2, secretKey);
-            cipher2 = NetworkEncryptionUtils.cipherFromKey(1, secretKey);
-            byte[] bs = packet.getNonce();
-            loginKeyC2SPacket = new LoginKeyC2SPacket(secretKey, publicKey, bs);
-        } catch (Exception var9) {
-            throw new IllegalStateException("Protocol error", var9);
+            KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+            keyGenerator.init(128);
+            return keyGenerator.generateKey();
+        } catch (NoSuchAlgorithmException ex) {
+            throw new RuntimeException(ex);
         }
-
-        if (packet.needsAuthentication()) {
-            Util.getIoWorkerExecutor().submit(() -> {
-                Text text = this.joinServerSession(string);
-                if (text != null) {
-                    if (this.serverInfo == null || !this.serverInfo.isLocal()) {
-                        this.connection.disconnect(text);
-                        return;
-                    }
-
-                    LOGGER.warn(text.getString());
-                }
-
-                this.setupEncryption(loginKeyC2SPacket, cipher, cipher2);
-            });
-        } else {
-            this.setupEncryption(loginKeyC2SPacket, cipher, cipher2);
-        }
-         */
     }
+    public static PublicKey decodeEncodedRsaPublicKey(byte[] key) {
+        try {
+            EncodedKeySpec encodedKeySpec = new X509EncodedKeySpec(key);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePublic(encodedKeySpec);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static Cipher cipherFromKey(int opMode, Key key) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding");
+            cipher.init(opMode, key, new IvParameterSpec(key.getEncoded()));
+            return cipher;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static byte[] encrypt(Key key, byte[] data) {
+        return crypt(1, key, data);
+    }
+
+    private static byte[] crypt(int opMode, Key key, byte[] data) {
+        try {
+            return createCipher(opMode, key.getAlgorithm(), key).doFinal(data);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private static Cipher createCipher(int opMode, String algorithm, Key key) throws Exception {
+        Cipher cipher = Cipher.getInstance(algorithm);
+        cipher.init(opMode, key);
+        return cipher;
+    }
+
+
+
+
 }

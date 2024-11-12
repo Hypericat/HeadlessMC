@@ -3,7 +3,7 @@ package client.game;
 import client.HeadlessInstance;
 import client.game.inventory.Inventory;
 import client.game.inventory.LivingInventory;
-import client.utils.UUID;
+import java.util.UUID;
 import math.Vec3d;
 
 public class LivingEntity extends Entity {

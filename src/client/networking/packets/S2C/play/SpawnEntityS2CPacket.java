@@ -6,7 +6,7 @@ import client.networking.packets.PacketID;
 import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
 import client.utils.PacketUtil;
-import client.utils.UUID;
+import java.util.UUID;
 import io.netty.buffer.ByteBuf;
 
 public class SpawnEntityS2CPacket extends S2CPacket {
@@ -41,7 +41,7 @@ public class SpawnEntityS2CPacket extends S2CPacket {
     @Override
     public void decode(ByteBuf buf) {
         entityID = PacketUtil.readVarInt(buf);
-        entityUuid = UUID.fromBuf(buf);
+        entityUuid = PacketUtil.readUUID(buf);
         entityType = PacketUtil.readVarInt(buf);
         x = buf.readDouble();
         y = buf.readDouble();

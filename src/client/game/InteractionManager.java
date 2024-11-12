@@ -10,7 +10,7 @@ import client.pathing.goals.GoalMineBlock;
 import client.pathing.goals.GoalXYZ;
 import client.pathing.movement.BlockBreakTickCache;
 import client.utils.Flag;
-import client.utils.UUID;
+import java.util.UUID;
 import math.MathHelper;
 import math.Pair;
 import math.Vec3d;

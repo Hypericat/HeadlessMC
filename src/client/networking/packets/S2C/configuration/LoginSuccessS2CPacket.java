@@ -3,7 +3,9 @@ package client.networking.packets.S2C.configuration;
 import client.networking.packets.PacketID;
 import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
-import client.utils.UUID;
+import java.util.UUID;
+
+import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
 import client.networking.ClientPacketListener;
 import client.networking.NetworkState;
@@ -29,7 +31,7 @@ public class LoginSuccessS2CPacket extends S2CPacket {
 
     @Override
     public void decode(ByteBuf buf) {
-        uuid = UUID.fromBuf(buf);
+        uuid = PacketUtil.readUUID(buf);
     }
 
     public UUID getUuid() {

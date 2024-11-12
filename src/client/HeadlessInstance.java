@@ -1,5 +1,7 @@
 package client;
 
+import auth.Account;
+import auth.SessionHandler;
 import client.game.ClientPlayerEntity;
 import client.game.InteractionManager;
 import client.game.World;
@@ -7,16 +9,21 @@ import client.networking.NetworkHandler;
 import client.networking.NetworkState;
 import client.networking.packets.C2S.configuration.HandShakeC2SPacket;
 import client.networking.packets.C2S.configuration.LoginStartC2SPacket;
-import client.utils.UUID;
+import java.util.UUID;
 import client.commands.TerminalHandler;
 
+import java.io.File;
+
 public class HeadlessInstance implements Runnable {
+
+    public static final File HEADLESSMC_DIRECTORY = new File(System.getProperty("user.home") + "\\Documents\\HeadlessMC");
+
 
     private final NetworkHandler network;
     private String currentAddress = "";
     private int currentPort = -1;
     private final String ip;
-    private final String userName;
+    private final Account account;
     private long lastTickTime;
     public static final long MSPT = 50;
 
@@ -30,10 +37,15 @@ public class HeadlessInstance implements Runnable {
     private final TerminalHandler terminal;
     private boolean dev;
 
+    public static void initDir() {
+        if (!HEADLESSMC_DIRECTORY.exists()) HEADLESSMC_DIRECTORY.mkdirs();
+        SessionHandler.initSessionFolder();
+    }
 
-    public HeadlessInstance(String userName, String ip, int id, int viewDistance, boolean dev, TerminalHandler terminalHandler) {
-        this.userName = userName + id;
-        this.logger = new Logger(userName, id, dev);
+
+    public HeadlessInstance(Account account, String ip, int id, int viewDistance, boolean dev, TerminalHandler terminalHandler) {
+        this.account = account;
+        this.logger = new Logger(account.getName(), id, dev);
         this.dev = dev;
         this.viewDistance = (byte) viewDistance;
         this.ip = ip;
@@ -71,6 +83,10 @@ public class HeadlessInstance implements Runnable {
         //network.sendPacket(new ClientInformationC2SPacket());
     }
 
+    public Account getAccount() {
+        return this.account;
+    }
+
     public void initWorld() {
         if (world != null) return;
         this.world = new World(this);
@@ -90,7 +106,7 @@ public class HeadlessInstance implements Runnable {
 
         if (!this.connect(ip)) return;
         network.setNetworkState(NetworkState.HANDSHAKE);
-        login(userName);
+        login(account.getName());
 
         while (network.isConnected()) {
             sleep(MSPT - (System.currentTimeMillis() - lastTickTime));
@@ -134,6 +150,7 @@ public class HeadlessInstance implements Runnable {
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
+        this.account.setUuid(uuid);
     }
 
     public UUID getUuid() {
