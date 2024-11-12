@@ -39,13 +39,6 @@ public class PacketHandler implements ClientPacketListener {
     @Override
     public void onEncryption(EncryptionRequestS2CPacket packet) {
         instance.getLogger().debug("Received encryption packet from server");
-        instance.getLogger().debug("Server id : " + packet.getServerID());
-        instance.getLogger().debug("Public Key Length " + packet.getPublicKeyLength());
-        instance.getLogger().debug("Public Key " + Arrays.toString(packet.getPublicKey()));
-        instance.getLogger().debug("Token Length " + packet.getVerifyTokenLength());
-        instance.getLogger().debug("Token " + Arrays.toString(packet.getVerifyToken()));
-        instance.getLogger().debug("Should Authenticate " + packet.isShouldAuthenticate());
-
         Cipher cipher;
         Cipher cipher2;
         String hash;
@@ -64,12 +57,11 @@ public class PacketHandler implements ClientPacketListener {
             throw new IllegalStateException("Protocol error", ex);
         }
 
+        if (!instance.getAccount().isPremium()) throw new IllegalStateException("Server requested authentication on non-premium account!");
+        AuthUtil.authenticateSession(instance.getAccount(), hash);
+
         instance.getNetworkHandler().sendPacket(encryptionResponseC2SPacket);
-
-
-        //this.setupEncryption(encryptionResponseC2SPacket, cipher, cipher2);
-
-
+        instance.getNetworkHandler().enableEncryption(cipher, cipher2);
     }
 
     @Override

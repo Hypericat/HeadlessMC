@@ -12,6 +12,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import client.networking.packets.C2S.C2SPacket;
 
+import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
 import java.net.ConnectException;
 import java.util.Arrays;
@@ -28,6 +29,10 @@ public class NetworkHandler {
     private boolean compressionEnabled;
     private int compressionThreshold;
     private boolean connected;
+    private InboundHandler handler;
+
+
+    private boolean encrypted = false;
 
     public static final boolean logIn = false;
     public static final boolean logOut = false;
@@ -161,6 +166,15 @@ public class NetworkHandler {
         this.connected = false;
     }
 
+    public void enableEncryption(Cipher decryptionCipher, Cipher encryptionCipher) {
+        this.handler.setupEncryption(decryptionCipher, encryptionCipher);
+        this.encrypted = true;
+    }
+
+    public boolean isEncrypted() {
+        return this.encrypted;
+    }
+
 
     public NetworkState getNetworkState() {
         return networkState;
@@ -182,7 +196,7 @@ public class NetworkHandler {
     private void connectInternal(String address, int port) throws ConnectException {
         group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
-        InboundHandler handler = new InboundHandler(this, instance);
+        this.handler = new InboundHandler(this, instance);
         bootstrap.group(group).channel(NioSocketChannel.class).option(ChannelOption.SO_KEEPALIVE, true).handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) {
@@ -200,6 +214,7 @@ public class NetworkHandler {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        handler.initChannel(channel);
 
         instance.getLogger().logUser("Successfully connected to server!");
     }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Component {
+    private CustomData data;
     private AttributeModifiers modifiers;
     private EnchantmentsComponent enchantments;
     private Lore lore;
@@ -45,6 +46,7 @@ public class Component {
     private HashMap<Integer, IComponent> components;
 
     public Component(Component component) {
+        this.data = (CustomData) component.data.copy();
         this.modifiers = (AttributeModifiers) component.modifiers.copy();
         this.enchantments = (EnchantmentsComponent) component.enchantments.copy();
         this.lore = (Lore) component.lore.copy();
@@ -84,6 +86,7 @@ public class Component {
     }
 
     public Component(builder builder) {
+        this.data = builder.data;
         this.modifiers = builder.modifiers;
         this.enchantments = builder.enchantmentsComponent;
         this.lore = builder.lore;
@@ -124,6 +127,7 @@ public class Component {
 
     public void initComponents() {
         components = new HashMap<>();
+        addToComponents(data, "customData");
         addToComponents(modifiers, "modifiers");
         addToComponents(enchantments, "enchantments");
         addToComponents(lore, "lore");
@@ -163,7 +167,6 @@ public class Component {
 
     private void addToComponents(IComponent component, String name) {
         if (components.containsKey(component.getTypeID())) throw new RuntimeException("Duplicated component id : " + component.getTypeID() + " name : " + name);
-        if (component.getTypeID() == 0) throw new RuntimeException();
         components.put(component.getTypeID(), component);
     }
 
@@ -173,6 +176,14 @@ public class Component {
 
     public IComponent getComponentByID(int id) {
         return components.get(id);
+    }
+
+    public CustomData getData() {
+        return data;
+    }
+
+    public void setData(CustomData data) {
+        this.data = data;
     }
 
     public MapID getMapID() {
@@ -464,6 +475,7 @@ public class Component {
     }
 
     public static class builder {
+        private CustomData data;
         private AttributeModifiers modifiers;
         private EnchantmentsComponent enchantmentsComponent;
         private Lore lore;
@@ -501,6 +513,7 @@ public class Component {
         private MapID mapID;
 
         public builder() {
+            this.data = new CustomData();
             this.modifiers = new AttributeModifiers();
             this.enchantmentsComponent = new EnchantmentsComponent();
             this.lore = new Lore();
@@ -564,6 +577,14 @@ public class Component {
                 this.unbreakable = new Unbreakable();
             else
                 this.unbreakable = null;
+        }
+
+        public CustomData getData() {
+            return data;
+        }
+
+        public void setData(CustomData data) {
+            this.data = data;
         }
 
         public ItemName getItemName() {

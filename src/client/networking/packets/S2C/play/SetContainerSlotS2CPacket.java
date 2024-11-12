@@ -40,7 +40,8 @@ public class SetContainerSlotS2CPacket extends S2CPacket {
         windowID = buf.readByte();
         stateID = PacketUtil.readVarInt(buf);
         this.slot = buf.readShort();
-        itemStack = ComponentReader.readSlot(buf);
+        itemStack = ComponentReader.readSlot(buf).getLeft();
+        //don't need to check if successful because it is the last
     }
 
     public boolean isClientInventory() {

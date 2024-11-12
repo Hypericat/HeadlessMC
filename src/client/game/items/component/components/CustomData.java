@@ -1,39 +1,34 @@
 package client.game.items.component.components;
 
 import client.game.items.component.IComponent;
+import dev.dewy.nbt.Nbt;
+import dev.dewy.nbt.api.registry.TagTypeRegistry;
+import dev.dewy.nbt.io.NbtReader;
+import dev.dewy.nbt.tags.TagType;
+import dev.dewy.nbt.tags.collection.CompoundTag;
 import io.netty.buffer.ByteBuf;
 
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 
-public class CustomName implements IComponent {
-    private String name;
+public class CustomData implements IComponent {
 
-    public CustomName(String name) {
-        this.name = name;
+    public CustomData() {
+
     }
 
     @Override
     public IComponent copy() {
-        return new CustomName(name);
+        return new CustomData();
     }
 
     @Override
     public int getTypeID() {
-        return 5;
+        return 0;
     }
 
     @Override
     public void read(ByteBuf buf) {
         throw new IllegalStateException();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

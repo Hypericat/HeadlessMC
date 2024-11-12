@@ -1,6 +1,7 @@
 package client.networking.packets.S2C.play;
 
 import client.Logger;
+import client.game.Block;
 import client.game.items.ItemStack;
 import client.game.items.ItemType;
 import client.game.items.component.ComponentReader;
@@ -12,6 +13,7 @@ import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.S2CPacket;
 import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
+import math.Pair;
 import math.Vec3i;
 
 import java.util.ArrayList;
@@ -46,9 +48,14 @@ public class SetContainerContentS2CPacket extends S2CPacket {
         count = PacketUtil.readVarInt(buf);
         items = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            items.add(ComponentReader.readSlot(buf));
+            Pair<ItemStack, Boolean> pair = ComponentReader.readSlot(buf);
+            items.add(pair.getLeft());
+            if (!pair.getRight()) return;
         }
-        carriedStack = ComponentReader.readSlot(buf);
+        Pair<ItemStack, Boolean> pair = ComponentReader.readSlot(buf);
+        carriedStack = pair.getLeft();
+        //dont need to check boolean because it is last
+
     }
 
     public boolean isClientInventory() {

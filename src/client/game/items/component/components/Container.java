@@ -5,6 +5,7 @@ import client.game.items.component.ComponentReader;
 import client.game.items.component.IComponent;
 import client.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
+import math.Pair;
 
 import java.util.Arrays;
 
@@ -28,7 +29,9 @@ public class Container implements IComponent {
         int num = PacketUtil.readVarInt(buf);
         slots = new ItemStack[num];
         for (int i = 0; i < num; i++) {
-            slots[i] = ComponentReader.readSlot(buf);
+            Pair<ItemStack, Boolean> pair = ComponentReader.readSlot(buf);
+            slots[i] = pair.getLeft();
+            if (!pair.getRight()) return;
         }
     }
 

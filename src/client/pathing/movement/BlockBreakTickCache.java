@@ -44,7 +44,6 @@ public class BlockBreakTickCache {
             ItemStack stack = playerInventory.getHotbar().get(i);
             if (stack == null) continue;
             int speed = getMiningTickCount(stack.getType(), block);
-            System.out.println("speed to mine " + block + " with " + stack + " is " + speed);
             if (speed < 0) continue;
             if (speed < bestSpeed) {
                 bestSpeed = speed;

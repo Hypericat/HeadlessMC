@@ -1,18 +1,17 @@
 package client.networking;
 
 import client.HeadlessInstance;
-import client.Logger;
-import client.networking.packets.PacketID;
-import client.networking.packets.PacketIDS;
 import client.networking.packets.S2C.*;
 import client.networking.packets.S2C.configuration.*;
 import client.networking.packets.S2C.play.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import client.utils.PacketUtil;
 
+import javax.crypto.Cipher;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
@@ -23,14 +22,21 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private boolean usedCompression;
     private byte[] lastBytes;
     private byte[] lastCompressedBytes;
+    private final HeadlessInstance instance;
+    private Channel channel = null;
 
 
     public InboundHandler(NetworkHandler handler, HeadlessInstance instance) {
         super();
         usedCompression = false;
         packetHandler = new PacketHandler(instance);
+        this.instance = instance;
         this.handler = handler;
         initPacketMap();
+    }
+
+    public void initChannel(Channel channel) {
+        this.channel = channel;
     }
 
     @Override
@@ -91,12 +97,13 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
             handler.logPacket(Boundness.S2C, packetType);
         }
 
+        Class<?> clazz = packetMap.get(handler.getNetworkState().calcOffset(packetType));
+        if (clazz == null) {
+            //Unknown packet with no implementation
+            return;
+        }
+
         try {
-            Class<?> clazz = packetMap.get(handler.getNetworkState().calcOffset(packetType));
-            if (clazz == null) {
-                //System.err.println("Invalid/Unknown packet ID Packet Received, class is null");
-                return;
-            }
             S2CPacket packet = (S2CPacket) clazz.getDeclaredConstructors()[0].newInstance(buf, maxLength);
             packet.apply(packetHandler);
         } catch (IllegalArgumentException e) {
@@ -104,6 +111,7 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
             //e.printStackTrace();
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             System.err.println("Failed to decode packet");
+            System.err.println(clazz);
             if (handler.getInstance().isDev())
                 e.printStackTrace();
         }
@@ -201,5 +209,10 @@ public class InboundHandler extends SimpleChannelInboundHandler<ByteBuf> {
         packetMap.put(SetContainerSlotS2CPacket.packetID.getOffset(), SetContainerSlotS2CPacket.class);
         packetMap.put(PlayerChatMessageS2C.packetID.getOffset(), PlayerChatMessageS2C.class);
         packetMap.put(UnloadChunkS2CPacket.packetID.getOffset(), UnloadChunkS2CPacket.class);
+    }
+
+    public void setupEncryption(Cipher decryptionCipher, Cipher encryptionCipher) {
+        this.channel.pipeline().addFirst(new PacketDecrypter(decryptionCipher));
+        this.channel.pipeline().addLast(new PacketEncrypter(encryptionCipher));
     }
 }

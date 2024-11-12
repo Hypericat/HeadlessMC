@@ -17,5 +17,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="netty-all-5.0.0.Alpha2" level="project" />
+    <orderEntry type="library" name="nbt-1.5.1" level="project" />
+    <orderEntry type="library" name="gson-2.11.0" level="project" />
   </component>
 </module>

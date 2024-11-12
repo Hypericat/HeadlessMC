@@ -32,7 +32,7 @@ public class Main {
 
         //makeInstance(args[0], args[1], Integer.parseInt(args[2]));
         makeInstances("Winston", "127.0.0.1", 1);
-        //makeInstance("Winston", "192.168.2.226", 1);
+        //makeInstance("Winston", "127.0.0.1", 1);
 
         //don't remove this
         Block.initCollisions();
@@ -72,7 +72,7 @@ public class Main {
     public static void makeInstance(String name, String ip, int id) {
         if (ip.equalsIgnoreCase("localhost")) ip = "127.0.0.1";
 
-        HeadlessInstance headless = new HeadlessInstance(new Account(name), ip, id, 5, isDev(), terminal);
+        HeadlessInstance headless = new HeadlessInstance(accounts[id], ip, id, 5, isDev(), terminal);
         Thread thread = new Thread(headless);
         instances.add(new Pair<>(headless, thread));
         thread.start();
