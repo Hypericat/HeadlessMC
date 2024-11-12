@@ -79,7 +79,6 @@ public class PacketHandler implements ClientPacketListener {
         instance.getNetworkHandler().sendPacket(new ClientInformationC2SPacket(instance.getViewDistance()));
 
         instance.getNetworkHandler().setNetworkState(NetworkState.CONFIGURATION);
-        instance.config();
     }
 
     @Override

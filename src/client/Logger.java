@@ -1,23 +1,23 @@
 package client;
 
+import auth.Account;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Logger {
-    private final String baseName;
-    private final int id;
+    private final Account account;
     private final boolean isDev;
     private final List<String> logBuffer;
     private final File logFile;
     private final int flushMinCount;
 
-    public Logger(String baseName, int id, boolean dev) {
-       this.baseName = baseName;
+    public Logger(Account account, boolean dev) {
+       this.account = account;
        this.logFile = new File("latest.log");
        if (logFile.exists()) logFile.delete();
        this.logBuffer = new ArrayList<>();
-       this.id = id;
        this.isDev = dev;
        this.flushMinCount = isDev ? 1 : 10;
     }
@@ -45,8 +45,8 @@ public class Logger {
         }
     }
 
-    public Logger(String baseName) {
-        this(baseName, -1, false);
+    public Logger(Account account) {
+        this(account, false);
     }
 
     private void consoleLog(String string) {
@@ -80,6 +80,6 @@ public class Logger {
     }
 
     public String getName() {
-        return baseName + (id == -1 ? "" : id);
+        return account.getName();
     }
 }

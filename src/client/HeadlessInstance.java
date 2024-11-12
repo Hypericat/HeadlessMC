@@ -17,21 +17,20 @@ import java.io.File;
 public class HeadlessInstance implements Runnable {
 
     public static final File HEADLESSMC_DIRECTORY = new File(System.getProperty("user.home") + "\\Documents\\HeadlessMC");
+    public static final long MSPT = 50;
 
 
     private final NetworkHandler network;
-    private String currentAddress = "";
-    private int currentPort = -1;
-    private final String ip;
+    private final String serverAddress;
+    private final int currentPort;
     private final Account account;
     private long lastTickTime;
-    public static final long MSPT = 50;
+    private final int protocolID;
 
     private final byte viewDistance;
     private ClientPlayerEntity player;
     private World world;
     private InteractionManager interactionManager;
-    private UUID uuid;
     private final Scheduler scheduler;
     private final Logger logger;
     private final TerminalHandler terminal;
@@ -43,14 +42,16 @@ public class HeadlessInstance implements Runnable {
     }
 
 
-    public HeadlessInstance(Account account, String ip, int id, int viewDistance, boolean dev, TerminalHandler terminalHandler) {
+    public HeadlessInstance(Account account, String serverAddress, int port, int viewDistance, int protocolID, boolean dev, TerminalHandler terminalHandler) {
         this.account = account;
-        this.logger = new Logger(account.getName(), id, dev);
+        this.logger = new Logger(account, dev);
         this.dev = dev;
         this.viewDistance = (byte) viewDistance;
-        this.ip = ip;
+        this.serverAddress = serverAddress;
+        this.currentPort = port;
         this.lastTickTime = System.currentTimeMillis();
         this.scheduler = new Scheduler();
+        this.protocolID = protocolID;
         this.network = new NetworkHandler(this);
         this.terminal = terminalHandler;
     }
@@ -64,23 +65,20 @@ public class HeadlessInstance implements Runnable {
     }
 
     public boolean connect(String address) {
-        return connect(address, 25565);
+        return connect(address, this.currentPort);
     }
 
     public boolean connect(String address, int port) {
-        this.currentAddress = address;
-        this.currentPort = port;
         return network.connect(address, port);
     }
     public void login(String userName) {
-        network.sendPacket(new HandShakeC2SPacket(this.getCurrentAddress(), getCurrentPort(), 2));
+        network.sendPacket(new HandShakeC2SPacket(this.getProtocolID(), this.getServerAddress(), getCurrentPort(), 2));
         network.setNetworkState(NetworkState.LOGIN);
         network.sendPacket(new LoginStartC2SPacket(userName));
     }
 
-    public void config() {
-        //network.sendPacket(new ServerboundPluginMessageC2SPacket());
-        //network.sendPacket(new ClientInformationC2SPacket());
+    public int getProtocolID() {
+        return protocolID;
     }
 
     public Account getAccount() {
@@ -104,7 +102,7 @@ public class HeadlessInstance implements Runnable {
     public void run() {
         getLogger().logUser("Starting instance!");
 
-        if (!this.connect(ip)) return;
+        if (!this.connect(this.serverAddress)) return;
         network.setNetworkState(NetworkState.HANDSHAKE);
         login(account.getName());
 
@@ -132,8 +130,8 @@ public class HeadlessInstance implements Runnable {
         return network;
     }
 
-    public String getCurrentAddress() {
-        return currentAddress.isEmpty() ? "127.0.0.1" : currentAddress;
+    public String getServerAddress() {
+        return serverAddress.isEmpty() ? "127.0.0.1" : serverAddress;
     }
 
     public int getCurrentPort() {
@@ -149,12 +147,11 @@ public class HeadlessInstance implements Runnable {
     }
 
     public void setUuid(UUID uuid) {
-        this.uuid = uuid;
         this.account.setUuid(uuid);
     }
 
     public UUID getUuid() {
-        return uuid;
+        return this.account.getUuid();
     }
 
     public InteractionManager getInteractionManager() {

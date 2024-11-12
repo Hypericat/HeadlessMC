@@ -25,15 +25,6 @@ public class HandShakeC2SPacket extends C2SPacket {
         this.serverPort = (short) serverPort;
         this.nextState = (byte) nextState;
     }
-    public HandShakeC2SPacket(String serverAddress, int serverPort, int nextState) {
-        this(767, serverAddress, serverPort, nextState);
-    }
-    public HandShakeC2SPacket(String serverAddress, int serverPort) {
-        this(serverAddress, serverPort, 2);
-    }
-    public HandShakeC2SPacket(String serverAddress) {
-        this(serverAddress, 25565);
-    }
 
     @Override
     public void apply(ClientPacketListener listener) {
