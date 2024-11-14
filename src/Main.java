@@ -33,7 +33,7 @@ public class Main {
         if ((boolean) options.get(OptionTypes.PREMIUM).getValue())
             accounts = SessionHandler.readAccounts();
 
-        terminal = new TerminalHandler();
+        terminal = new TerminalHandler(options);
         Thread terminalThread = new Thread(terminal);
 
         makeFreeAccounts((String) options.get(OptionTypes.ACCOUNT_NAME).getValue(), (String) options.get(OptionTypes.SERVER_ADDRESS).getValue(), (int) options.get(OptionTypes.BOT_COUNT).getValue(), (int) options.get(OptionTypes.PORT).getValue());

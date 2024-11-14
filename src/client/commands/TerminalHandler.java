@@ -1,10 +1,8 @@
 package client.commands;
 
 import client.HeadlessInstance;
-import client.commands.command.GotoCommand;
-import client.commands.command.MineBlockCommand;
-import client.commands.command.SayCommand;
-import client.commands.command.StopCommand;
+import client.commands.command.*;
+import ux.Options;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +12,12 @@ public class TerminalHandler implements Runnable {
     private final List<HeadlessInstance> instances = new ArrayList<>();
     private final List<Command> commands;
     private final Scanner systemIn;
+    private final Options options;
 
-    public TerminalHandler() {
+    public TerminalHandler(Options options) {
         systemIn = new Scanner(System.in);
         commands = new ArrayList<>();
+        this.options = options;
         initCommands();
     }
 
@@ -26,6 +26,7 @@ public class TerminalHandler implements Runnable {
         commands.add(new GotoCommand());
         commands.add(new StopCommand());
         commands.add(new SayCommand());
+        commands.add(new OptionCommand(this.options));
     }
 
     private Command getCommand(String in) {

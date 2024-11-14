@@ -37,7 +37,7 @@ public class Options {
     }
 
     public Option<?> get(String name) {
-        return get(name.hashCode());
+        return get(name.toLowerCase().hashCode());
     }
 
     public Option<?> get(Option<?> option) {

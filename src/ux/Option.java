@@ -10,7 +10,7 @@ public class Option<T> {
         this.value = value;
         this.name = name;
         this.clazz = value.getClass();
-        this.nameHash = name.hashCode();
+        this.nameHash = name.toLowerCase().hashCode();
     }
 
     protected Option(Option<T> option) {
@@ -26,6 +26,10 @@ public class Option<T> {
 
     public void setValue(T value) {
         this.value = value;
+    }
+
+    public void setObjValue(Object value) {
+        this.value = (T) value;
     }
 
     @Override
