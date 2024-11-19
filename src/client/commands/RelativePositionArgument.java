@@ -11,4 +11,7 @@ public class RelativePositionArgument extends Argument<Integer> {
         if (in.isEmpty()) return 0;
         return Integer.parseInt(in);
     }
+    public String toString() {
+        return "<RelativePositionArgument>";
+    }
 }

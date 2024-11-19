@@ -34,4 +34,9 @@ public class MultipleArgument<T> extends Argument<List<T>> {
         return arguments;
     }
 
+    @Override
+    public String toString() {
+        return "<MultipleArgument Length " + size + " " + argumentClass.getSimpleName()  + ">" ;
+    }
+
 }

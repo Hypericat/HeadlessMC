@@ -14,4 +14,10 @@ public class BlockArgument extends Argument<Block> {
         return b;
     }
 
+    @Override
+    public String toString() {
+        return "<BlockArgument>";
+    }
+
+
 }

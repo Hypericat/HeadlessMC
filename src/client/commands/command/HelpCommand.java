@@ -3,14 +3,15 @@ package client.commands.command;
 import client.HeadlessInstance;
 import client.commands.Command;
 import client.commands.CommandSyntax;
+import client.commands.TerminalHandler;
 
 import java.util.List;
 
-public class StopCommand extends Command {
+public class HelpCommand extends Command {
     @Override
     public void initSyntax() {
         getSyntaxes().add(CommandSyntax.builder
-                .name("stop")
+                .name("help")
                 .executes((syntax, arguments, instances) -> {
                     execute(instances);
                 })
@@ -18,8 +19,11 @@ public class StopCommand extends Command {
     }
 
     public void execute(List<HeadlessInstance> instances) {
-        instances.forEach(instance -> {
-            instance.getPlayer().setPathfinderExecutor(null);
-        });
+        TerminalHandler.getTerminal().getCommands().forEach(HelpCommand::printUses);
     }
-}
+
+    public static void printUses(Command command) {
+        command.getSyntaxes().forEach(commandSyntax -> {
+            System.out.println(command.getStarts().getFirst() + " : " + commandSyntax.toString());
+        });
+    }}

@@ -72,4 +72,13 @@ public class CommandSyntax {
             return new CommandSyntax(this);
         }
     }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < arguments.size(); i++) {
+            if (i == 0) continue; //skip the first string argument for the command name
+            (builder.isEmpty() ? builder : builder.append(" ")).append(arguments.get(i).toString());
+        }
+        return builder.toString();
+    }
 }

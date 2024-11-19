@@ -8,4 +8,9 @@ public class IntArgument extends Argument<Integer> {
         String in = s.removeFirst();
         return Integer.parseInt(in);
     }
+
+    @Override
+    public String toString() {
+        return "<IntArgument>";
+    }
 }

@@ -10,7 +10,7 @@ public class MineBlockCommand extends Command {
     @Override
     public void initSyntax() {
         getSyntaxes().add(CommandSyntax.builder
-                .name("Mine")
+                .name("mine")
                 .argument(new MultipleArgument<>(BlockArgument.class, -1))
                 .executes((syntax, arguments, instances) -> {
                     execute(instances, (List<Block>) arguments.get(1));

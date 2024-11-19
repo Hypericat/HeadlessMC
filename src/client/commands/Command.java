@@ -29,7 +29,7 @@ public abstract class Command {
         Logger.sysLog("Failed to find valid command syntax for command : " + s);
     }
 
-    protected List<CommandSyntax> getSyntaxes() {
+    public List<CommandSyntax> getSyntaxes() {
         return syntaxes;
     }
 

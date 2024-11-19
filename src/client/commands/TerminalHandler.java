@@ -13,15 +13,19 @@ public class TerminalHandler implements Runnable {
     private final List<Command> commands;
     private final Scanner systemIn;
     private final Options options;
+    private static TerminalHandler terminalInstance;
 
     public TerminalHandler(Options options) {
         systemIn = new Scanner(System.in);
         commands = new ArrayList<>();
         this.options = options;
         initCommands();
+        terminalInstance = this;
     }
 
     private void initCommands() {
+        commands.add(new HelpCommand());
+        commands.add(new CreateInstanceCommand());
         commands.add(new MineBlockCommand());
         commands.add(new GotoCommand());
         commands.add(new StopCommand());
@@ -33,7 +37,14 @@ public class TerminalHandler implements Runnable {
         return commands.stream().filter(command -> command.isInstance(in)).findFirst().orElse(null);
     }
 
+    public List<Command> getCommands() {
+        return this.commands;
+    }
 
+    // This is bad code, but I don't feel like passing the instance through the pipeline so this is happening for now
+    public static TerminalHandler getTerminal() {
+        return terminalInstance;
+    }
 
     public void addInstance(HeadlessInstance instance) {
         instances.add(instance);

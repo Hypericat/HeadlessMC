@@ -9,4 +9,8 @@ public class StringArgument extends Argument<String> {
         return in;
     }
 
+    public String toString() {
+        return "<StringArgument>";
+    }
+
 }
