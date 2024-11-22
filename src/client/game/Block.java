@@ -243,4 +243,9 @@ public class Block implements BlockTypeList {
     public Block[] getBlocks() {
         return new Block[] {this};
     }
+
+    @Override
+    public int hashCode() {
+        return this.states.getDefault();
+    }
 }
