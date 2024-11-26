@@ -16,15 +16,10 @@ public class Main {
         if ((boolean) InstanceHandler.options.get(OptionTypes.PREMIUM).getValue())
             InstanceHandler.accounts = SessionHandler.readAccounts();
 
-        InstanceHandler.terminal = new TerminalHandler(InstanceHandler.options);
-        Thread terminalThread = new Thread(InstanceHandler.terminal);
-
-        InstanceHandler.makeFreeAccounts();
 
         //don't remove this
         Block.initCollisions();
 
-        terminalThread.start();
 
         InstanceHandler.runMainThread();
         return;

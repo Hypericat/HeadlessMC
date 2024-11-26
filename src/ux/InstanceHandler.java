@@ -53,7 +53,18 @@ public class InstanceHandler {
     }
 
     public static void runMainThread() {
-        loop : while (true) {
+        running = true;
+        InstanceHandler.terminal = new TerminalHandler(InstanceHandler.options);
+        Thread terminalThread = new Thread(InstanceHandler.terminal);
+
+        terminalThread.start();
+
+        System.out.println("Welcome to Headless MC!");
+        System.out.println("Use create to create new instances");
+        System.out.println("Use options list see options");
+        System.out.println("Type help to list commands!");
+
+        loop : while (running) {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -61,11 +72,10 @@ public class InstanceHandler {
             }
             for (int i = 0; i < instances.size(); i++) {
                 Thread thread = instances.get(i).getRight();
-                if (thread.isAlive()) continue loop;
+                if (!thread.isAlive()) continue;
                 instances.remove(i);
                 i--;
             }
-            break;
         }
         System.out.println("All instances terminated, terminating program!");
         instances.clear();

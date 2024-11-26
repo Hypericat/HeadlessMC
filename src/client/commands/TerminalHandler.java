@@ -2,6 +2,7 @@ package client.commands;
 
 import client.HeadlessInstance;
 import client.commands.command.*;
+import ux.InstanceHandler;
 import ux.Options;
 
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public class TerminalHandler implements Runnable {
 
     @Override
     public void run() {
-        while (instances.stream().anyMatch(instance -> instance.getNetworkHandler().isConnected())) {
+        while (InstanceHandler.running) {
             pollInput(instances);
         }
     }
