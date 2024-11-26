@@ -197,6 +197,7 @@ public class InteractionManager {
         Pair<Integer, Integer> pair = BlockBreakTickCache.getBestSlotAndTickTimeUncached(this.player.getInventory(), this.world.getBlock(pos), false);
         this.setSelectedSlot(pair.getLeft());
         this.syncSelectedSlots();
+        //System.out.println("tick time : " + pair.getRight());
         return this.playerMineBlock(pos, pair.getRight());
     }
 

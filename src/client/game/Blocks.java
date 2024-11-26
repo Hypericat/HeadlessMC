@@ -391,7 +391,7 @@ public final class Blocks {
     public static final Block SPRUCE_HANGING_SIGN = register(new Block("minecraft:spruce_hanging_sign", "minecraft:ceiling_hanging_sign", new BlockProperties(), new BlockStates(4898, 4961, 4931), 1.0F));
     public static final Block WHITE_TERRACOTTA = register(new Block("minecraft:white_terracotta", "minecraft:block", new BlockProperties(), new BlockStates(9356, 9356, 9356), 1.25F));
     public static final Block BLACKSTONE_SLAB = register(new Block("minecraft:blackstone_slab", "minecraft:slab", new BlockProperties(), new BlockStates(19865, 19870, 19868), 2.0F));
-    public static final Block LAVA = register(new Block("minecraft:lava", "minecraft:liquid", new BlockProperties(), new BlockStates(96, 111, 96), 100.0F));
+    public static final Block LAVA = register(new Block("minecraft:lava", "minecraft:liquid", new BlockProperties(), new BlockStates(96, 111, 96), -1.0F));
     public static final Block JUNGLE_TRAPDOOR = register(new Block("minecraft:jungle_trapdoor", "minecraft:trapdoor", new BlockProperties(), new BlockStates(6153, 6216, 6168), 3.0F));
     public static final Block BLACK_CARPET = register(new Block("minecraft:black_carpet", "minecraft:wool_carpet", new BlockProperties(), new BlockStates(10743, 10743, 10743), 0.1F));
     public static final Block FIRE_CORAL = register(new Block("minecraft:fire_coral", "minecraft:coral_plant", new BlockProperties(), new BlockStates(12829, 12830, 12829), 0.0F));
@@ -497,7 +497,7 @@ public final class Blocks {
     public static final Block GREEN_TERRACOTTA = register(new Block("minecraft:green_terracotta", "minecraft:block", new BlockProperties(), new BlockStates(9369, 9369, 9369), 1.25F));
     public static final Block RED_CANDLE_CAKE = register(new Block("minecraft:red_candle_cake", "minecraft:candle_cake", new BlockProperties(), new BlockStates(21027, 21028, 21028), 0.5F));
     public static final Block RED_CARPET = register(new Block("minecraft:red_carpet", "minecraft:wool_carpet", new BlockProperties(), new BlockStates(10742, 10742, 10742), 0.1F));
-    public static final Block WATER = register(new Block("minecraft:water", "minecraft:liquid", new BlockProperties(), new BlockStates(80, 95, 80), 100.0F));
+    public static final Block WATER = register(new Block("minecraft:water", "minecraft:liquid", new BlockProperties(), new BlockStates(80, 95, 80), -1.00F));
     public static final Block WHITE_CONCRETE = register(new Block("minecraft:white_concrete", "minecraft:block", new BlockProperties(), new BlockStates(12728, 12728, 12728), 1.8F));
     public static final Block MANGROVE_SLAB = register(new Block("minecraft:mangrove_slab", "minecraft:slab", new BlockProperties(), new BlockStates(11204, 11209, 11207), 2.0F));
     public static final Block OAK_WOOD = register(new Block("minecraft:oak_wood", "minecraft:rotated_pillar", new BlockProperties(), new BlockStates(189, 191, 190), 2.0F));

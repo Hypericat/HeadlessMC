@@ -42,8 +42,8 @@ public class BlockBreakTickCache {
         int bestSlot = 0;
         for (int i = 0; i < playerInventory.getHotbar().size(); i++) {
             ItemStack stack = playerInventory.getHotbar().get(i);
-            if (stack == null) continue;
-            int speed = getMiningTickCount(stack.getType(), block);
+            int speed = getMiningTickCount(stack == null ? null : stack.getType(), block);
+            //System.out.println("speed with stack " + stack + " : " + speed);
             if (speed < 0) continue;
             if (speed < bestSpeed) {
                 bestSpeed = speed;
@@ -67,7 +67,7 @@ public class BlockBreakTickCache {
         float hardness = block.getHardness();
         if (hardness < 0) return -1f;
 
-        float speed = itemType.getComponent().getTool().getSpeedAgainstBlock(block);
+        float speed = itemType == null ? 1F : itemType.getComponent().getTool().getSpeedAgainstBlock(block);
         if (speed > 1f && itemType.getComponent().getEnchantments().hasEnchantment(EnchantmentTypes.EFFICIENCY)) {
             int level = itemType.getComponent().getEnchantments().getByType(EnchantmentTypes.EFFICIENCY).getLevel();
             if (level > 0)

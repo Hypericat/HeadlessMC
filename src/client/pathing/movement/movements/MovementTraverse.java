@@ -44,8 +44,11 @@ public class MovementTraverse extends Movement {
             return cost;
         }
         for (Vec3i vec3i : invalid) {
+            for (Vec3i sur : vec3i.getSurrounding()) {
+                if (ctx.getWorld().getBlock(sur).shouldAvoidSurrounding()) return ActionCosts.COST_INF;
+            }
             double tick = getMiningDurationTicks(ctx, ctx.getWorld().getBlock(vec3i), false);
-            if (tick == ActionCosts.COST_INF) return ActionCosts.COST_INF;
+            if (tick >= ActionCosts.COST_INF) return ActionCosts.COST_INF;
             cost += tick;
         }
         return cost;

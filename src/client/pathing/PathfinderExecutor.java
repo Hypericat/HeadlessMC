@@ -64,7 +64,9 @@ public class PathfinderExecutor {
             Pathfinder pathfinder = new Pathfinder(instance.getPlayer().getBlockPos(), goal, new CalculationContext(instance.getWorld(), new BlockBreakTickCache(instance.getPlayer().getInventory())));
             currentPath = pathfinder.calculate();
             if (currentPath != null) {
-                instance.getLogger().logUser("Found path! Going to " + currentPath.positions().getLast());
+                instance.getLogger().logUser("Next block at " + instance.getWorld().getBlock(currentPath.positions().getLast()));
+                instance.getLogger().logUser("Found path! Going to " + currentPath.positions().getLast() + " type : " + instance.getWorld().getBlock(currentPath.positions().getLast()));
+
                 break;
             }
             instance.getLogger().logUser("Failed to find path!");

@@ -1,6 +1,7 @@
 package client.pathing.movement;
 
 import client.game.Block;
+import client.game.Blocks;
 import client.pathing.ActionCosts;
 import client.pathing.CalculationContext;
 import client.pathing.openset.MutableMoveResult;

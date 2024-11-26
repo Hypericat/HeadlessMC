@@ -49,33 +49,33 @@ public class Logger {
         this(account, false);
     }
 
-    private void consoleLog(String string) {
+    private synchronized void consoleLog(String string) {
         System.out.println(string);
         logBuffer.add(string);
     }
 
-    public void logUser(Object object) {
+    public synchronized void logUser(Object object) {
         this.consoleLog("[" + this.getName() + "] " +  object);
         checkLogBuffer();
     }
 
-    public void debug(Object object) {
+    public synchronized void debug(Object object) {
         if (!isDev) return;
         this.consoleLog("[DEBUG] " + object);
     }
 
-    public void err(Object object) {
+    public synchronized void err(Object object) {
         System.err.println("[ERROR] " + object);
         logBuffer.add("[ERROR] " + object);
         checkLogBuffer();
     }
 
-    public void logToFile(Object object) {
+    public synchronized void logToFile(Object object) {
         logBuffer.add(String.valueOf(object));
         checkLogBuffer();
     }
 
-    public void checkLogBuffer() {
+    public synchronized void checkLogBuffer() {
         if (logBuffer.size() >= flushMinCount) flush();
     }
 

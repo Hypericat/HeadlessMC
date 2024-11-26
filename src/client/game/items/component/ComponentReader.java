@@ -33,7 +33,7 @@ public class ComponentReader {
     public static void addValues(ItemType baseType, int amountToAdd, ByteBuf buf) {
         for (int i = 0; i < amountToAdd; i++) {
             int componentID = PacketUtil.readVarInt(buf);
-            System.out.println("ComponentID : " + componentID);
+            //System.out.println("ComponentID : " + componentID);
             baseType.getComponent().getComponentByID(componentID).read(buf);
         }
     }

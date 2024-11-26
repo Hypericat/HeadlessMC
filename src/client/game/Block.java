@@ -13,6 +13,7 @@ public class Block implements BlockTypeList {
     private final BlockStates states;
     private final float hardness;
     private final static HashSet<Block> noCollision = new HashSet<>();
+    private final static HashSet<Block> avoidSur = new HashSet<>();
 
     public Block(String name, String type, BlockProperties properties, BlockStates states, float hardness) {
         this.name = name;
@@ -53,13 +54,13 @@ public class Block implements BlockTypeList {
     public boolean hasCollision() {
         return !hasNoCollision();
     }
+
     public boolean hasNoCollision() {
         return noCollision.contains(this);
     }
 
     public static void initCollisions() {
-        //noCollision.add(Blocks.WATER); // For now put water
-
+        //noCollision.add(Blocks.WATER);
         noCollision.add(Blocks.AIR);
         noCollision.add(Blocks.OAK_SAPLING);
         noCollision.add(Blocks.SPRUCE_SAPLING);
@@ -214,6 +215,15 @@ public class Block implements BlockTypeList {
         noCollision.add(Blocks.PINK_PETALS);
         noCollision.add(Blocks.HANGING_ROOTS);
         noCollision.add(Blocks.FROGSPAWN);
+
+
+
+        avoidSur.add(Blocks.WATER);
+        avoidSur.add(Blocks.LAVA);
+    }
+
+    public boolean shouldAvoidSurrounding() {
+        return avoidSur.contains(this);
     }
 
     public boolean isUnbreakable() {

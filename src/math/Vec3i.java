@@ -34,6 +34,17 @@ public class Vec3i implements Comparable<Vec3i> {
         return new Vec3i((int) Math.ceil(vec3d.getX()), (int) Math.ceil(vec3d.getY()), (int) Math.ceil(vec3d.getZ()));
     }
 
+    public Vec3i[] getSurrounding() {
+        Vec3i[] vec3is = new Vec3i[6];
+        vec3is[0] = this.addY(1);
+        vec3is[1] = this.addY(-1);
+        vec3is[2] = this.addX(1);
+        vec3is[3] = this.addX(-1);
+        vec3is[4] = this.addZ(1);
+        vec3is[5] = this.addZ(-1);
+        return vec3is;
+    }
+
     public static long longHash(int x, int y, int z) {
         long hash = 3241;
         hash = 3457689L * hash + x;
